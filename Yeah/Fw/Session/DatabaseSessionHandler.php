@@ -13,7 +13,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface {
         register_shutdown_function('session_write_close');
         ini_set("session.gc_probability", 100);
         ini_set("session.gc_divisor", 1);
-        $id = isset($_COOKIE['SpoilersSession']) ? $_COOKIE['SpoilersSession'] : (isset($_GET['client_id']) ? $_GET['client_id'] : Various::generateRandomString(32));
+        $id = isset($_COOKIE['SpoilersSession']) ? $_COOKIE['SpoilersSession'] : (isset($_GET['client_id']) ? $_GET['client_id'] : \Yeah\Fw\Toolbox\Various::generateRandomString(32));
         $this->id = $id;
         session_name($this->name);
         session_id($this->id);

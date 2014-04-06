@@ -45,7 +45,7 @@ class Response {
     }
 
     public function setFlash($text, $type = 'info') {
-        Context::getInstance()->getSessionHandler()->setSessionParam('flash', array('text' => $text, 'type' => $type));
+        \Yeah\Fw\Application\Context::getInstance()->getSessionHandler()->setSessionParam('flash', array('text' => $text, 'type' => $type));
         return $this;
     }
 

@@ -65,7 +65,7 @@ class Context {
     public function executeAction($route) {
         $controller = $route['controller'];
         $method = $route['action'] . '_action';
-        $class = '\\' . $controller . 'Controller';
+        $class = '\\' . ucfirst($controller) . 'Controller';
         $this->controller = new $class($this->request, $this->response, $this->getSessionHandler(), $this->getLogger());
 
         if (!method_exists($this->controller, $method) || !is_callable($class . '::' . $method)) {
@@ -123,7 +123,7 @@ class Context {
 
     /**
      * 
-     * @return LoggerInterface
+     * @return \Yeah\Fw\Logger\LoggerInterface
      */
     public function getLogger() {
         return $this->logger;

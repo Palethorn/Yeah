@@ -17,7 +17,6 @@ abstract class PdoModel {
 
     public function __construct() {
         $this->dbAdapter = PdoConnection::getInstance();
-        $this->table = strtolower(get_class($this)) . 's';
         $this->schema = self::$schema[$this->table];
     }
 

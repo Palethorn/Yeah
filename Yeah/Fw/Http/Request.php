@@ -1,6 +1,6 @@
 <?php
-namespace Yeah\Fw\Http;
 
+namespace Yeah\Fw\Http;
 
 class Request {
 
@@ -21,7 +21,7 @@ class Request {
     }
 
     public function retrieveRequestHeaders() {
-        foreach($_SERVER as $key => $value) {
+        foreach ($_SERVER as $key => $value) {
             $key = strtolower(str_replace(array('-', '_', 'HTTP'), '', $key));
             $this->headers[$key] = $value;
         }
@@ -45,7 +45,7 @@ class Request {
 
     public function parseParameters() {
         $this->parseGetParameters();
-        $this->parseRequestBody();
+        $this->parsePostParameters();
     }
 
     public function parseGetParameters() {
@@ -59,34 +59,25 @@ class Request {
         }
         $this->parameters['controller'] = isset($params[0]) ? $params[0] : '';
         $this->parameters['action'] = isset($params[1]) ? $params[1] : NULL;
-        for($i = 0; $i < (count($params)); $i++) {
+        for ($i = 0; $i < (count($params)); $i++) {
             $next = $i + 1;
             $this->parameters[$params[$i]] = isset($params[$next]) ? $params[$next] : NULL;
         }
     }
 
-    public function parseRequestBody() {
-        if($this->getContentLength() == 0)
-            return;
-        $fp = fopen('php://input', 'r');
-        $this->requestBody = fread($fp, $this->getContentLength());
-        fclose($fp);
-        $params = explode('&', $this->requestBody);
-        foreach($params as $param) {
-            $pair = explode('=', $param);
-            if(count($pair) == 0) {
-                continue;
-            }
-            if(count($pair) == 1) {
-                $this->parameters[$pair[0]] = null;
-                continue;
-            }
-            $this->parameters[$pair[0]] = urldecode($pair[1]);
+    public function parsePostParameters() {
+        foreach ($_POST as $key => $value) {
+            $this->parameters[$key] = $value;
         }
     }
 
     public function getRequestBody() {
-        return $this->requestBody;
+        if($this->getContentLength() == 0) {
+            return '';
+        }
+        $fp = fopen('php://stdin', 'r');
+        $this->requestBody = fread($fp, $this->getContentLength());
+        fclose($fp);
     }
 
     public function get($key) {

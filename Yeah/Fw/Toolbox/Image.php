@@ -4,7 +4,7 @@ namespace Yeah\Fw\Toolbox;
 /**
  * @property type $name Description
  */
-class Image extends Imagick {
+class Image extends \Imagick {
 
     public $width;
     public $height;
