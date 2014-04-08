@@ -1,4 +1,5 @@
 <?php
+
 namespace Yeah\Fw\Mvc;
 
 /**
@@ -8,18 +9,19 @@ namespace Yeah\Fw\Mvc;
  */
 class Controller {
 
-    private $HasView = false;
-    private $view = null;
+    private $view = false;
     private $data = null;
     protected $session = null;
     protected $request = null;
     protected $response = null;
+    private $options = null;
 
-    public function __construct(\Yeah\Fw\Http\Request $request, \Yeah\Fw\Http\Response $response, \Yeah\Fw\Session\DatabaseSessionHandler $session, $logger) {
-        $this->session = $session;
-        $this->logger = $logger;
-        $this->request = $request;
-        $this->response = $response;
+    public function __construct($options) {
+        $this->options = $options;
+        $this->session = $options['session'];
+        $this->logger = $options['logger'];
+        $this->request = $options['request'];
+        $this->response = $options['response'];
     }
 
     public function execute($action) {
@@ -32,10 +34,9 @@ class Controller {
      * @return View
      */
     public function setView($view) {
-        $this->HasView = true;
-        $this->view = new View($view);
+        $this->view = new View($this->options['view']);
         $flash = $this->session->getSessionParam('flash');
-        if ($flash) {
+        if($flash) {
             $this->session->removeSessionParam('flash');
             $this->view->setMessage($flash['text'], $flash['type']);
         }
@@ -47,15 +48,14 @@ class Controller {
      * @return View
      */
     public function getView() {
+        if(!$this->view) {
+            $this->view = new \Yeah\Fw\Mvc\View($this->options['view']);
+        }
         return $this->view;
     }
 
     public function getData() {
         return $this->data;
-    }
-
-    public function hasView() {
-        return $this->HasView;
     }
 
     public function setData($data) {

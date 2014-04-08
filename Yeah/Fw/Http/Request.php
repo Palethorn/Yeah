@@ -8,7 +8,7 @@ class Request {
     private $parameters = array();
     private $method = '';
 
-    public function __construct() {
+    public function __construct($options = array()) {
         $this->retrieveRequestHeaders();
         $this->parseParameters();
     }

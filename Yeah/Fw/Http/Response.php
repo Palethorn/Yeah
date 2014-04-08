@@ -5,7 +5,7 @@ class Response {
 
     private $output = null;
 
-    public function __construct() {
+    public function __construct($options = array()) {
         $this->output = fopen('php://output', 'w');
     }
 

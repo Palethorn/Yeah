@@ -4,16 +4,26 @@ namespace Yeah\Fw\Mvc;
 class View {
 
     public $params = array();
+    private $options = array();
+    private $name = false;
 
-    public function __construct($view = false) {
-        $this->name = $view;
+    public function __construct($options = array()) {
+        $this->options = $options;
     }
-
+    
     public function __call($name, $arguments) {
         if(strpos($name, 'setMeta') === 0) {
             $key = str_replace('setMeta', '', $name);
             $this->setMeta($key, $arguments[0]);
         }
+    }
+    
+    /*
+     * @return View
+     */
+    public function setTemplate($template = false) {
+        $this->name = $template;
+        return $this;
     }
     
     public function setContent($content) {
@@ -56,10 +66,6 @@ class View {
         $this->title = $title;
         return $this;
     }
-
-    public function setMeta($key, $value) {
-        
-    }
     
     public function getTitle() {
         if(isset($this->title)) {
@@ -74,11 +80,11 @@ class View {
         }
         if(isset($this->layout)) {
             ob_start();
-            if(!file_exists(\Yeah\Fw\Application\Config::get('views') . DS . 'layouts' . DS . $this->layout . '.php')) {
+            if(!file_exists($this->options['views_dir'] . DS . 'layouts' . DS . $this->layout . '.php')) {
                 ob_end_clean();
                 throw new \Exception('Layout not found.', 500, null);
             }
-            require_once \Yeah\Fw\Application\Config::get('views') . DS . 'layouts' . DS . $this->layout . '.php';
+            require_once $this->options['views_dir'] . DS . 'layouts' . DS . $this->layout . '.php';
             $this->content = ob_get_contents();
             ob_end_clean();
         }
@@ -89,11 +95,11 @@ class View {
         $this->name = str_replace('/', DS, $this->name);
         $view = $this->name . '.php';
         ob_start();
-        if(!file_exists(\Yeah\Fw\Application\Config::get('views') . DS . $view)) {
+        if(!file_exists($this->options['views_dir'] . DS . $view)) {
             ob_end_clean();
             throw new \Exception('View not found.', 500, null);
         }
-        require_once \Yeah\Fw\Application\Config::get('views') . DS . $view;
+        require_once $this->options['views_dir'] . DS . $view;
         $this->content = ob_get_contents();
         ob_end_clean();
     }

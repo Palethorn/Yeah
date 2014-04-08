@@ -8,16 +8,13 @@ class FileLogger implements \Yeah\Fw\Logger\LoggerInterface {
 
     private $log = null;
     private $level = null;
+    private $options = array();
 
-    public function __construct($path, $level) {
-        $path = str_replace(array('/', '\\'), DS, $path);
+    public function __construct($options) {
+        $this->options = $options;
+        $path = str_replace(array('/', '\\'), DS, $options['log_path']);
         $this->log = new \Yeah\Fw\Filesystem\File($path, 'a');
-        $this->level = $level;
-    }
-
-    public function i($message) {
-        $message = '[' . date('d-m-Y H:i:s') . '] Info - ' . $message . PHP_EOL;
-        $this->log->write($message);
+        $this->level = $options['log_level'];
     }
 
     public function emergency($message, array $context = array()) {

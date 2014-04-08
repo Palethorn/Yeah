@@ -12,25 +12,18 @@ class PdoConnection extends \PDO {
     private static $username = null;
     private static $password = null;
     
-    public function __construct($dsn, $username, $password) {
-        parent::__construct($dsn, $username, $password, array());
-        $this->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $this->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-        $this->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
+    public function __construct($options) {
+        parent::__construct(self::$dsn, self::$username, self::$password, array(
+            \PDO::ATTR_PERSISTENT => true,
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_EMULATE_PREPARES => false,
+            \PDO::ATTR_STRINGIFY_FETCHES => false
+        ));
     }
 
     public static function configure($dsn, $username, $password) {
         self::$dsn = $dsn;
         self::$username = $username;
         self::$password = $password;
-    }
-    /**
-     * @return PdoConnection
-     */
-    public static function getInstance() {
-        if(self::$instance == null) {
-            self::$instance = new PdoConnection(self::$dsn, self::$username, self::$password);
-        }
-        return self::$instance;
     }
 }
