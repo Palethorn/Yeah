@@ -69,7 +69,7 @@ class Controller {
 
     /**
      * 
-     * @return Response
+     * @return \Yeah\Fw\Http\Response
      */
     public function getResponse() {
         return $this->response;

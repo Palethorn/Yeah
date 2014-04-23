@@ -4,7 +4,7 @@ namespace Yeah\Fw\Aaa;
 
 /**
  * @property Context $context Current context
- * @property SessionHandlerInterface $sessionHandler Session handler object
+ * @property SessionHandlerInterface $session_handler Session handler object
  */
 class DatabaseAuth implements AuthInterface {
 
@@ -26,6 +26,10 @@ class DatabaseAuth implements AuthInterface {
 
     public function setAuthenticated($value) {
         $this->session_handler->setSessionParam('is_authenticated', $value);
+    }
+    
+    public function destroy() {
+        $this->session_handler->destroy(null);
     }
 
 }

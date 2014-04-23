@@ -8,6 +8,7 @@ namespace Yeah\Fw\Application;
  * @property Router $router Desc
  * @property SessionHandlerInterface $session Description
  * @property Logger $logger Description
+ * @property DatabaseAuth $auth Desc
  */
 class App {
 
@@ -17,6 +18,7 @@ class App {
     private $router = null;
     private $session = null;
     private $logger = null;
+    private $auth = null;
 
     private function __construct($options = array()) {
         $this->options = $options;
@@ -33,7 +35,7 @@ class App {
         $this->request = new $this->options['app']['factories']['request']['class']($this->options['app']['factories']['request']);
         $this->response = new $this->options['app']['factories']['response']['class']($this->options['app']['factories']['response']);
         $this->router = new $this->options['app']['factories']['router']['class']($this->options['app']['factories']['router']);
-        $this->auth = new $this->options['app']['factories']['auth']['class']($this->options['app']['factories']['auth']);
+        $this->auth = new $this->options['app']['factories']['auth']['class'](array('session_handler' => $this->session));
     }
 
     public function execute() {

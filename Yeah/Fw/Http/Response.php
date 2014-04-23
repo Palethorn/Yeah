@@ -13,6 +13,10 @@ class Response {
         http_response_code($code);
     }
 
+    public function setContentType($content_type) {
+        $this->header("Content-Type", $content_type);
+    }
+    
     public function writeJson($output) {
         $this->header('Content-Type', 'application/json');
         fwrite($this->output, $output);
@@ -45,7 +49,7 @@ class Response {
     }
 
     public function setFlash($text, $type = 'info') {
-        \Yeah\Fw\Application\Context::getInstance()->getSessionHandler()->setSessionParam('flash', array('text' => $text, 'type' => $type));
+        \Yeah\Fw\Application\App::getInstance()->getSessionHandler()->setSessionParam('flash', array('text' => $text, 'type' => $type));
         return $this;
     }
 

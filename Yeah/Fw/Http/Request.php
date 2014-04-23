@@ -6,7 +6,8 @@ class Request {
 
     private $headers = array();
     private $parameters = array();
-    private $method = '';
+    private $method = null;
+    private $requestBody = null;
 
     public function __construct($options = array()) {
         $this->retrieveRequestHeaders();
@@ -75,9 +76,11 @@ class Request {
         if($this->getContentLength() == 0) {
             return '';
         }
-        $fp = fopen('php://stdin', 'r');
-        $this->requestBody = fread($fp, $this->getContentLength());
-        fclose($fp);
+        if($this->requestBody) {
+            return $this->requestBody;
+        }
+        $this->requestBody = file_get_contents('php://input');
+        return $this->requestBody;
     }
 
     public function get($key) {

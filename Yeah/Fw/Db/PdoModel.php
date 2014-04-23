@@ -28,12 +28,13 @@ abstract class PdoModel {
         $this->schema = self::$schema[$this->table];
     }
 
-    public static function findBy($field, $arg, $return_as_object = true) {
-        $query = "select * from $this->table where " . $field . '=' . $arg;
+    public function findBy($field, $arg, $return_as_object = true) {
+        $query = "select * from " . $this->table . " where " . $field . '=\'' . $arg . '\'';
         try {
             $r = $this->db_adapter->query($query);
             if($return_as_object) {
-                return $r->fetch(\PDO::FETCH_CLASS, get_class());
+                $r->setFetchMode(\PDO::FETCH_INTO, $this);
+                return $r->fetch();
             } else {
                 return $r->fetch(\PDO::FETCH_ASSOC);
             }
@@ -44,11 +45,15 @@ abstract class PdoModel {
 
     public function findAll($return_as_object = true) {
         $query = "select * from " . $this->table;
-        $r = $this->db_adapter->query($query);
-        if($return_as_object) {
-            return $r->fetchAll(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, get_class($this));
+        try {
+            $r = $this->db_adapter->query($query);
+            if($return_as_object) {
+                return $r->fetchAll(\PDO::FETCH_INTO | \PDO::FETCH_PROPS_LATE, get_class($this));
+            }
+            return $r->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            throw new \Exception('Error in SQL query!', 500, null);
         }
-        return $r->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function save() {
