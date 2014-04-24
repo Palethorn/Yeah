@@ -48,7 +48,7 @@ abstract class PdoModel {
         try {
             $r = $this->db_adapter->query($query);
             if($return_as_object) {
-                return $r->fetchAll(\PDO::FETCH_INTO | \PDO::FETCH_PROPS_LATE, get_class($this));
+                return $r->fetchAll(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, get_class($this));
             }
             return $r->fetchAll(\PDO::FETCH_ASSOC);
         } catch (Exception $e) {
