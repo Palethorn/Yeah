@@ -6,6 +6,7 @@ class View {
     public $params = array();
     private $options = array();
     private $name = false;
+    private $content = '';
 
     public function __construct($options = array()) {
         $this->options = $options;
