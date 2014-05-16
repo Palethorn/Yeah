@@ -1,4 +1,5 @@
 <?php
+
 namespace Yeah\Fw\Application;
 
 class Router {
@@ -11,9 +12,11 @@ class Router {
         }
     }
 
-    public static function get($route) {
-        if(isset(self::$routes[$route])) {
-            return self::$routes[$route];
+    public static function get($req) {
+        foreach (self::$routes as $pattern => $route) {
+            if(preg_match($pattern, $req)) {
+                return $route;
+            }
         }
         return false;
     }
@@ -22,27 +25,34 @@ class Router {
         unset(self::$routes[$route]);
     }
 
-    public function handle(\Yeah\Fw\Http\Request $request) {
-        $request_uri = $request->getRequestUri();
+    public function handle($request) {
         $controller = $request->getParameter('controller');
-        $action = $request->getParameter('action') . '_action';
-        $route = array('controller' => $controller, 'action' => $request->getParameter('action'));
-        if(($r = self::get($request_uri))) {
-            $c = $r['controller'];
-            $request->setParameter('controller', $c);
-            if(isset($r['restful'])) {
-                if(!isset($r['restful'][$request->getRequestMethod()])) {
-                    throw new \Exception('No allowed methods', 405, null);
-                }
-
-                $action = $r['restful'][$request->getRequestMethod()];
+        $action = $request->getParameter('action');
+        $request_uri = $this->combine($controller, $action);
+        if(($route = self::get($request_uri))) {
+            $controller = $route['controller'];
+            $request->setParameter('controller', $controller);
+            if(isset($route['restful'])) {
+                $this->checkMethod($route, $request->getRequestMethod());
+                $action = $route['restful'][$request->getRequestMethod()];
                 $request->setParameter('action', $action);
             } else {
-                $action = $r['action'] . '_action';
-                $request->setParameter('action', $r['action']);
+                $request->setParameter('action', $route['action']);
             }
-            $route = $r;
+            return $route;
         }
+        $route = array('controller' => $controller, 'action' => $action);
         return $route;
     }
+
+    public function checkMethod($route, $method) {
+        if(!isset($route['restful'][$method])) {
+            throw new \Exception('No allowed methods', 405, null);
+        }
+    }
+
+    public function combine($controller, $action) {
+        return '/' . ($controller ? $controller : '') . ($action ? '/' . $action : '');
+    }
+
 }
