@@ -70,7 +70,6 @@ class App {
      * 
      */
     public function executeAction($route) {
-        var_dump($route); die();
         $controller = $route['controller'];
         $method = $route['action'] . '_action';
         $class = '\\' . ucfirst($controller) . 'Controller';
