@@ -1,7 +1,7 @@
 <?php
 namespace Yeah\Fw\Db;
 
-class PdoLoader {
+class PdoAdapter implements \Yeah\Fw\Db\AdapterInterface {
 
     public function init($options) {
         PdoConnection::configure($options['dsn'], $options['db_user'], $options['db_password']);

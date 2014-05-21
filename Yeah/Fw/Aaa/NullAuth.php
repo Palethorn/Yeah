@@ -2,7 +2,7 @@
 
 namespace Yeah\Fw\Aaa;
 
-class NullAuth implements AuthInterface {
+class NullAuth implements \Yeah\Fw\Aaa\AuthInterface {
 
     function getUser() {
         return array();

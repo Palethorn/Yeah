@@ -29,7 +29,7 @@ class App {
     public function createInstances() {
         (new \Yeah\Fw\Application\Autoloader())->setIncludePath($this->options['app']['paths']['models'])->register();
         (new \Yeah\Fw\Application\Autoloader())->setIncludePath($this->options['app']['paths']['controllers'])->register();
-        (new \Yeah\Fw\Db\PdoLoader())->init($this->options['app']['database']);
+        (new $this->options['app']['database']['adapter']())->init($this->options['app']['database']);
         $this->logger = new $this->options['app']['factories']['logger']['class']($this->options['app']['factories']['logger']);
         $this->session = new $this->options['app']['factories']['session_handler']['class']($this->options['app']['database']);
         $this->request = new $this->options['app']['factories']['request']['class']($this->options['app']['factories']['request']);
@@ -70,6 +70,7 @@ class App {
      * 
      */
     public function executeAction($route) {
+        var_dump($route); die();
         $controller = $route['controller'];
         $method = $route['action'] . '_action';
         $class = '\\' . ucfirst($controller) . 'Controller';
