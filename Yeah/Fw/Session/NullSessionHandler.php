@@ -1,5 +1,7 @@
 <?php
+
 namespace Yeah\Fw\Session;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -11,7 +13,8 @@ namespace Yeah\Fw\Session;
  *
  * @author david
  */
-class NullSessionHandler implements \SessionHandlerInterface {
+class NullSessionHandler extends SessionHandlerAbstract {
+
     public function close() {
         
     }
@@ -33,6 +36,18 @@ class NullSessionHandler implements \SessionHandlerInterface {
     }
 
     public function write($session_id, $session_data) {
+        
+    }
+
+    public function setSessionParam($key, $value) {
+        
+    }
+
+    public function getSessionParam($key) {
+        return false;
+    }
+
+    public function removeSessionParam($key) {
         
     }
 
