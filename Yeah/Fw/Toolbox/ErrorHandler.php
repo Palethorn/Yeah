@@ -60,11 +60,7 @@ class ErrorHandler {
 
     public function render($options) {
         http_response_code(500);
-        if(!isset($_SERVER['CONTENT_TYPE']) || (isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] == 'text/html')) {
-            $this->renderHtml($options);
-        } else if(isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] == 'application/json') {
-            echo json_encode(array('error' => $options));
-        }
+        $this->renderHtml($options);
     }
 
     public function renderHtml($options) {

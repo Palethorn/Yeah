@@ -29,7 +29,10 @@ abstract class PdoModel {
     }
 
     public function findBy($field, $arg, $return_as_object = true) {
-        $query = "select * from " . $this->table . " where " . $field . '=\'' . $arg . '\'';
+        if($field != 'id') {
+            $arg = '\'' . $arg . '\'';
+        }
+        $query = "select * from " . $this->table . " where " . $field . '=' . $arg;
         try {
             $r = $this->db_adapter->query($query);
             if($return_as_object) {
@@ -70,11 +73,16 @@ abstract class PdoModel {
         foreach ($this->schema as $property => $options) {
             if(isset($this->$property)) {
                 $columns[] = $property;
-                $values[] = "'" . $this->$property . "'";
+                if($options['pdo_type'] == \PDO::PARAM_INT) {
+                    $values[] = $this->$property;
+                } else {
+                    $values[] = "'" .  $this->$property . "'";
+                }
             }
         }
         $query = 'insert into ' . $this->table . '(' . implode(',', $columns) . ') ' . 'values(' . implode(',', $values) . ')';
         $this->db_adapter->query($query);
+        $this->id = $this->db_adapter->lastInsertId();
     }
 
     public function update() {
