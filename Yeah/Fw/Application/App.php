@@ -31,7 +31,7 @@ class App {
         (new \Yeah\Fw\Application\Autoloader())->setIncludePath($this->options['app']['paths']['controllers'])->register();
         (new $this->options['app']['database']['adapter']())->init($this->options['app']['database']);
         $this->logger = new $this->options['app']['factories']['logger']['class']($this->options['app']['factories']['logger']);
-        $this->session = new $this->options['app']['factories']['session_handler']['class']($this->options['app']['database']);
+        $this->session = new $this->options['app']['factories']['session_handler']['class']($this->options['app']);
         $this->request = new $this->options['app']['factories']['request']['class']($this->options['app']['factories']['request']);
         $this->response = new $this->options['app']['factories']['response']['class']($this->options['app']['factories']['response']);
         $this->router = new $this->options['app']['factories']['router']['class']($this->options['app']['factories']['router']);
@@ -60,7 +60,7 @@ class App {
         if(isset($route['secure']) && $route['secure'] == true) {
             $auth = $this->getAuth();
             if(!$auth->isAuthenticated()) {
-                $this->getResponse()->setFlash('You are not logged in!')->redirect('/user/login');
+                $this->getResponse()->setFlash('You are not logged in!')->redirect($this->options['app']['default_login']);
             }
         }
         return $route;

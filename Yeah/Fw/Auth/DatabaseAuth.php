@@ -1,6 +1,6 @@
 <?php
 
-namespace Yeah\Fw\Aaa;
+namespace Yeah\Fw\Auth;
 
 /**
  * Yeah authentication class

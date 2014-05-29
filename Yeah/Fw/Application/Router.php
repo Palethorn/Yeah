@@ -36,6 +36,7 @@ class Router {
                 $this->checkMethod($route, $request->getRequestMethod());
                 $action = $route['restful'][$request->getRequestMethod()];
                 $request->setParameter('action', $action);
+                $route['action'] = $action;
             } else {
                 $request->setParameter('action', $route['action']);
             }

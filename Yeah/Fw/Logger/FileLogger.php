@@ -51,7 +51,7 @@ class FileLogger implements \Yeah\Fw\Logger\LoggerInterface {
 
     public function log($level, $message, array $context = array()) {
         if($level <= $this->level) {
-            $this->log->write($message);
+            $this->log->write($message . PHP_EOL);
         }
     }
 

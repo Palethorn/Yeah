@@ -10,6 +10,10 @@ class DatabaseSessionHandler implements \SessionHandlerInterface {
     private $db = null;
 
     public function __construct($options) {
+        if($options['static_url'] == 'http://' . $_SERVER['HTTP_HOST']) {
+            return;
+        }
+        $db_conf = $options['database'];
         register_shutdown_function('session_write_close');
         ini_set("session.gc_probability", 100);
         ini_set("session.gc_divisor", 1);
@@ -22,7 +26,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface {
                 array($this, 'open'), array($this, 'close'), array($this, 'read'), array($this, 'write'), array($this, 'destroy'), array($this, 'gc')
         );
         
-        $this->db = new \PDO($options['dsn'], $options['db_user'], $options['db_password']);
+        $this->db = new \PDO($db_conf['dsn'], $db_conf['db_user'], $db_conf['db_password']);
         session_start();
     }
 

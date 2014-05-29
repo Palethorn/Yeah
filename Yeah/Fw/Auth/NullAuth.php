@@ -1,8 +1,8 @@
 <?php
 
-namespace Yeah\Fw\Aaa;
+namespace Yeah\Fw\Auth;
 
-class NullAuth implements \Yeah\Fw\Aaa\AuthInterface {
+class NullAuth implements AuthInterface {
 
     function getUser() {
         return array();
