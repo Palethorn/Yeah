@@ -2,15 +2,42 @@
 
 namespace Yeah\Fw\Application;
 
+/*
+ * Used for for automatic loading of required files.
+ * Designed for low performance hit and low resource consuption.
+ * 
+ */
+
 class Autoloader {
 
-    private $include_path = '';
+    private $include_path = null;
 
+    /*
+     * Sets the path where the autoloader should look for required files
+     * 
+     * @param string $inc_path Include path parameter
+     * 
+     * @return \Yeah\Fw\Application\Autoloader
+     */
     public function setIncludePath($inc_path) {
         $this->include_path = $inc_path;
         return $this;
     }
 
+    /**
+     * Getter for include path
+     * 
+     * @return string
+     */
+    public function getIncludePath() {
+        return $this->include_path;
+    }
+
+    /**
+     * Automatically loads required file based on it's namespace
+     * 
+     * @param string $class_name Class name with its appropriate namespace
+     */
     function autoload($class_name) {
         $class_name = ltrim($class_name, '\\');
         $file_name = '';
@@ -26,11 +53,22 @@ class Autoloader {
         }
     }
 
+    /**
+     * Instructs autoloader to begin listening for class requirements
+     * 
+     * @return \Yeah\Fw\Application\Autoloader
+     */
     public function register() {
         spl_autoload_register(array($this, 'autoload'));
         return $this;
     }
 
+    /**
+     * 
+     * Stops autoloader for further listening
+     * 
+     * @return \Yeah\Fw\Application\Autoloader
+     */
     public function unregister() {
         spl_autoload_unregister(array($this, 'autoload'));
         return $this;

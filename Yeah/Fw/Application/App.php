@@ -3,12 +3,7 @@
 namespace Yeah\Fw\Application;
 
 /**
- * @property Request $request Description
- * @property Response $response Description
- * @property Router $router Desc
- * @property SessionHandlerInterface $session Description
- * @property Logger $logger Description
- * @property DatabaseAuth $auth Desc
+ * 
  */
 class App {
 
@@ -20,13 +15,21 @@ class App {
     private $logger = null;
     private $auth = null;
 
+    /**
+     * Class constructor.
+     * @param mixed $options Configuration options
+     * 
+     */
     private function __construct($options = array()) {
         $this->options = $options;
         $this->options['app'] = require_once $options['paths']['app_dir'] . DS . 'config' . DS . 'AppConfiguration.php';
         $this->createInstances();
     }
 
-    public function createInstances() {
+    /**
+     * Creates application instances from application settings.
+     */
+    private function createInstances() {
         (new \Yeah\Fw\Application\Autoloader())->setIncludePath($this->options['app']['paths']['models'])->register();
         (new \Yeah\Fw\Application\Autoloader())->setIncludePath($this->options['app']['paths']['controllers'])->register();
         (new $this->options['app']['database']['adapter']())->init($this->options['app']['database']);
@@ -38,8 +41,10 @@ class App {
         $this->auth = new $this->options['app']['factories']['auth']['class'](array('session_handler' => $this->session));
     }
 
+    /**
+     * Begins chain execution
+     */
     public function execute() {
-        // Chain execution
         $ret = $this->executeRouter();
         $ret = $this->executeSecurity($ret);
         $ret = $this->executeAction($ret);
@@ -47,16 +52,21 @@ class App {
     }
 
     /**
-     * 
+     * Fetches the route inside of a chain execution.
+     * Don't invoke unless you know what you're doing.
      */
-    public function executeRouter() {
+    private function executeRouter() {
         return $this->router->handle($this->request);
     }
 
     /**
+     * Executes access checkup inside chain execution.
+     * Don't invoke unless you know what you're doing.
      * 
+     * @param mixed $route Route options
+     * @return mixed Route options
      */
-    public function executeSecurity($route) {
+    private function executeSecurity($route) {
         if(isset($route['secure']) && $route['secure'] == true) {
             $auth = $this->getAuth();
             if(!$auth->isAuthenticated()) {
@@ -67,9 +77,13 @@ class App {
     }
 
     /**
+     * Executes action inside chain execution.
+     * Don't invoke unless you know what you're doing.
      * 
+     * @param mixed $route Route options
+     * @return \Yeah\Fw\Mvc\View Controller view object
      */
-    public function executeAction($route) {
+    private function executeAction($route) {
         $controller = $route['controller'];
         $method = $route['action'] . '_action';
         $class = '\\' . ucfirst($controller) . 'Controller';
@@ -92,9 +106,12 @@ class App {
     }
 
     /**
+     * Executes view rendering inside chain execution.
+     * Don't invoke unless you know what you're doing.
      * 
+     * @param \Yeah\Fw\Mvc\View $view Controller view object
      */
-    public function executeRender($view) {
+    private function executeRender($view) {
         if($this->getRequest()->getContentType() == 'application/json') {
             $this->response->writeJson($view->render());
         } else if($view != null) {
@@ -105,22 +122,25 @@ class App {
     }
 
     /**
+     * getter for HTTP request object
      * 
-     * @return Request
+     * @return \Yeah\Fw\Http\Request
      */
     public function getRequest() {
         return $this->request;
     }
 
     /**
+     * Getter for HTTP response object
      * 
-     * @return Response
+     * @return \Yeah\Fw\Http\Response
      */
     public function getResponse() {
         return $this->response;
     }
 
     /**
+     * Getter for session handler object
      * 
      * @return SessionHandlerInterface
      */
@@ -129,14 +149,16 @@ class App {
     }
 
     /**
+     * Getter for authentication object
      * 
-     * @return Auth
+     * @return \Yeah\Fw\Auth\AuthInterface
      */
     public function getAuth() {
         return $this->auth;
     }
 
     /**
+     * Getter for logger object
      * 
      * @return \Yeah\Fw\Logger\LoggerInterface
      */
@@ -149,8 +171,10 @@ class App {
     }
 
     /**
+     * Returns current application instance
      * 
-     * @return Context
+     * @param mixed $options Application options
+     * @return \Yeah\Fw\Application\App
      */
     public static function getInstance($options = null) {
         if(!isset(static::$instance)) {

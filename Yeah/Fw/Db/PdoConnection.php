@@ -2,9 +2,8 @@
 namespace Yeah\Fw\Db;
 
 /**
- * @property PDO $instance PDO object instance
+ * PDO connection class
  */
-
 class PdoConnection extends \PDO {
 
     private static $instance = null;
@@ -12,6 +11,11 @@ class PdoConnection extends \PDO {
     private static $username = null;
     private static $password = null;
     
+    /**
+     * Creates PdoConnection object
+     * 
+     * @param mixed $options PdoConnection options
+     */
     public function __construct($options) {
         parent::__construct(self::$dsn, self::$username, self::$password, array(
             \PDO::ATTR_PERSISTENT => true,
@@ -21,6 +25,14 @@ class PdoConnection extends \PDO {
         ));
     }
 
+    /**
+     * Called from \Yeah\Fw\Db\PdoAdapter
+     * Sets global database options
+     * 
+     * @param string $dsn
+     * @param string $username
+     * @param string $password
+     */
     public static function configure($dsn, $username, $password) {
         self::$dsn = $dsn;
         self::$username = $username;

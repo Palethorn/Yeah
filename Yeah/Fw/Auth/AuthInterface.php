@@ -2,6 +2,9 @@
 
 namespace Yeah\Fw\Auth;
 
+/**
+ * Interface for authentication class implementation
+ */
 interface AuthInterface {
     /**
      * Return session user object
