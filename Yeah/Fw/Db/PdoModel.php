@@ -4,6 +4,8 @@ namespace Yeah\Fw\Db;
 
 /**
  * Provides abstract implementation of database model class
+ * 
+ * @author David Cavar
  */
 abstract class PdoModel {
 
@@ -42,7 +44,7 @@ abstract class PdoModel {
         $this->db_adapter = new PdoConnection(\Yeah\Fw\Application\Config::get('database'));
         $this->schema = self::$schema[$this->table];
     }
-    
+
     /**
      * Finds record by specified table field and value
      * 
@@ -109,13 +111,13 @@ abstract class PdoModel {
     private function insert() {
         $values = array();
         $columns = array();
-        foreach ($this->schema as $property => $options) {
+        foreach($this->schema as $property => $options) {
             if(isset($this->$property)) {
                 $columns[] = $property;
                 if($options['pdo_type'] == \PDO::PARAM_INT) {
                     $values[] = $this->$property;
                 } else {
-                    $values[] = "'" .  $this->$property . "'";
+                    $values[] = "'" . $this->$property . "'";
                 }
             }
         }
@@ -129,7 +131,7 @@ abstract class PdoModel {
      */
     public function update() {
         $columns = array();
-        foreach ($this->schema as $property => $options) {
+        foreach($this->schema as $property => $options) {
             if(isset($this->$property)) {
                 $columns[] = $property . '=' . $this->$property;
             }

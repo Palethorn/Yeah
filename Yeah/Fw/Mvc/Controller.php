@@ -24,11 +24,17 @@ class Controller {
         $this->response = $options['response'];
     }
 
+    /**
+     * Executes controller action if implemented
+     * 
+     * @param string $action
+     */
     public function execute($action) {
         $this->$action($this->request);
     }
 
     /**
+     * Sets controller view
      * 
      * @param string $view
      * @return View
@@ -44,6 +50,7 @@ class Controller {
     }
 
     /**
+     * Fetches current view
      * 
      * @return View
      */
@@ -54,20 +61,38 @@ class Controller {
         return $this->view;
     }
 
+    /**
+     * Fetches controller response data
+     * 
+     * @return string
+     */
     public function getData() {
         return $this->data;
     }
 
+    /**
+     * Sets controller response data. Not called if the controller has a view
+     * 
+     * @param string $data
+     */
     public function setData($data) {
         $this->data = $data;
     }
 
+    /**
+     * Sets user message to display
+     * 
+     * @param string $text
+     * @param string $type
+     * @return \Yeah\Fw\Mvc\Controller
+     */
     public function setFlash($text, $type = 'info') {
         $this->session->setSessionParam('flash', array('text' => $text, 'type' => $type));
         return $this;
     }
 
     /**
+     * Fetches HTTP response object
      * 
      * @return \Yeah\Fw\Http\Response
      */
@@ -76,6 +101,7 @@ class Controller {
     }
 
     /**
+     * Fetches HTTP request object
      * 
      * @return Request
      */
@@ -83,6 +109,11 @@ class Controller {
         return $this->request;
     }
 
+    /**
+     * Redirects client to another URI
+     * 
+     * @param string $uri
+     */
     public function redirect($uri) {
         $this->response->redirect($uri);
     }

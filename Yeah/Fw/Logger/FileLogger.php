@@ -4,6 +4,10 @@ namespace Yeah\Fw\Logger;
 
 use Yeah\Fw\Logger\LogLevel;
 
+/**
+ * Implements LoggerInterface as per PSR-3 standard recommendation
+ * @link https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
+ */
 class FileLogger implements \Yeah\Fw\Logger\LoggerInterface {
 
     private $log = null;

@@ -4,6 +4,7 @@ namespace Yeah\Fw\Application;
 /**
  * Use for storing runtime configuration
  * 
+ * @author David Cavar
  */
 class Config {
     private static $config = array();

@@ -2,6 +2,11 @@
 
 namespace Yeah\Fw\Http;
 
+/**
+ * HTTP request implementation
+ * 
+ * @author David Cavar
+ */
 class Request {
 
     private $headers = array();
@@ -21,13 +26,22 @@ class Request {
         }
     }
 
+    /**
+     * Parses request headers
+     */
     public function retrieveRequestHeaders() {
-        foreach ($_SERVER as $key => $value) {
+        foreach($_SERVER as $key => $value) {
             $key = strtolower(str_replace(array('-', '_', 'HTTP'), '', $key));
             $this->headers[$key] = $value;
         }
     }
 
+    /**
+     * Retrieves request parameter
+     * 
+     * @param string $key
+     * @return string|boolean
+     */
     public function getParameter($key) {
         if(isset($this->parameters[$key])) {
             return $this->parameters[$key];
@@ -36,19 +50,36 @@ class Request {
         }
     }
 
+    /**
+     * Overwrites default request parameter
+     * 
+     * @param string $key
+     * @param mixed $value
+     */
     public function setParameter($key, $value) {
         $this->parameters[$key] = $value;
     }
 
+    /**
+     * Retrieves all request parameters
+     * 
+     * @return array
+     */
     public function getAllParameters() {
         return $this->parameters;
     }
 
+    /**
+     * Parses request parameters
+     */
     public function parseParameters() {
         $this->parseGetParameters();
         $this->parsePostParameters();
     }
 
+    /**
+     * Parses GET parameters
+     */
     public function parseGetParameters() {
         $params = str_replace('?', '/', $this->getRequestUri());
         $params = str_replace('=', '/', $params);
@@ -60,18 +91,26 @@ class Request {
         }
         $this->parameters['controller'] = isset($params[0]) ? $params[0] : '';
         $this->parameters['action'] = isset($params[1]) ? $params[1] : NULL;
-        for ($i = 0; $i < (count($params)); $i++) {
+        for($i = 0; $i < (count($params)); $i++) {
             $next = $i + 1;
             $this->parameters[$params[$i]] = isset($params[$next]) ? $params[$next] : NULL;
         }
     }
 
+    /**
+     * Parses POST parameters
+     */
     public function parsePostParameters() {
-        foreach ($_POST as $key => $value) {
+        foreach($_POST as $key => $value) {
             $this->parameters[$key] = $value;
         }
     }
 
+    /**
+     * Gets request POST content
+     * 
+     * @return string
+     */
     public function getRequestBody() {
         if($this->getContentLength() == 0) {
             return '';
@@ -83,6 +122,12 @@ class Request {
         return $this->requestBody;
     }
 
+    /**
+     * Retrieves header value
+     * 
+     * @param string $key
+     * @return string|boolean
+     */
     public function get($key) {
         if(isset($this->headers[$key])) {
             return $this->headers[$key];
@@ -91,10 +136,21 @@ class Request {
         }
     }
 
+    /**
+     * Sets header value
+     * 
+     * @param set $key
+     * @param mixed $value
+     */
     public function set($key, $value) {
         $this->headers[$key] = $value;
     }
 
+    /**
+     * Identifies HTTP request method (GET, POST, PUT, DELETE)
+     * 
+     * @return string
+     */
     public function getRequestMethod() {
         return $_SERVER['REQUEST_METHOD'];
     }

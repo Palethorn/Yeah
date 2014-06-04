@@ -4,6 +4,8 @@ namespace Yeah\Fw\Application;
 
 /**
  * Maps request URI to appropriate controller and action
+ * 
+ * @author David Cavar
  */
 class Router {
 
@@ -28,7 +30,7 @@ class Router {
      * @return mixed
      */
     public static function get($route) {
-        foreach (self::$routes as $pattern => $options) {
+        foreach(self::$routes as $pattern => $options) {
             if(preg_match($pattern, $route)) {
                 return $options;
             }
@@ -45,13 +47,12 @@ class Router {
         unset(self::$routes[$route]);
     }
 
-    
-   /**
-    * Handles route request
-    * 
-    * @param \Yeah\Fw\Http\Request $request HTTP request object
-    * @return mixed Route options
-    */
+    /**
+     * Handles route request
+     * 
+     * @param \Yeah\Fw\Http\Request $request HTTP request object
+     * @return mixed Route options
+     */
     public function handle($request) {
         $controller = $request->getParameter('controller');
         $action = $request->getParameter('action');

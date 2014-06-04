@@ -1,7 +1,10 @@
 <?php
 namespace Yeah\Fw\Form;
 
-class ComboBoxComponent implements ComponentInterface {
+/**
+ * 
+ */
+class ComboBoxHtmlComponent implements HtmlComponentInterface {
 
     private $options = array();
 

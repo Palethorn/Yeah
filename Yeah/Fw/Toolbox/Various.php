@@ -2,6 +2,10 @@
 namespace Yeah\Fw\Toolbox;
 
 class Various {
+    /**
+     * Generates random string of specified length
+     * @param int length
+     */
     public static function generateRandomString($length) {
         $pool = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUWXYZ';
         $pool = str_shuffle($pool);

@@ -1,7 +1,9 @@
 <?php
 
 namespace Yeah\Fw\Toolbox;
-
+/**
+ * Handles PHP errors and exceptions in a safe way
+ */
 class ErrorHandler {
 
     const TYPE_EXCEPTION = 0;
@@ -9,6 +11,11 @@ class ErrorHandler {
 
     private $handled = false;
 
+    /**
+     * 
+     * @param int $error_reporting specified error reporting level
+     * @param bool $display_errors Should php display errors on screen
+     */
     public function __construct($error_reporting = E_ALL, $display_errors = 1) {
         $this->handled = false;
 
@@ -20,6 +27,13 @@ class ErrorHandler {
         register_shutdown_function(array($this, 'shutdownHandler'));
     }
 
+    /**
+     * 
+     * @param int $errno Error number
+     * @param string $errstr Error message
+     * @param string $errfile Filepath where the error occured
+     * @param string $errline Line in a file where error occured
+     */
     public function errorHandler($errno, $errstr, $errfile, $errline, $errcontext) {
         $this->handled = true;
         if($errno & error_reporting()) {
@@ -35,6 +49,11 @@ class ErrorHandler {
         }
     }
 
+    /**
+     * Handler for exceptions. Ignored on redirect exception
+     * 
+     * @param \Exception $e Caught exception
+     */
     public function exceptionHandler(\Exception $e) {
         if($e->getCode() == '302') {
             return;
@@ -51,6 +70,10 @@ class ErrorHandler {
         die();
     }
 
+    /**
+     * Last resort error checking. Uset for E_ERROR E_CORE error types which are
+     * not cought by error handler
+     */
     public function shutdownHandler() {
         $error = error_get_last();
         if(!$this->handled && $error && ($error['type'] & error_reporting())) {
@@ -58,6 +81,11 @@ class ErrorHandler {
         }
     }
 
+    /**
+     * Renders information on screen when error occures
+     * 
+     * @param array $options Error parameters
+     */
     public function render($options) {
         http_response_code(500);
         $this->renderHtml($options);

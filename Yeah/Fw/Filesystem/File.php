@@ -1,6 +1,12 @@
 <?php
+
 namespace Yeah\Fw\Filesystem;
 
+/**
+ * Handles simple filesystem operations. Create, write and append.
+ * 
+ * @author David Cavar
+ */
 class File {
 
     private $fp;
@@ -48,11 +54,11 @@ class File {
     public function getSize() {
         return filesize($this->location);
     }
-    
+
     public function getLocation() {
         return $this->location;
     }
-    
+
     public function __destruct() {
         fclose($this->fp);
         $this->fp = null;

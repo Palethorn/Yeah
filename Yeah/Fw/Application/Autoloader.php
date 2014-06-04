@@ -6,6 +6,7 @@ namespace Yeah\Fw\Application;
  * Used for for automatic loading of required files.
  * Designed for low performance hit and low resource consuption.
  * 
+ * @author David Cavar
  */
 
 class Autoloader {

@@ -7,6 +7,8 @@ namespace Yeah\Fw\Auth;
  * Gets and sets user authentication data
  * 
  * @property SessionHandlerInterface $session_handler Session handler object
+ * 
+ * @author David Cavar
  */
 class DatabaseAuth implements AuthInterface {
 
@@ -55,7 +57,7 @@ class DatabaseAuth implements AuthInterface {
     public function setAuthenticated($value) {
         $this->session_handler->setSessionParam('is_authenticated', $value);
     }
-    
+
     /**
      * Destroys current session
      */

@@ -3,7 +3,15 @@
 namespace Yeah\Fw\Image;
 
 /**
- * @property type $name Description
+ * Imagick adapter with additional methods
+ * 
+ * @param float $width
+ * @param float $height
+ * @param string $format
+ * @param string $mime_type
+ * @param float $aspect_ratio
+ * 
+ * @author David Cavar
  */
 class ImagickAdapter extends \Imagick {
 
@@ -21,6 +29,9 @@ class ImagickAdapter extends \Imagick {
         $this->readParameters();
     }
 
+    /**
+     * Reads image parameters
+     */
     public function readParameters() {
         $this->width = $this->getimagewidth();
         $this->height = $this->getimageheight();
@@ -29,6 +40,13 @@ class ImagickAdapter extends \Imagick {
         $this->aspect_ratio = $this->width / $this->height;
     }
 
+    /**
+     * Gets maximum image size based on current size and specified aspect ratio,
+     * without distorting the picture
+     * 
+     * @param float $aspect_ratio
+     * @return array
+     */
     public function getMaxSize($aspect_ratio) {
         if($this->aspect_ratio > $aspect_ratio) {
             $height = $this->height;
@@ -40,12 +58,24 @@ class ImagickAdapter extends \Imagick {
         return array("width" => $width, 'height' => $height);
     }
 
+    /**
+     * Crops image based on specified image width, height and start point
+     * 
+     * @param array $params
+     * @return \Yeah\Fw\Image\ImagickAdapter
+     */
     public function crop($params) {
         $this->cropimage($params['crop_width'], $params['crop_height'], $params['x'], $params['y']);
         $this->readParameters();
         return $this;
     }
 
+    /**
+     * Resize picture based on specified width and height parameters
+     * 
+     * @param array $params
+     * @param bool $force
+     */
     public function resize($params, $force = false) {
         if($force) {
             $this->resizeimage($params['width'], $params['height'], \Imagick::FILTER_LANCZOS, 1);
@@ -53,18 +83,31 @@ class ImagickAdapter extends \Imagick {
         }
     }
 
+    /**
+     * Resize by width parameter with regard to image aspect ratio
+     * @param float $width
+     */
     public function resizeByWidth($width) {
         $height = $width / $this->aspect_ratio;
         $this->resizeimage($width, $height, \Imagick::FILTER_LANCZOS, 1);
         $this->readParameters();
     }
-
+    
+    /**
+     * Resize by height parameter with regard to image aspect ratio
+     * @param float $width
+     */
     public function resizeByHeight($height) {
         $width = $height * $this->aspect_ratio;
         $this->resizeimage($width, $height, \Imagick::FILTER_LANCZOS, 1);
         $this->readParameters();
     }
 
+    /**
+     * Writes centered text on image
+     * 
+     * @param array $params
+     */
     public function anotate($params) {
         $draw = new \ImagickDraw();
         $draw->setfillcolor($this->getInverted());
@@ -86,6 +129,11 @@ class ImagickAdapter extends \Imagick {
         $this->annotateimage($draw, $this->width - ($text_width / 2), $i, 0, $row);
     }
 
+    /**
+     * Gets inverted color based on image histogram
+     * 
+     * @return \ImagickPixel
+     */
     public function getInverted() {
         $histogram = $this->getimagehistogram();
         $imagick_pixel = end($histogram);

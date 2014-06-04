@@ -2,6 +2,10 @@
 
 namespace Yeah\Fw\Logger;
 
+/**
+ * This class provides no implementation of LoggerInterface. It should be used
+ * in applications with no need for logger.
+ */
 class NullLogger implements \Yeah\Fw\Logger\LoggerInterface {
 
     public function alert($message, array $context = array()) {

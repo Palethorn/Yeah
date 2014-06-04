@@ -1,8 +1,11 @@
 <?php
+
 namespace Yeah\Fw\Db;
 
 /**
  * Implements initialization of database adapter
+ * 
+ * @author David Cavar
  */
 class PdoAdapter implements \Yeah\Fw\Db\AdapterInterface {
 
@@ -15,4 +18,5 @@ class PdoAdapter implements \Yeah\Fw\Db\AdapterInterface {
         PdoConnection::configure($options['dsn'], $options['db_user'], $options['db_password']);
         PdoModel::configure($options['db_schema_path']);
     }
+
 }

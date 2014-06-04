@@ -1,8 +1,11 @@
 <?php
+
 namespace Yeah\Fw\Db;
 
 /**
  * PDO connection class
+ * 
+ * @author David Cavar
  */
 class PdoConnection extends \PDO {
 
@@ -10,7 +13,7 @@ class PdoConnection extends \PDO {
     private static $dsn = null;
     private static $username = null;
     private static $password = null;
-    
+
     /**
      * Creates PdoConnection object
      * 
@@ -38,4 +41,5 @@ class PdoConnection extends \PDO {
         self::$username = $username;
         self::$password = $password;
     }
+
 }

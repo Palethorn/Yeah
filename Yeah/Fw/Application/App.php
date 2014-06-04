@@ -3,7 +3,9 @@
 namespace Yeah\Fw\Application;
 
 /**
+ * Implements singleton pattern. Used for application request entry point
  * 
+ * @author David Cavar
  */
 class App {
 

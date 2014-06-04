@@ -1,8 +1,11 @@
 <?php
+
 namespace Yeah\Fw\Db;
 
 /**
  * Class for creating query objects used in a simple CRUD
+ * 
+ * @author David Cavar
  */
 class PdoQuery {
 
@@ -18,7 +21,7 @@ class PdoQuery {
         $this->parts[0] = 'select ' . $fields;
         return $this;
     }
-    
+
     /**
      * Adds FROM portion of the query
      * 

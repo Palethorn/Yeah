@@ -2,16 +2,13 @@
 
 namespace Yeah\Fw\Session;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Description of NullSessionHandler
- *
- * @author david
+ * This class does not provide any implementations. Should be used for applications
+ * with no session support.
+ * 
+ * @see DatabaseSessionHandler
+ * @see SessionHandlerAbstract
+ * 
  */
 class NullSessionHandler extends SessionHandlerAbstract {
 
@@ -50,6 +47,4 @@ class NullSessionHandler extends SessionHandlerAbstract {
     public function removeSessionParam($key) {
         
     }
-
-//put your code here
 }
