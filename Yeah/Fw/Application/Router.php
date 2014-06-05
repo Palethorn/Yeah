@@ -31,6 +31,7 @@ class Router {
      */
     public static function get($route) {
         foreach(self::$routes as $pattern => $options) {
+            $pattern .= '/'; // Ending delimiter
             if(preg_match($pattern, $route)) {
                 return $options;
             }
