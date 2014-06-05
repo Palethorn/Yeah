@@ -1,6 +1,6 @@
 <?php
 
-namespace \Yeah\Fw\Db;
+namespace Yeah\Fw\Db;
 
 /**
  * Doesn't provide \Yeah\Fw\Db\AdapterInterface implementation.
