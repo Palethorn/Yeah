@@ -59,7 +59,7 @@ abstract class PdoModel {
         if($field != 'id') {
             $arg = '\'' . $arg . '\'';
         }
-        $query = "select * from " . $this->table . " where " . $field . '=' . $arg . ' limit 1';
+        $query = "select * from " . $this->table . " where " . $field . '=' . $arg . ' limit 0, 1';
         try {
             $r = $this->db_adapter->query($query);
             if($return_as_object) {

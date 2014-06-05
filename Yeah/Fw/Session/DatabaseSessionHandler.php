@@ -9,7 +9,7 @@ namespace Yeah\Fw\Session;
  * @property string $name Session name as it appears in cookie
  * @property int $last_access Session timestamp
  */
-class DatabaseSessionHandler implements SessionHandlerAbstract {
+class DatabaseSessionHandler extends SessionHandlerAbstract {
 
     private $params = array();
     private $id = '';
