@@ -20,4 +20,8 @@ interface HtmlComponentInterface {
     function validate();
 
     function render();
+    
+    function getValue();
+    
+    function setValue($value);
 }

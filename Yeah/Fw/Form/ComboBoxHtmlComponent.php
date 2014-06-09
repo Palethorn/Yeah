@@ -8,6 +8,8 @@ class ComboBoxHtmlComponent implements HtmlComponentInterface {
 
     private $options = array();
 
+    private $value = null;
+    
     public function __construct($options) {
         foreach($options as $key => $option) {
             $this->setOption($key, $option);
@@ -48,6 +50,14 @@ class ComboBoxHtmlComponent implements HtmlComponentInterface {
 
     public function validate() {
         
+    }
+
+    public function getValue() {
+        return $this->value;
+    }
+
+    public function setValue($value) {
+        $this->value = $value;
     }
 
 }
