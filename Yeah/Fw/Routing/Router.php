@@ -1,6 +1,6 @@
 <?php
 
-namespace Yeah\Fw\Application;
+namespace Yeah\Fw\Routing;
 
 /**
  * Maps request URI to appropriate controller and action
@@ -12,7 +12,7 @@ class Router {
     private static $routes = array();
 
     /**
-     * Maps URI to controller and action
+     * Maps URI to route
      * 
      * @param string $route URI key under which to map specified route
      * @param type $params
@@ -52,7 +52,7 @@ class Router {
      * Handles route request
      * 
      * @param \Yeah\Fw\Http\Request $request HTTP request object
-     * @return mixed Route options
+     * @return RouteInterface
      */
     public function handle($request) {
         $controller = $request->getParameter('controller');
