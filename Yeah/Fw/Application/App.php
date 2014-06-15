@@ -5,6 +5,9 @@ namespace Yeah\Fw\Application;
 /**
  * Implements singleton pattern. Used for application request entry point
  * 
+ * @property Router $router
+ * @property Request $request
+ * @property Response $response
  * @author David Cavar
  */
 class App {
@@ -68,8 +71,8 @@ class App {
      * @param mixed $route Route options
      * @return mixed Route options
      */
-    private function executeSecurity($route) {
-        if(isset($route['secure']) && $route['secure'] == true) {
+    private function executeSecurity(\Yeah\Fw\Routing\RouteInterface $route) {
+        if($route->isSecure()) {
             $auth = $this->getAuth();
             if(!$auth->isAuthenticated()) {
                 $this->getResponse()->setFlash('You are not logged in!')->redirect($this->options['app']['default_login']);
@@ -85,9 +88,9 @@ class App {
      * @param mixed $route Route options
      * @return \Yeah\Fw\Mvc\View Controller view object
      */
-    private function executeAction($route) {
-        $controller = $route['controller'];
-        $method = $route['action'] . '_action';
+    private function executeAction(\Yeah\Fw\Routing\RouteInterface $route) {
+        $controller = $route->getController();
+        $method = $route->getAction() . '_action';
         $class = '\\' . ucfirst($controller) . 'Controller';
         $this->controller = new $class(array(
             'request' => $this->request,

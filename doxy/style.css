@@ -257,9 +257,8 @@ div.groupText {
 }
 
 body {
-	background-color: white;
 	color: black;
-        margin: 0;
+    margin: 0;
 }
 
 div.contents {
@@ -538,12 +537,10 @@ table.memberdecls {
         border-left: 1px solid #A8B8D9;
         border-right: 1px solid #A8B8D9;
         padding: 6px 0px 6px 0px;
-        color: #253555;
+        color: white;
         font-weight: bold;
-        text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);
-        background-image:url('nav_f.png');
-        background-repeat:repeat-x;
-        background-color: #E2E8F2;
+        /*text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);*/
+        background-color: #da5c00;
         /* opera specific markup */
         box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
         border-top-right-radius: 4px;
@@ -910,7 +907,7 @@ table.fieldtable {
 	top: 0px;
 	left: 10px;
 	height: 36px;
-	background-image: url('tab_b.png');
+	background-color: #da5c00;
 	z-index: 101;
 	overflow: hidden;
 	font-size: 13px;

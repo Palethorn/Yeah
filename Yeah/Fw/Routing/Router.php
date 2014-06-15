@@ -30,8 +30,9 @@ class Router {
      * @return mixed
      */
     public static function get($route) {
+
         foreach(self::$routes as $pattern => $options) {
-            $pattern .= '/'; // Ending delimiter
+            $pattern = '#' . $pattern . '#';
             if(preg_match($pattern, $route)) {
                 return $options;
             }
@@ -55,47 +56,19 @@ class Router {
      * @return RouteInterface
      */
     public function handle($request) {
-        $controller = $request->getParameter('controller');
-        $action = $request->getParameter('action');
-        $request_uri = $this->combine($controller, $action);
+        $request_uri = $request->getRequestUri();
         if(($route = self::get($request_uri))) {
-            $controller = $route['controller'];
-            $request->setParameter('controller', $controller);
-            if(isset($route['restful'])) {
-                $this->checkMethod($route, $request->getRequestMethod());
-                $action = $route['restful'][$request->getRequestMethod()];
-                $request->setParameter('action', $action);
-                $route['action'] = $action;
-            } else {
-                $request->setParameter('action', $route['action']);
-            }
-            return $route;
+            $routeRequest = new $route['route_request_handler']();
+            return $routeRequest->handle($route, $request);
+        } else {
+            $routeRequest = new RouteRequestHandler();
+            return $routeRequest->handle(array(
+                'controller' => $request->getParameter('controller'),
+                'action' => $request->getParameter('action') ? $request->getParameter('action') : '',
+                'secure' => false
+                    ), $request);
         }
-        $route = array('controller' => $controller, 'action' => $action);
-        return $route;
-    }
-
-    /**
-     * 
-     * @param mixed $route Route options
-     * @param string $method HTTP method
-     * @throws \Exception
-     */
-    private function checkMethod($route, $method) {
-        if(!isset($route['restful'][$method])) {
-            throw new \Exception('No allowed methods', 405, null);
-        }
-    }
-
-    /**
-     * Combines controller and action into request URI
-     * 
-     * @param string $controller
-     * @param string $action
-     * @return string
-     */
-    private function combine($controller, $action) {
-        return '/' . ($controller ? $controller : '') . ($action ? '/' . $action : '');
+        return null;
     }
 
 }

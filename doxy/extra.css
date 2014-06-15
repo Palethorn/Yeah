@@ -1,0 +1,19 @@
+.tabs, .tabs2, .tabs3 {
+	background: #da5c00;
+	border: 1px solid #602020;
+	width: 100%;
+	z-index: 101;
+	font-size: 13px;
+	font-family: 'Lucida Grande',Geneva,Helvetica,Arial,sans-serif;
+}
+body {
+	background-color:rgb(39, 40, 34);
+}
+
+#projectname {
+	color: rgb(255,153, 0);
+}
+
+h2.groupheader {
+	color: gray;
+}

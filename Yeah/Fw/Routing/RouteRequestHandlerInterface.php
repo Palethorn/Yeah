@@ -7,12 +7,13 @@ namespace Yeah\Fw\Routing;
  * 
  * @author David Cavar
  */
-interface RouteRequestInterface {
+interface RouteRequestHandlerInterface {
     /**
      * Generates route object from request
      * 
      * @param array $options
+     * @param Yeah\Fw\Http\Request $request
      * @return RouteInterface
      */
-    function handle($options);
+    function handle($options, $request);
 }
