@@ -132,6 +132,9 @@ abstract class PdoModel {
     public function update() {
         $columns = array();
         foreach($this->schema as $property => $options) {
+            if($property === 'id') {
+                continue;
+            }
             if(isset($this->$property)) {
                 if($options['pdo_type'] == \PDO::PARAM_INT) {
                     $columns[] = $property . '=' . $this->$property;
@@ -140,7 +143,7 @@ abstract class PdoModel {
                 }
             }
         }
-        $query = 'update ' . $this->table . ' set ' . implode(',', $columns);
+        $query = 'update ' . $this->table . ' set ' . implode(',', $columns) . ' where id = ' . $this->id;
         $this->db_adapter->query($query);
     }
 
