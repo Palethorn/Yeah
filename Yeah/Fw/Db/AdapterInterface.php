@@ -9,5 +9,10 @@ namespace Yeah\Fw\Db;
  */
 interface AdapterInterface {
 
+    /**
+     * Initializes database adapter
+     * 
+     * @param array $options
+     */
     function init($options);
 }

@@ -27,7 +27,7 @@ class Config {
      * Stores specified value under specified key
      * 
      * @param string $key Key to store value under it
-     * @param type $value Value to store under certain key
+     * @param mixed $value Value to store under certain key
      */
     public static function set($key, $value)
     {

@@ -15,10 +15,6 @@ interface FormInterface {
 
     function getObject();
 
-    function getValue($key);
-
-    function setValue($key, $value);
-
     function setOption($key, $value);
 
     function getOption($key);
@@ -28,4 +24,6 @@ interface FormInterface {
     function save();
 
     function bind();
+    
+    function configure();
 }

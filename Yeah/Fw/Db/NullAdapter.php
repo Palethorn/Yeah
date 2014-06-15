@@ -10,6 +10,10 @@ namespace Yeah\Fw\Db;
  */
 class NullAdapter implements \Yeah\Fw\Db\AdapterInterface {
 
+    /**
+     * 
+     * @param array $options
+     */
     public function init($options) {
         
     }

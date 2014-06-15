@@ -1,6 +1,6 @@
 <?php
 
-namespace Yeah\Fw\Form;
+namespace Yeah\Fw\HtmlComponents;
 
 /**
  * Exposes methods every HtmlComponent shoud implement
@@ -20,8 +20,4 @@ interface HtmlComponentInterface {
     function validate();
 
     function render();
-    
-    function getValue();
-    
-    function setValue($value);
 }

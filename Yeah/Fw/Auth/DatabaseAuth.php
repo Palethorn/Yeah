@@ -13,7 +13,7 @@ namespace Yeah\Fw\Auth;
 class DatabaseAuth implements AuthInterface {
 
     /**
-     * Constructs interface
+     * Constructs object
      * 
      * @param mixed $options Contains options necesarry for object initialization
      */
