@@ -133,7 +133,11 @@ abstract class PdoModel {
         $columns = array();
         foreach($this->schema as $property => $options) {
             if(isset($this->$property)) {
-                $columns[] = $property . '=' . $this->$property;
+                if($options['pdo_type'] == \PDO::PARAM_INT) {
+                    $columns[] = $property . '=' . $this->$property;
+                } else {
+                    $columns[] = $property . '=\'' . $this->$property . '\'';
+                }
             }
         }
         $query = 'update ' . $this->table . ' set ' . implode(',', $columns);
