@@ -141,6 +141,16 @@ abstract class PdoModel {
     }
 
     /**
+     * Deletes current object from database
+     */
+    public function delete() {
+        if(isset($this->id)) {
+            $q = 'delete from ' . $this->table . ' where id=' . $this->id;
+            $this->db_adapter->query($q);
+        }
+    }
+
+    /**
      * Checks if a record already exists
      * 
      * @return boolean
