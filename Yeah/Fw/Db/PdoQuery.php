@@ -12,13 +12,20 @@ class PdoQuery {
     private $parts = array();
 
     /**
+     * @return string
+     */
+    public function combineArray($array) {
+        return implode(',', $array);
+    }
+    
+    /**
      * Adds SELECT portion of the query
      * 
      * @param string $fields Fields to be selected
      * @return \Yeah\Fw\Db\PdoQuery
      */
     public function Select($fields) {
-        $this->parts[0] = 'select ' . $fields;
+        $this->parts[0] = 'select ' . $this->combineArray($fields);
         return $this;
     }
 
@@ -26,9 +33,10 @@ class PdoQuery {
      * Adds FROM portion of the query
      * 
      * @param string $tables List of tables for FROM statement
+     * @return \Yeah\Fw\Db\PdoQuery
      */
     public function From($tables) {
-        $this->parts[1] = ' from ' . $tables;
+        $this->parts[1] = ' from ' . $this->combineArray($tables);
         return $this;
     }
 
@@ -73,6 +81,9 @@ class PdoQuery {
      * @return \Yeah\Fw\Db\PdoQuery
      */
     public function AndWhere($field, $param) {
+        if(!isset($this->parts[3])) {
+            return $this->Where($field);
+        }
         $part = ' and ' . $field;
         if(isset($param)) {
             if(is_array($param)) {
@@ -94,6 +105,9 @@ class PdoQuery {
      * @return \Yeah\Fw\Db\PdoQuery
      */
     public function OrWhere($field, $param) {
+        if(!isset($this->parts[3])) {
+            return $this->Where($field, $param);
+        }
         $part = ' or ' . $field;
         if(isset($param)) {
             if(is_array($param)) {
@@ -148,7 +162,7 @@ class PdoQuery {
      * @return mixed
      */
     public function execute() {
-        $db = PdoConnection::getInstance();
+        $db = new PdoConnection(array());
         $stmt = $db->prepare($this->getSql());
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
