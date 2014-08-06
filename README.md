@@ -6,7 +6,7 @@ After setting up your alias:
 
 ```
 #!bash
-alias yeah="php /var/www-ro/yeah-devtools/yeah"
+alias yeah="php /path/to/yeah/file/in/devtools/root"
 ```
 you can then create folder and invoke
 
