@@ -34,5 +34,5 @@ Apache rewrite rules are similar. htaccess file example (NOT TESTED):
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^/(.*)$ project_name.php/$1
+RewriteRule ^/(.*)$ project_name.php/$1 [L]
 ```
