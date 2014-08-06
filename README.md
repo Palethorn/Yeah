@@ -1,29 +1,16 @@
-# README #
+# GENERAL INFO #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Setting up this framework requires that you download and set up Yeah! DevTools. Download from https://bitbucket.org/palethorn/yeah-devtools/src
 
-### What is this repository for? ###
+After setting up your alias:
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+```
+#!bash
+alias yeah="php /var/www-ro/yeah-devtools/yeah"
+```
+you can then create folder and invoke
 
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+```
+#!bash
+yeah create_app project_name
+```
