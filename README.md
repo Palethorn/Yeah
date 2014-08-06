@@ -14,3 +14,17 @@ you can then create folder and invoke
 #!bash
 yeah create_app project_name
 ```
+
+Instruct your HTTP server to point to web folder as webroot.
+
+Lighttpd rewrite rules:
+
+```
+#!
+ url.rewrite-if-not-file = (
+        "^/(.*)" => "/project_name.php/$1"
+    )
+
+```
+
+Apache rewrite rules are similar.
