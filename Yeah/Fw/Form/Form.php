@@ -2,11 +2,19 @@
 
 namespace Yeah\Fw\Form;
 
-abstract class FormAbstract extends \Yeah\Fw\ParameterHolder\SimpleParameterHolder implements \Yeah\Fw\Form\FormInterface {
+class Form extends \Yeah\Fw\ParameterHolder\SimpleParameterHolder implements FormInterface {
 
     private $components = array();
 
     public function bind() {
+        
+    }
+
+    public function configure() {
+        
+    }
+
+    public function setOption($key, $value) {
         
     }
 
@@ -16,7 +24,7 @@ abstract class FormAbstract extends \Yeah\Fw\ParameterHolder\SimpleParameterHold
 
     public function render() {
         $html = '';
-        foreach($this->components as $name => $component) {
+        foreach($this->components as $component) {
             $html .= $component->render();
         }
         return $html;

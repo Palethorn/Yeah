@@ -13,10 +13,14 @@ class SimpleParameterHolder implements ParameterHolderInterface {
         return false;
     }
 
-    public function setOption($key, $value) {
+    public function addOption($key, $value) {
         $this->options[$key] = $value;
     }
 
+    public function removeOption($key) {
+        unset($this->options[$key]);
+    }
+    
     public function getAllOptions() {
         return $this->options;
     }
