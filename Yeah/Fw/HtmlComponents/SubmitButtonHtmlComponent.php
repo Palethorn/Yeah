@@ -2,7 +2,7 @@
 
 namespace Yeah\Fw\HtmlComponents;
 
-class TextInputHtmlComponent extends HtmlComponentAbstract {
+class SubmitButtonHtmlComponent extends HtmlComponentAbstract {
     
     public function render() {
         $html = '<input type="submit"';

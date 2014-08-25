@@ -21,8 +21,9 @@ interface FormInterface {
 
     function bind();
     
-    function configure();
+    function configure($config);
     
     function getComponent($name);
+    
     function setComponent($name, $value);
 }

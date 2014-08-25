@@ -2,6 +2,9 @@
 
 namespace Yeah\Fw\Form;
 
+/**
+ * @property Yeah\Fw\Form\FormSection[] $components Form section collection
+ */
 class Form extends \Yeah\Fw\ParameterHolder\SimpleParameterHolder implements FormInterface {
 
     private $components = array();
@@ -10,8 +13,12 @@ class Form extends \Yeah\Fw\ParameterHolder\SimpleParameterHolder implements For
         
     }
 
-    public function configure() {
-        
+    public function configure($config) {
+        foreach($config as $section) {
+            $sec = new FormSection();
+            $sec->configure($section);
+            $this->setComponent($section['title'], $sec);
+        }
     }
 
     public function setOption($key, $value) {
@@ -23,10 +30,11 @@ class Form extends \Yeah\Fw\ParameterHolder\SimpleParameterHolder implements For
     }
 
     public function render() {
-        $html = '';
-        foreach($this->components as $component) {
-            $html .= $component->render();
+        $html = '<div>';
+        foreach($this->components as $section) {
+            $html .= $section->render();
         }
+        $html .= '</div>';
         return $html;
     }
 
