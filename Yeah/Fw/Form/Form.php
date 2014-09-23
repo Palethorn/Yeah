@@ -14,10 +14,15 @@ class Form extends \Yeah\Fw\ParameterHolder\SimpleParameterHolder implements For
     }
 
     public function configure($config) {
-        foreach($config as $section) {
+        $this->setOption('id', $config['id']);
+        $this->setOption('title', $config['title']);
+        $this->setOption('action', $config['action']);
+        $this->setOption('method', $config['method']);
+        
+        foreach($config['sections'] as $key => $section) {
             $sec = new FormSection();
             $sec->configure($section);
-            $this->setComponent($section['title'], $sec);
+            $this->setComponent($key, $sec);
         }
     }
 
@@ -30,11 +35,12 @@ class Form extends \Yeah\Fw\ParameterHolder\SimpleParameterHolder implements For
     }
 
     public function render() {
-        $html = '<div>';
+        $html = '';
+        $html .= '<form id="' . $this->getOption('id') . '" method="' . $this->getOption('method') . '" action="' . $this->getOption('action') . '">';
         foreach($this->components as $section) {
             $html .= $section->render();
         }
-        $html .= '</div>';
+        $html .= '</form>';
         return $html;
     }
 

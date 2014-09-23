@@ -8,8 +8,12 @@ class FormSection extends \Yeah\Fw\ParameterHolder\SimpleParameterHolder impleme
 
     public function configure($section) {
         $this->setOption('title', $section['title']);
-        foreach($section['components'] as $key => $component) {
-            $comp = new $component['class']($component);
+        foreach($section['fields'] as $key => $component) {
+            /**
+             * @var Yeah\Fw\Form\HtmlComponents $comp
+             */
+            $comp = new $component['class']();
+            $comp->configure($component);
             $this->setComponent($key, $comp);
         }
     }
@@ -30,10 +34,8 @@ class FormSection extends \Yeah\Fw\ParameterHolder\SimpleParameterHolder impleme
     }
 
     public function render() {
-        $html = '<div>' .
-                '<div>' .
-                $this->getOption('title') .
-                '   </div>';
+        $html = '<div>';
+        $html .= '<div>' . $this->getOption('title') . '</div>';
         foreach($this->components as $key => $component) {
             $html .= $component->render();
         }

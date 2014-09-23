@@ -9,7 +9,7 @@ namespace Yeah\Fw\HtmlComponents;
  */
 interface HtmlComponentInterface {
 
-    function __construct($options);
+    function configure($options);
 
     function validate();
 
