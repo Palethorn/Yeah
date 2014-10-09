@@ -17,7 +17,7 @@ class PdoQuery {
     public function combineArray($array) {
         return implode(',', $array);
     }
-    
+
     /**
      * Adds SELECT portion of the query
      * 
@@ -25,7 +25,10 @@ class PdoQuery {
      * @return \Yeah\Fw\Db\PdoQuery
      */
     public function Select($fields) {
-        $this->parts[0] = 'select ' . $this->combineArray($fields);
+        if(is_array($fields)) {
+            $fields = $this->combineArray($fields);
+        }
+        $this->parts[0] = 'select ' . $fields;
         return $this;
     }
 
@@ -36,7 +39,10 @@ class PdoQuery {
      * @return \Yeah\Fw\Db\PdoQuery
      */
     public function From($tables) {
-        $this->parts[1] = ' from ' . $this->combineArray($tables);
+        if(is_array($tables)) {
+            $tables = $this->combineArray($tables);
+        }
+        $this->parts[1] = ' from ' . $tables;
         return $this;
     }
 
@@ -80,7 +86,7 @@ class PdoQuery {
      * @param string $param Value to consider
      * @return \Yeah\Fw\Db\PdoQuery
      */
-    public function AndWhere($field, $param) {
+    public function AndWhere($field, $param = null) {
         if(!isset($this->parts[3])) {
             return $this->Where($field);
         }
