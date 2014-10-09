@@ -4,7 +4,8 @@
     "type": "library",
     "keywords": ["framework", "PHP", "yeah"],
     "require": {
-        "php": ">=5.3.0"
+        "php": ">=5.3.0",
+        "yeah/yeah-devtools": "dev-master"
     },
     "autoload": {
         "psr-0": { "Yeah\\Fw\\": "" }
