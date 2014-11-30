@@ -9,7 +9,7 @@ class RestRouteRequestHandler implements RouteRequestHandlerInterface {
         $this->checkMethod($options, $request->getRequestMethod());
         $route->setAction($options['restful'][$request->getRequestMethod()]['action']);
         $route->setController($options['controller']);
-        $secure = $options['secure'] && $options['restful'][$request->getRequestMethod()]['secure'];
+        $secure = $options['secure'] || $options['restful'][$request->getRequestMethod()]['secure'];
         $route->setSecure($secure);
         return $route;
     }

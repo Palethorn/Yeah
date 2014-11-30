@@ -23,7 +23,7 @@ class Route implements RouteInterface {
     }
 
     public function setSecure($secure) {
-        $this->setSecure = $secure;
+        $this->secure = $secure;
     }
 
 }
