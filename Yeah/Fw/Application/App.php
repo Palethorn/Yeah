@@ -19,6 +19,7 @@ class App {
     private $session = null;
     private $logger = null;
     private $auth = null;
+    private $options = null;
 
     /**
      * Class constructor.
@@ -27,7 +28,6 @@ class App {
      */
     private function __construct($options = array()) {
         $this->options = $options;
-        $this->options['app'] = require_once $options['paths']['app_dir'] . DS . 'config' . DS . 'AppConfiguration.php';
         $this->createInstances();
     }
 
@@ -35,6 +35,13 @@ class App {
      * Creates application instances from application settings.
      */
     private function createInstances() {
+        $lib = $this->options['project_paths']['lib'];
+        // Register autoloader
+        require_once $lib . DS . 'Yeah' . DS . 'Fw' . DS . 'Application' . DS . 'Autoloader.php';
+        $autoloader = new Application\Autoloader();
+        $autoloader->setIncludePath($lib);
+        $autoloader->register();
+        
         (new \Yeah\Fw\Application\Autoloader())->setIncludePath($this->options['app']['paths']['models'])->register();
         (new \Yeah\Fw\Application\Autoloader())->setIncludePath($this->options['app']['paths']['controllers'])->register();
         (new $this->options['app']['database']['adapter']())->init($this->options['app']['database']);
@@ -188,4 +195,8 @@ class App {
         return static::$instance;
     }
 
+    public function getOptions() {
+        return $this->options;
+    }
+    
 }
