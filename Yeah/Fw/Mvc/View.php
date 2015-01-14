@@ -5,12 +5,12 @@ namespace Yeah\Fw\Mvc;
 class View {
 
     public $params = array();
-    private $options = array();
     private $name = false;
+    private $layout = false;
     private $content = '';
 
-    public function __construct($options = array()) {
-        $this->options = $options;
+    public function __construct(string $views_dir) {
+        $this->views_dir = $views_dir;
     }
 
     public function __call($name, $arguments) {
@@ -78,29 +78,35 @@ class View {
     }
 
     public function render() {
-        if($this->name) {
-            $this->includeView();
-        }
-        if(isset($this->layout)) {
-            if(!file_exists($this->options['views_dir'] . DS . 'layouts' . DS . $this->layout . '.php')) {
-                throw new \Exception('Layout not found.', 500, null);
-            }
-            ob_start();
-            require_once $this->options['views_dir'] . DS . 'layouts' . DS . $this->layout . '.php';
-            $this->content = ob_get_contents();
-            ob_end_clean();
-        }
+        $this->renderView();
+        $this->renderLayout();
         return $this->content;
     }
 
-    public function includeView() {
+    public function renderLayout() {
+        if(!$this->layout) {
+            return;
+        }
+        if(!file_exists($this->views_dir . DS . 'layouts' . DS . $this->layout . '.php')) {
+            throw new \Exception('Layout not found.', 500, null);
+        }
+        ob_start();
+        require_once $this->views_dir . DS . 'layouts' . DS . $this->layout . '.php';
+        $this->content = ob_get_contents();
+        ob_end_clean();
+    }
+
+    public function renderView() {
+        if(!$this->name) {
+            return;
+        }
         $this->name = str_replace('/', DS, $this->name);
         $view = $this->name . '.php';
-        if(!file_exists($this->options['views_dir'] . DS . $view)) {
+        if(!file_exists($this->views_dir . DS . $view)) {
             throw new \Exception('View not found.', 500, null);
         }
         ob_start();
-        require_once $this->options['views_dir'] . DS . $view;
+        require_once $this->views_dir . DS . $view;
         $this->content = ob_get_contents();
         ob_end_clean();
     }

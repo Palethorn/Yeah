@@ -13,54 +13,34 @@ namespace Yeah\Fw\Application;
  */
 class App {
 
-    private static $instance = null;
+    protected static $instance = null;
     private $request = null;
     private $response = null;
     private $router = null;
-    private $session = null;
-    private $logger = null;
-    private $auth = null;
-    private $options = null;
     private $autoloader = null;
+    private $error_handler = null;
 
     /**
      * Class constructor.
      * @param mixed $options Configuration options
      * 
      */
-    private function __construct($options = array()) {
-        $this->autoloader = $options['autoloader'];
-        $this->options = $options;
-        $this->createInstances();
-    }
-
-    /**
-     * Creates application instances from application settings.
-     */
-    private function createInstances() {
+    protected function __construct($base_dir) {
+        $this->base_dir = $base_dir;
         $this->registerAutoloaders();
         $this->router = new \Yeah\Fw\Routing\Router();
         $this->request = new \Yeah\Fw\Http\Request();
         $this->response = new \Yeah\Fw\Http\Response();
-
-        (new $this->options['app']['database']['class']())->init($this->options['app']['database']['params']);
-
-        $this->logger = new $this->options['app']['factories']['logger']['class']($this->options['app']['factories']['logger']['params']);
-        $this->session = new \Yeah\Fw\Session\NullSessionHandler(); //new $this->options['app']['factories']['session']['class']($this->options['app']['database']);
-        $this->auth = new \Yeah\Fw\Auth\NullAuth();// new $this->options['app']['factories']['auth']['class']($this->session);
-
-        foreach($this->options['app']['factories'] as $key => $val) {
-            if(!isset($val['params'])) {
-                $val['params'] = array();
-            }
-            $this->$key = new $val['class']($val['params']);
-        }
+        $this->error_handler = new \Yeah\Fw\Error\ErrorHandler();
     }
 
     private function registerAutoloaders() {
-        $this->autoloader->addIncludePath($this->options['app']['paths']['app_lib']);
-        $this->autoloader->addIncludePath($this->options['app']['paths']['models']);
-        $this->autoloader->addIncludePath($this->options['app']['paths']['controllers']);
+        require_once $this->getLibDir() . DS . 'Yeah' . DS . 'Fw' . DS . 'Application' . DS . 'Autoloader.php';
+        $this->autoloader = new Autoloader();
+        $this->autoloader->addIncludePath($this->getLibDir());
+        $this->autoloader->addIncludePath($this->getModelsDir());
+        $this->autoloader->addIncludePath($this->getControllersDir());
+        $this->autoloader->register();
     }
 
     /**
@@ -103,16 +83,29 @@ class App {
      * @return \Yeah\Fw\Mvc\View Controller view object
      */
     private function executeAction(\Yeah\Fw\Routing\RouteInterface $route) {
+        if($route instanceof \Yeah\Fw\Routing\SimpleRoute) {
+            $controller = new \Yeah\Fw\Mvc\Controller(array(
+                'request' => $this->getRequest(),
+                'response' => $this->getResponse(),
+                'session' => null, //$this->getSessionHandler(),
+                'logger' => null, $this->getLogger(),
+                'view' => array(
+                    'views_dir' => $this->getViewsDir()
+                )
+            ));
+            $controller->anonymous($route->getAction());
+            return;
+        }
         $controller = $route->getController();
         $method = $route->getAction() . '_action';
         $class = '\\' . ucfirst($controller) . 'Controller';
         $this->controller = new $class(array(
             'request' => $this->getRequest(),
             'response' => $this->getResponse(),
-            'session' => $this->getSessionHandler(),
-            'logger' => $this->getLogger(),
+            'session' => null, //$this->getSessionHandler(),
+            'logger' => null, $this->getLogger(),
             'view' => array(
-                'views_dir' => $this->options['app']['paths']['views']
+                'views_dir' => $this->getViewsDir()
             )
         ));
 
@@ -223,14 +216,53 @@ class App {
     public function setAutoloader(Autoloader $autoloader) {
         $this->autoloader = $autoloader;
     }
-    
-    
+
     public function getAutoloader(Autoloader $autoloader) {
         $this->autoloader = $autoloader;
     }
-    
+
+    public function getBaseDir() {
+        return $this->base_dir;
+    }
+
+    public function getLibDir() {
+        return $this->base_dir . DS . 'lib';
+    }
+
+    public function getWebDir() {
+        return $this->base_dir . DS . 'web';
+    }
+
+    public function getCacheDir() {
+        return $this->base_dir . DS . 'cache';
+    }
+
+    public function getLogDir() {
+        return $this->base_dir . DS . 'log';
+    }
+
+    public function getControllersDir() {
+        return $this->base_dir . DS . 'controllers';
+    }
+
+    public function getModelsDir() {
+        return $this->base_dir . DS . 'models';
+    }
+
+    public function getViewsDir() {
+        return $this->base_dir . DS . 'views';
+    }
+
     private function __clone() {
         
+    }
+
+    public function get($url, $method, $secure = false) {
+        \Yeah\Fw\Routing\Router::add($url, array(
+            'route_request_handler' => 'Yeah\Fw\Routing\SimpleRouteRequestHandler',
+            'secure' => $secure,
+            'method' => $method
+        ));
     }
 
     /**
@@ -239,15 +271,11 @@ class App {
      * @param mixed $options Application options
      * @return \Yeah\Fw\Application\App
      */
-    public static function getInstance($options = null) {
+    public static function getInstance($base_dir = null) {
         if(!isset(static::$instance)) {
-            static::$instance = new App($options);
+            static::$instance = new App($base_dir);
         }
         return static::$instance;
-    }
-
-    public function getOptions() {
-        return $this->options;
     }
 
 }

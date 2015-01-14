@@ -41,17 +41,17 @@ class Autoloader {
      */
     function autoload($class_name) {
         $class_name = ltrim($class_name, '\\');
-        $file_name = '';
+        $relative_path = '';
         $namespace = '';
         if($last_ns_pos = strrpos($class_name, '\\')) {
             $namespace = substr($class_name, 0, $last_ns_pos);
             $class_name = substr($class_name, $last_ns_pos + 1);
-            $file_name = str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
+            $relative_path = str_replace('\\', DS, $namespace);
         }
         foreach($this->include_paths as $include_path) {
-            $file_name = $include_path . DIRECTORY_SEPARATOR . $file_name . DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $class_name) . '.php';
-            if(file_exists($file_name)) {
-                require $file_name;
+            $file_path = $include_path . DS . $relative_path . DS . str_replace('_', DS, $class_name) . '.php';
+            if(file_exists($file_path)) {
+                require $file_path;
                 return;
             }
         }

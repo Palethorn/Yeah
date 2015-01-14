@@ -33,6 +33,10 @@ class Controller {
         $this->$action($this->request);
     }
 
+    public function anonymous($method) {
+        $method($this->request);
+    }
+    
     /**
      * Sets controller view
      * 
