@@ -8,6 +8,7 @@ namespace Yeah\Fw\Application;
  * @property Router $router
  * @property Request $request
  * @property Response $response
+ * @property \Yeah\Fw\Application\Autoloader $autoloader
  * @author David Cavar
  */
 class App {
@@ -20,6 +21,7 @@ class App {
     private $logger = null;
     private $auth = null;
     private $options = null;
+    private $autoloader = null;
 
     /**
      * Class constructor.
@@ -27,6 +29,7 @@ class App {
      * 
      */
     private function __construct($options = array()) {
+        $this->autoloader = $options['autoloader'];
         $this->options = $options;
         $this->createInstances();
     }
@@ -35,32 +38,39 @@ class App {
      * Creates application instances from application settings.
      */
     private function createInstances() {
-        $lib = $this->options['project_paths']['lib'];
-        // Register autoloader
-        require_once $lib . DS . 'Yeah' . DS . 'Fw' . DS . 'Application' . DS . 'Autoloader.php';
-        $autoloader = new Application\Autoloader();
-        $autoloader->setIncludePath($lib);
-        $autoloader->register();
-        
-        (new \Yeah\Fw\Application\Autoloader())->setIncludePath($this->options['app']['paths']['models'])->register();
-        (new \Yeah\Fw\Application\Autoloader())->setIncludePath($this->options['app']['paths']['controllers'])->register();
-        (new $this->options['app']['database']['adapter']())->init($this->options['app']['database']);
-        $this->logger = new $this->options['app']['factories']['logger']['class']($this->options['app']['factories']['logger']);
-        $this->session = new $this->options['app']['factories']['session_handler']['class']($this->options['app']);
-        $this->request = new $this->options['app']['factories']['request']['class']($this->options['app']['factories']['request']);
-        $this->response = new $this->options['app']['factories']['response']['class']($this->options['app']['factories']['response']);
-        $this->router = new $this->options['app']['factories']['router']['class']($this->options['app']['factories']['router']);
-        $this->auth = new $this->options['app']['factories']['auth']['class'](array('session_handler' => $this->session));
+        $this->registerAutoloaders();
+        $this->router = new \Yeah\Fw\Routing\Router();
+        $this->request = new \Yeah\Fw\Http\Request();
+        $this->response = new \Yeah\Fw\Http\Response();
+
+        (new $this->options['app']['database']['class']())->init($this->options['app']['database']['params']);
+
+        $this->logger = new $this->options['app']['factories']['logger']['class']($this->options['app']['factories']['logger']['params']);
+        $this->session = new \Yeah\Fw\Session\NullSessionHandler(); //new $this->options['app']['factories']['session']['class']($this->options['app']['database']);
+        $this->auth = new \Yeah\Fw\Auth\NullAuth();// new $this->options['app']['factories']['auth']['class']($this->session);
+
+        foreach($this->options['app']['factories'] as $key => $val) {
+            if(!isset($val['params'])) {
+                $val['params'] = array();
+            }
+            $this->$key = new $val['class']($val['params']);
+        }
+    }
+
+    private function registerAutoloaders() {
+        $this->autoloader->addIncludePath($this->options['app']['paths']['app_lib']);
+        $this->autoloader->addIncludePath($this->options['app']['paths']['models']);
+        $this->autoloader->addIncludePath($this->options['app']['paths']['controllers']);
     }
 
     /**
      * Begins chain execution
      */
     public function execute() {
-        $ret = $this->executeRouter();
-        $ret = $this->executeSecurity($ret);
-        $ret = $this->executeAction($ret);
-        $this->executeRender($ret);
+        $route = $this->executeRouter();
+        $route = $this->executeSecurity($route);
+        $view = $this->executeAction($route);
+        $this->executeRender($view);
     }
 
     /**
@@ -79,11 +89,8 @@ class App {
      * @return mixed Route options
      */
     private function executeSecurity(\Yeah\Fw\Routing\RouteInterface $route) {
-        if($route->isSecure()) {
-            $auth = $this->getAuth();
-            if(!$auth->isAuthenticated()) {
-                $this->getResponse()->setFlash('You are not logged in!')->redirect($this->options['app']['default_login']);
-            }
+        if($route->isSecure() && !$this->getAuth()->isAuthenticated()) {
+            throw new \Yeah\Fw\Http\Exception\UnauthorizedHttpException();
         }
         return $route;
     }
@@ -100,8 +107,8 @@ class App {
         $method = $route->getAction() . '_action';
         $class = '\\' . ucfirst($controller) . 'Controller';
         $this->controller = new $class(array(
-            'request' => $this->request,
-            'response' => $this->response,
+            'request' => $this->getRequest(),
+            'response' => $this->getResponse(),
             'session' => $this->getSessionHandler(),
             'logger' => $this->getLogger(),
             'view' => array(
@@ -110,7 +117,7 @@ class App {
         ));
 
         if(!method_exists($this->controller, $method) || !is_callable($class . '::' . $method)) {
-            throw new \Exception('Not Found', 404, null);
+            throw new \Yeah\Fw\Http\Exception\NotFoundHttpException();
         }
         $this->controller->$method($this->request);
         $view = $this->controller->getView();
@@ -152,12 +159,30 @@ class App {
     }
 
     /**
+     * Getter for router object
+     * 
+     * @return \Yeah\Fw\Routing\Router
+     */
+    public function getRouter() {
+        return $this->router;
+    }
+
+    /**
      * Getter for session handler object
      * 
      * @return SessionHandlerInterface
      */
-    public function getSessionHandler() {
+    public function getSession() {
         return $this->session;
+    }
+
+    /**
+     * Setter for session handler object
+     * 
+     * @params \SessionHandlerInterface $session
+     */
+    public function setSession(\SessionHandlerInterface $session) {
+        $this->session = $session;
     }
 
     /**
@@ -170,6 +195,15 @@ class App {
     }
 
     /**
+     * Setter for authentication object
+     * 
+     * @param \Yeah\Fw\Auth\AuthInterface $auth
+     */
+    public function setAuth(\Yeah\Fw\Auth\AuthInterface $auth) {
+        $this->auth = $auth;
+    }
+
+    /**
      * Getter for logger object
      * 
      * @return \Yeah\Fw\Logger\LoggerInterface
@@ -178,6 +212,23 @@ class App {
         return $this->logger;
     }
 
+    /**
+     * Setter for logger object
+     * @param \Yeah\Fw\Logger\LoggerInterface $logger
+     */
+    public function setLogger(\Yeah\Fw\Logger\LoggerInterface $logger) {
+        $this->logger = $logger;
+    }
+
+    public function setAutoloader(Autoloader $autoloader) {
+        $this->autoloader = $autoloader;
+    }
+    
+    
+    public function getAutoloader(Autoloader $autoloader) {
+        $this->autoloader = $autoloader;
+    }
+    
     private function __clone() {
         
     }
@@ -198,5 +249,5 @@ class App {
     public function getOptions() {
         return $this->options;
     }
-    
+
 }

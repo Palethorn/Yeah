@@ -1,6 +1,7 @@
 <?php
 
 namespace Yeah\Fw\Toolbox;
+
 /**
  * Handles PHP errors and exceptions in a safe way
  */
@@ -8,6 +9,7 @@ class ErrorHandler {
 
     const TYPE_EXCEPTION = 0;
     const TYPE_ERROR = 1;
+    const TYPE_HTTP_EXCEPTION = 3;
 
     private $handled = false;
 
@@ -37,13 +39,18 @@ class ErrorHandler {
     public function errorHandler($errno, $errstr, $errfile, $errline, $errcontext) {
         $this->handled = true;
         if($errno & error_reporting()) {
+            http_response_code(500);
+            $app = \Yeah\Fw\Application\App::getInstance();
+            $options = $app->getOptions();
+            $view = $options['app']['paths']['views'] . DIRECTORY_SEPARATOR . 'error' . DIRECTORY_SEPARATOR . $options['app']['app_name'] . DIRECTORY_SEPARATOR . 'fatal_error.php';
             $this->render(array(
                 'title' => 'Yeah! FW Error Handler',
                 'message' => $errstr,
                 'file' => $errfile,
                 'line' => $errline,
                 //'trace' => $errcontext,
-                'type' => ErrorHandler::TYPE_ERROR
+                'type' => ErrorHandler::TYPE_ERROR,
+                'view' => $view
             ));
             die();
         }
@@ -55,23 +62,56 @@ class ErrorHandler {
      * @param \Exception $e Caught exception
      */
     public function exceptionHandler(\Exception $e) {
-        if($e->getCode() == '302') {
-            return;
-        }
         $this->handled = true;
+        if($e instanceof \Yeah\Fw\Http\Exception\HttpExceptionInterface) {
+            $this->handleHttpException($e);
+            die();
+        }
+        http_response_code(500);
+        $app = \Yeah\Fw\Application\App::getInstance();
+        $options = $app->getOptions();
+
+        $view = $options['app']['paths']['views'] . DIRECTORY_SEPARATOR . 'error' . DIRECTORY_SEPARATOR . $options['app']['app_name'] . DIRECTORY_SEPARATOR . 'fatal_error.php';
         $this->render(array(
-            'title' => 'Yeah! FW Exception Handler',
-            'message' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'trace' => $e->getTrace(),
-            'type' => ErrorHandler::TYPE_EXCEPTION
+        'title' => 'Yeah! FW Exception Handler',
+        'message' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine(),
+        'trace' => $e->getTrace(),
+        'type' => ErrorHandler::TYPE_EXCEPTION,
+        'view' => $view
         ));
         die();
     }
 
     /**
-     * Last resort error checking. Uset for E_ERROR E_CORE error types which are
+     * Render custom error message when http exception occurs
+     * 
+     * @param \Yeah\Fw\Http\Exception\HttpExceptionInterface $e
+     * @return type
+     */
+    public function handleHttpException(\Yeah\Fw\Http\Exception\HttpExceptionInterface $e) {
+        $status_code = $e->getStatusCode();
+        if($status_code === 302) {
+            return;
+        }
+        $app = \Yeah\Fw\Application\App::getInstance();
+        $options = $app->getOptions();
+
+        $view = $options['app']['paths']['views'] . DIRECTORY_SEPARATOR . 'error' . DIRECTORY_SEPARATOR . $options['app']['app_name'] . DIRECTORY_SEPARATOR . $status_code . '.php';
+        $options = array(
+            'title' => 'Http Exception',
+            'status_code' => $e->getStatusCode(),
+            'message' => $e->getMessage(),
+            'type' => ErrorHandler::TYPE_HTTP_EXCEPTION,
+            'view' => $view
+        );
+
+        $this->render($options);
+    }
+
+    /**
+     * Last resort error checking. Used for E_ERROR E_CORE error types which are
      * not cought by error handler
      */
     public function shutdownHandler() {
@@ -87,11 +127,14 @@ class ErrorHandler {
      * @param array $options Error parameters
      */
     public function render($options) {
-        http_response_code(500);
         $this->renderHtml($options);
     }
 
     public function renderHtml($options) {
+        if(isset($options['view']) && file_exists($options['view'])) {
+            include $options['view'];
+            return;
+        }
         ?>
         <html>
             <head>
@@ -121,9 +164,11 @@ class ErrorHandler {
                     <div id="message">
                         <?php echo $options['message'] ?>
                     </div>
-                    <div id="file">
-                        <?php echo $options['file'] . ' at line ' . $options['line'] ?>
-                    </div>
+                    <?php if($options['type'] != ErrorHandler::TYPE_HTTP_EXCEPTION) { ?>
+                        <div id="file">
+                            <?php echo $options['file'] . ' at line ' . $options['line'] ?>
+                        </div>
+                    <?php } ?>
                     <?php if($options['type'] == ErrorHandler::TYPE_EXCEPTION) { ?>
                         <div id="trace">
 
@@ -142,4 +187,5 @@ class ErrorHandler {
     public function print_r2($array) {
         return '<pre>' . print_r($array, true) . '</pre>';
     }
+
 }

@@ -17,8 +17,8 @@ class DatabaseAuth implements AuthInterface {
      * 
      * @param mixed $options Contains options necesarry for object initialization
      */
-    public function __construct($options) {
-        $this->session_handler = $options['session_handler'];
+    public function __construct(\SessionHandlerInterface $session) {
+        $this->session_handler = $session;
     }
 
     /**

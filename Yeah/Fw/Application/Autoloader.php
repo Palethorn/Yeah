@@ -11,7 +11,7 @@ namespace Yeah\Fw\Application;
 
 class Autoloader {
 
-    private $include_path = null;
+    private $include_paths = array();
 
     /*
      * Sets the path where the autoloader should look for required files
@@ -20,8 +20,8 @@ class Autoloader {
      * 
      * @return \Yeah\Fw\Application\Autoloader
      */
-    public function setIncludePath($inc_path) {
-        $this->include_path = $inc_path;
+    public function addIncludePath($inc_path) {
+        $this->include_paths[] = $inc_path;
         return $this;
     }
 
@@ -30,8 +30,8 @@ class Autoloader {
      * 
      * @return string
      */
-    public function getIncludePath() {
-        return $this->include_path;
+    public function getIncludePaths() {
+        return $this->include_paths;
     }
 
     /**
@@ -48,9 +48,12 @@ class Autoloader {
             $class_name = substr($class_name, $last_ns_pos + 1);
             $file_name = str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
         }
-        $file_name = $this->include_path . DIRECTORY_SEPARATOR . $file_name . DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $class_name) . '.php';
-        if(file_exists($file_name)) {
-            require $file_name;
+        foreach($this->include_paths as $include_path) {
+            $file_name = $include_path . DIRECTORY_SEPARATOR . $file_name . DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $class_name) . '.php';
+            if(file_exists($file_name)) {
+                require $file_name;
+                return;
+            }
         }
     }
 
