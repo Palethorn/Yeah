@@ -9,7 +9,7 @@ class View {
     private $layout = false;
     private $content = '';
 
-    public function __construct(string $views_dir) {
+    public function __construct($views_dir) {
         $this->views_dir = $views_dir;
     }
 

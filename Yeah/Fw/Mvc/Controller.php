@@ -16,12 +16,8 @@ class Controller {
     protected $response = null;
     private $options = null;
 
-    public function __construct($options) {
-        $this->options = $options;
-        $this->session = $options['session'];
-        $this->logger = $options['logger'];
-        $this->request = $options['request'];
-        $this->response = $options['response'];
+    public function __construct() {
+        
     }
 
     /**
@@ -30,13 +26,18 @@ class Controller {
      * @param string $action
      */
     public function execute($action) {
-        $this->$action($this->request);
+        $this->$action();
     }
 
-    public function anonymous($method) {
-        $method($this->request);
+    /**
+     * Executes anonymous method
+     * 
+     * @param Closure method
+     */
+    public function anonymous(\Closure $method) {
+        return $method();
     }
-    
+
     /**
      * Sets controller view
      * 
@@ -105,12 +106,30 @@ class Controller {
     }
 
     /**
+     * Sets HTTP response object
+     * 
+     * @param \Yeah\Fw\Http\Response
+     */
+    public function setResponse(\Yeah\Fw\Http\Response $response) {
+        $this->response = $response;
+    }
+
+    /**
      * Fetches HTTP request object
      * 
      * @return Request
      */
     public function getRequest() {
         return $this->request;
+    }
+
+    /**
+     * Fetches HTTP request object
+     * 
+     * @return Request
+     */
+    public function setRequest(\Yeah\Fw\Http\Request $request) {
+        $this->request = $request;
     }
 
     /**

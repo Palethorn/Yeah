@@ -29,7 +29,7 @@ class Router {
      * @param string $route
      * @return mixed
      */
-    public static function get($route) {
+    public static function match($route) {
 
         foreach(self::$routes as $pattern => $options) {
             $pattern = '#' . $pattern . '#';
@@ -56,19 +56,24 @@ class Router {
      * @return RouteInterface
      */
     public function handle($request) {
-        $request_uri = $request->getRequestUri();
-        if(($route = self::get($request_uri))) {
-            $routeRequest = new $route['route_request_handler']();
-            return $routeRequest->handle($route, $request);
-        } else {
-            $routeRequest = new RouteRequestHandler();
-            return $routeRequest->handle(array(
-                'controller' => $request->getParameter('controller'),
-                'action' => $request->getParameter('action') ? $request->getParameter('action') : '',
-                'secure' => false
-                    ), $request);
+        foreach(self::$routes as $pattern => $options) {
+            $routeRequest = new $options['route_request_handler']();
+            $options['pattern'] = $pattern;
+            $route = $routeRequest->handle($options, $request);
+            if($route) {
+                return $route;
+            }
         }
-        return null;
+        $class = '\\' . ucfirst($request->getParameter('controller')) . 'Controller';
+        if(!class_exists($class)) {
+            throw new \Yeah\Fw\Http\Exception\NotFoundHttpException();
+        }
+        $route = new \Yeah\Fw\Routing\Route\Route();
+        $route->setAction($request->getParameter('action') . '_action');
+        $controller = new $class();
+        $route->setController($controller);
+        $route->setSecure(false);
+        return $route;
     }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Yeah\Fw\Routing;
+namespace Yeah\Fw\Routing\RouteRequest;
 
 /**
  * Exposes route request class methods
@@ -15,5 +15,7 @@ interface RouteRequestHandlerInterface {
      * @param Yeah\Fw\Http\Request $request
      * @return RouteInterface
      */
-    function handle($options, $request);
+    function handle($options, \Yeah\Fw\Http\Request $request);
+    
+    function match($uri, $pattern);
 }

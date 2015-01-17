@@ -14,11 +14,14 @@ namespace Yeah\Fw\Application;
 class App {
 
     protected static $instance = null;
-    private $request = null;
-    private $response = null;
-    private $router = null;
-    private $autoloader = null;
-    private $error_handler = null;
+    protected $request = null;
+    protected $response = null;
+    protected $router = null;
+    protected $autoloader = null;
+    protected $error_handler = null;
+    protected $logger = null;
+    protected $session = null;
+    protected $auth = null;
 
     /**
      * Class constructor.
@@ -49,8 +52,8 @@ class App {
     public function execute() {
         $route = $this->executeRouter();
         $route = $this->executeSecurity($route);
-        $view = $this->executeAction($route);
-        $this->executeRender($view);
+        $action_result = $this->executeAction($route);
+        $this->executeRender($action_result);
     }
 
     /**
@@ -68,7 +71,7 @@ class App {
      * @param mixed $route Route options
      * @return mixed Route options
      */
-    private function executeSecurity(\Yeah\Fw\Routing\RouteInterface $route) {
+    private function executeSecurity(\Yeah\Fw\Routing\Route\RouteInterface $route) {
         if($route->isSecure() && !$this->getAuth()->isAuthenticated()) {
             throw new \Yeah\Fw\Http\Exception\UnauthorizedHttpException();
         }
@@ -82,39 +85,10 @@ class App {
      * @param mixed $route Route options
      * @return \Yeah\Fw\Mvc\View Controller view object
      */
-    private function executeAction(\Yeah\Fw\Routing\RouteInterface $route) {
-        if($route instanceof \Yeah\Fw\Routing\SimpleRoute) {
-            $controller = new \Yeah\Fw\Mvc\Controller(array(
-                'request' => $this->getRequest(),
-                'response' => $this->getResponse(),
-                'session' => null, //$this->getSessionHandler(),
-                'logger' => null, $this->getLogger(),
-                'view' => array(
-                    'views_dir' => $this->getViewsDir()
-                )
-            ));
-            $controller->anonymous($route->getAction());
-            return;
-        }
-        $controller = $route->getController();
-        $method = $route->getAction() . '_action';
-        $class = '\\' . ucfirst($controller) . 'Controller';
-        $this->controller = new $class(array(
-            'request' => $this->getRequest(),
-            'response' => $this->getResponse(),
-            'session' => null, //$this->getSessionHandler(),
-            'logger' => null, $this->getLogger(),
-            'view' => array(
-                'views_dir' => $this->getViewsDir()
-            )
-        ));
-
-        if(!method_exists($this->controller, $method) || !is_callable($class . '::' . $method)) {
-            throw new \Yeah\Fw\Http\Exception\NotFoundHttpException();
-        }
-        $this->controller->$method($this->request);
-        $view = $this->controller->getView();
-        return $view;
+    private function executeAction(\Yeah\Fw\Routing\Route\RouteInterface $route) {
+        return $route->execute(
+                        $this->getRequest(), $this->getResponse(), $this->getSession(), $this->getAuth()
+        );
     }
 
     /**
@@ -123,13 +97,9 @@ class App {
      * 
      * @param \Yeah\Fw\Mvc\View $view Controller view object
      */
-    private function executeRender($view) {
-        if($this->getRequest()->getContentType() == 'application/json') {
-            $this->response->writeJson($view->render());
-        } else if($view != null) {
-            $this->response->writePlain($view->render());
-        } else {
-            $this->response->writePlain($this->controller->getData());
+    private function executeRender($response) {
+        if($response instanceof \Yeah\Fw\Mvc\View) {
+            $this->response->writePlain($response->render());
         }
     }
 
@@ -166,6 +136,9 @@ class App {
      * @return SessionHandlerInterface
      */
     public function getSession() {
+        if($this->session == null) {
+            $this->session = new \Yeah\Fw\Session\NullSessionHandler();
+        }
         return $this->session;
     }
 
@@ -184,6 +157,9 @@ class App {
      * @return \Yeah\Fw\Auth\AuthInterface
      */
     public function getAuth() {
+        if($this->auth == null) {
+            $this->auth = new \Yeah\Fw\Auth\NullAuth();
+        }
         return $this->auth;
     }
 
@@ -202,6 +178,9 @@ class App {
      * @return \Yeah\Fw\Logger\LoggerInterface
      */
     public function getLogger() {
+        if($this->logger == null) {
+            $this->logger = new \Yeah\Fw\Logger\NullLogger();
+        }
         return $this->logger;
     }
 
@@ -257,11 +236,39 @@ class App {
         
     }
 
-    public function get($url, $method, $secure = false) {
+    public function routeGet($url, $method, $secure = false) {
         \Yeah\Fw\Routing\Router::add($url, array(
-            'route_request_handler' => 'Yeah\Fw\Routing\SimpleRouteRequestHandler',
+            'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
             'secure' => $secure,
-            'method' => $method
+            'method' => $method,
+            'http_method' => 'GET'
+        ));
+    }
+
+    public function routePost($url, $method, $secure = false) {
+        \Yeah\Fw\Routing\Router::add($url, array(
+            'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
+            'secure' => $secure,
+            'method' => $method,
+            'http_method' => 'POST'
+        ));
+    }
+
+    public function routePut($url, $method, $secure = false) {
+        \Yeah\Fw\Routing\Router::add($url, array(
+            'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
+            'secure' => $secure,
+            'method' => $method,
+            'http_method' => 'PUT'
+        ));
+    }
+
+    public function routeDelete($url, $method, $secure = false) {
+        \Yeah\Fw\Routing\Router::add($url, array(
+            'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
+            'secure' => $secure,
+            'method' => $method,
+            'http_method' => 'DELETE'
         ));
     }
 

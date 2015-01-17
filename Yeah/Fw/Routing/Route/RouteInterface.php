@@ -1,6 +1,6 @@
 <?php
 
-namespace Yeah\Fw\Routing;
+namespace Yeah\Fw\Routing\Route;
 
 /**
  * Exposes route class methods
@@ -25,17 +25,16 @@ interface RouteInterface {
     /**
      * Retrieves requested controller
      * 
-     * @param array $options
-     * @return string
+     * @return \Yeah\Fw\Mvc\Controller
      */
     function getController();
 
     /**
      * Sets requested controller
      * 
-     * @param string $controller
+     * @param \Yeah\Fw\Mvc\Controller $controller
      */
-    function setController($controller);
+    function setController(\Yeah\Fw\Mvc\Controller $controller);
 
     /**
      * Returns true if route is secure, false if not
@@ -50,4 +49,9 @@ interface RouteInterface {
      * @param bool $secure
      */
     function setSecure($secure);
+
+    /**
+     * Executes route action
+     */
+    function execute(\Yeah\Fw\Http\Request $request, \Yeah\Fw\Http\Response $response, \SessionHandlerInterface $session, \Yeah\Fw\Auth\AuthInterface $auth);
 }

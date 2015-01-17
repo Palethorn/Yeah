@@ -12,13 +12,11 @@ class FileLogger implements \Yeah\Fw\Logger\LoggerInterface {
 
     private $log = null;
     private $level = null;
-    private $options = array();
 
-    public function __construct($options) {
-        $this->options = $options;
-        $path = str_replace(array('/', '\\'), DS, $options['log_path']);
+    public function __construct($path, $log_level) {
+        $path = str_replace(array('/', '\\'), DS,$path);
         $this->log = new \Yeah\Fw\Filesystem\File($path, 'a');
-        $this->level = $options['log_level'];
+        $this->level = $log_level;
     }
 
     public function emergency($message, array $context = array()) {
