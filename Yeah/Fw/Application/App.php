@@ -37,7 +37,7 @@ class App {
         $this->error_handler = new \Yeah\Fw\Error\ErrorHandler();
     }
 
-    private function registerAutoloaders() {
+    protected function registerAutoloaders() {
         require_once $this->getLibDir() . DS . 'Yeah' . DS . 'Fw' . DS . 'Application' . DS . 'Autoloader.php';
         $this->autoloader = new Autoloader();
         $this->autoloader->addIncludePath($this->getLibDir());
@@ -98,8 +98,11 @@ class App {
      * @param \Yeah\Fw\Mvc\View $view Controller view object
      */
     private function executeRender($response) {
-        if($response instanceof \Yeah\Fw\Mvc\View) {
+        if($response instanceof \Yeah\Fw\Mvc\ViewInterface) {
             $this->response->writePlain($response->render());
+        }
+        if(is_array($response)) {
+            $this->response->writePlain($this->getView()->setTemplate('index.php.twig')->withParams($response)->render());
         }
     }
 
@@ -182,6 +185,14 @@ class App {
             $this->logger = new \Yeah\Fw\Logger\NullLogger();
         }
         return $this->logger;
+    }
+
+    /**
+     * 
+     * @return \Yeah\Fw\Mvc\ViewInterface
+     */
+    public function getView() {
+        
     }
 
     /**

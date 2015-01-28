@@ -2,7 +2,7 @@
 
 namespace Yeah\Fw\Mvc;
 
-class View {
+class View implements ViewInterface {
 
     public $params = array();
     private $name = false;
