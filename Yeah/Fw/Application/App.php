@@ -22,19 +22,20 @@ class App {
     protected $logger = null;
     protected $session = null;
     protected $auth = null;
+    protected $view = null;
 
     /**
      * Class constructor.
      * @param mixed $options Configuration options
      * 
      */
-    protected function __construct($base_dir) {
-        $this->base_dir = $base_dir;
+    protected function __construct() {
         $this->registerAutoloaders();
         $this->router = new \Yeah\Fw\Routing\Router();
         $this->request = new \Yeah\Fw\Http\Request();
         $this->response = new \Yeah\Fw\Http\Response();
         $this->error_handler = new \Yeah\Fw\Error\ErrorHandler();
+        $this->loadRoutes();
     }
 
     protected function registerAutoloaders() {
@@ -46,6 +47,13 @@ class App {
         $this->autoloader->register();
     }
 
+    public function loadRoutes() {
+        $routes_location = $this->getBaseDir() . DS . 'config' . DS . 'routes.php';
+        if(file_exists($routes_location)) {
+            require_once $routes_location;
+        }
+    }
+    
     /**
      * Begins chain execution
      */
@@ -102,7 +110,16 @@ class App {
             $this->response->writePlain($response->render());
         }
         if(is_array($response)) {
-            $this->response->writePlain($this->getView()->setTemplate('index.php.twig')->withParams($response)->render());
+            $layout = isset($response['layout']) ? $response['layout'] : 'default';
+            $template = isset($response['template']) ? $response['template'] : ($this->request->getParameter('action') ? $this->request->getParameter('action') : 'index');
+            $this->response
+                    ->writePlain(
+                            $this->getView()
+                            ->setTemplate($template)
+                            ->withLayout($layout)
+                            ->withParams($response)
+                            ->render()
+            );
         }
     }
 
@@ -192,7 +209,10 @@ class App {
      * @return \Yeah\Fw\Mvc\ViewInterface
      */
     public function getView() {
-        
+        if(!$this->view) {
+            $this->view = new \Yeah\Fw\Mvc\PhpView($this->getViewsDir());
+        }
+        return $this->view;
     }
 
     /**
@@ -212,35 +232,35 @@ class App {
     }
 
     public function getBaseDir() {
-        return $this->base_dir;
+        return dirname(__FILE__) . DS . '..' . '..' . '..';
     }
 
     public function getLibDir() {
-        return $this->base_dir . DS . 'lib';
+        return $this->getBaseDir() . DS . 'lib';
     }
 
     public function getWebDir() {
-        return $this->base_dir . DS . 'web';
+        return $this->getBaseDir() . DS . 'web';
     }
 
     public function getCacheDir() {
-        return $this->base_dir . DS . 'cache';
+        return $this->getBaseDir() . DS . 'cache';
     }
 
     public function getLogDir() {
-        return $this->base_dir . DS . 'log';
+        return $this->getBaseDir() . DS . 'log';
     }
 
     public function getControllersDir() {
-        return $this->base_dir . DS . 'controllers';
+        return $this->getBaseDir() . DS . 'controllers';
     }
 
     public function getModelsDir() {
-        return $this->base_dir . DS . 'models';
+        return $this->getBaseDir() . DS . 'models';
     }
 
     public function getViewsDir() {
-        return $this->base_dir . DS . 'views';
+        return $this->getBaseDir() . DS . 'views';
     }
 
     private function __clone() {
@@ -289,9 +309,9 @@ class App {
      * @param mixed $options Application options
      * @return \Yeah\Fw\Application\App
      */
-    public static function getInstance($base_dir = null) {
+    public static function getInstance() {
         if(!isset(static::$instance)) {
-            static::$instance = new App($base_dir);
+            static::$instance = new App();
         }
         return static::$instance;
     }

@@ -2,10 +2,10 @@
 
 namespace Yeah\Fw\Mvc;
 
-class View implements ViewInterface {
+class PhpView implements ViewInterface {
 
     public $params = array();
-    private $name = false;
+    private $template = false;
     private $layout = false;
     private $content = '';
 
@@ -25,7 +25,7 @@ class View implements ViewInterface {
      */
 
     public function setTemplate($template = false) {
-        $this->name = $template;
+        $this->template = $template;
         return $this;
     }
 
@@ -39,7 +39,9 @@ class View implements ViewInterface {
     }
 
     public function withParams($params) {
-        $this->params = $params;
+        foreach($params as $key => $val) {
+            $this->$key = $val;
+        }
         return $this;
     }
 
@@ -97,11 +99,11 @@ class View implements ViewInterface {
     }
 
     public function renderView() {
-        if(!$this->name) {
+        if(!$this->template) {
             return;
         }
-        $this->name = str_replace('/', DS, $this->name);
-        $view = $this->name . '.php';
+        $this->template = str_replace('/', DS, $this->template);
+        $view = $this->template . '.php';
         if(!file_exists($this->views_dir . DS . $view)) {
             throw new \Exception('View not found.', 500, null);
         }

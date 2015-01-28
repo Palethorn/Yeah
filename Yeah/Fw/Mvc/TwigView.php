@@ -10,10 +10,10 @@ class TwigView implements ViewInterface {
     private $content = '';
     private $twig;
 
-    public function __construct($views_dir) {
+    public function __construct($views_dir, $options = array()) {
         $this->views_dir = $views_dir;
         $loader = new \Twig_Loader_Filesystem($this->views_dir);
-        $this->twig = new \Twig_Environment($loader);
+        $this->twig = new \Twig_Environment($loader, $options);
     }
 
     public function render() {
@@ -21,7 +21,7 @@ class TwigView implements ViewInterface {
     }
 
     public function setTemplate($template = false) {
-        $this->template = $template;
+        $this->template = $template . '.php.twig';
         return $this;
     }
 
@@ -39,5 +39,4 @@ class TwigView implements ViewInterface {
         $this->params = array_merge($this->params, $params);
         return $this;
     }
-
 }

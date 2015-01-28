@@ -26,7 +26,7 @@ class Controller {
      * @param string $action
      */
     public function execute($action) {
-        $this->$action();
+        return $this->$action();
     }
 
     /**

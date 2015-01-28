@@ -36,7 +36,7 @@ class Route implements RouteInterface {
         $method = $this->getAction();
         $this->getController()->setRequest($request);
         $this->getController()->setResponse($response);
-        $this->getController()->execute($method);
+        return $this->getController()->execute($method);
     }
 
 }
