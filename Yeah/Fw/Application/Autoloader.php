@@ -17,7 +17,6 @@ class Autoloader {
      * Sets the path where the autoloader should look for required files
      * 
      * @param string $inc_path Include path parameter
-     * 
      * @return \Yeah\Fw\Application\Autoloader
      */
     public function addIncludePath($inc_path) {
@@ -36,6 +35,8 @@ class Autoloader {
 
     /**
      * Automatically loads required file based on it's namespace
+     * Uses any registered directory path as library root then resolves
+     * relative path based on namespace
      * 
      * @param string $class_name Class name with its appropriate namespace
      */

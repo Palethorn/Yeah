@@ -14,11 +14,22 @@ class Request {
     private $method = null;
     private $requestBody = null;
 
-    public function __construct($options = array()) {
+    /**
+     * 
+     * @param array $options
+     */
+    public function __construct() {
         $this->retrieveRequestHeaders();
         $this->parseParameters();
     }
 
+    /**
+     * Magic method for accessing parameters by using get* pattern
+     * 
+     * @param string $method
+     * @param array $args
+     * @return mixed
+     */
     public function __call($method, $args) {
         if(strpos($method, 'get') == 0) {
             $key = strtolower(str_replace('get', '', $method));
@@ -31,6 +42,7 @@ class Request {
      */
     public function retrieveRequestHeaders() {
         foreach($_SERVER as $key => $value) {
+            $value = filter_input(INPUT_SERVER, $key);
             $key = strtolower(str_replace(array('-', '_', 'HTTP'), '', $key));
             $this->headers[$key] = $value;
         }
@@ -81,7 +93,7 @@ class Request {
      * Parses GET parameters
      */
     public function parseGetParameters() {
-        $params = str_replace('?', '/', $this->getRequestUri());
+        $params = str_replace('?', '/', $this->_getRequestUri());
         $params = str_replace('=', '/', $params);
         $params = str_replace('&', '/', $params);
         $params = explode('/', $params);
@@ -102,6 +114,7 @@ class Request {
      */
     public function parsePostParameters() {
         foreach($_POST as $key => $value) {
+            $value = filter_input(INPUT_POST, $key);
             $this->parameters[$key] = $value;
         }
     }
@@ -152,7 +165,25 @@ class Request {
      * @return string
      */
     public function getRequestMethod() {
-        return $_SERVER['REQUEST_METHOD'];
+        return filter_input(INPUT_SERVER, 'REQUEST_METHOD', FILTER_SANITIZE_STRING);
     }
 
+    /**
+     * Return request uri with query string
+     * 
+     * @return string
+     */
+    private function _getRequestUri() {
+        return filter_input(INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_STRING);
+    }
+    
+    /**
+     * Return request uri without query string
+     * 
+     * @return string
+     */
+    public function getRequestUri() {
+        return explode('?', $this->_getRequestUri())[0];
+    }
+    
 }

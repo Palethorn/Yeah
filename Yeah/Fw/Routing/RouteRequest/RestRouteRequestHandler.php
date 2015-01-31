@@ -4,6 +4,9 @@ namespace Yeah\Fw\Routing\RouteRequest;
 
 class RestRouteRequestHandler implements RouteRequestHandlerInterface {
 
+    /**
+     * {@inheritdoc}
+     */
     public function handle($options, \Yeah\Fw\Http\Request $request) {
         if(!$this->match($request->getRequestUri(), $options['pattern']) || !$this->checkMethod($options, $request->getRequestMethod())) {
             return false;
@@ -29,8 +32,11 @@ class RestRouteRequestHandler implements RouteRequestHandlerInterface {
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function match($uri, $pattern) {
-        $pattern = '#' . $pattern . '#';
+        $pattern = '#^' . $pattern . '$#';
         if(preg_match($pattern, $uri)) {
             return true;
         }

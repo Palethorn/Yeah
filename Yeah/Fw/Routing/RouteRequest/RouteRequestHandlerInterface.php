@@ -8,14 +8,21 @@ namespace Yeah\Fw\Routing\RouteRequest;
  * @author David Cavar
  */
 interface RouteRequestHandlerInterface {
+
     /**
-     * Generates route object from request
+     * Checks match contition and generates route object from request
      * 
      * @param array $options
      * @param Yeah\Fw\Http\Request $request
      * @return RouteInterface
      */
     function handle($options, \Yeah\Fw\Http\Request $request);
-    
+
+    /**
+     * Tries to match requested uri with route pattern
+     * 
+     * @param string $uri
+     * @param string $pattern
+     */
     function match($uri, $pattern);
 }

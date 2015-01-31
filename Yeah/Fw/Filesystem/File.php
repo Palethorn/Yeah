@@ -13,6 +13,12 @@ class File {
     private $mode;
     private $location;
 
+    /**
+     * Create new instance
+     * 
+     * @param string $location
+     * @param char $mode
+     */
     public function __construct($location, $mode = 'r') {
         $this->open($location, $mode);
         if($this->opened()) {
@@ -21,10 +27,23 @@ class File {
         }
     }
 
+    /**
+     * Opens file handler
+     * 
+     * @param string $location
+     * @param char $mode
+     */
     public function open($location, $mode) {
         $this->fp = fopen($location, $mode);
     }
 
+    /**
+     * Writes data to file
+     * 
+     * @param mixed $data
+     * @param int $length
+     * @throws \Exception
+     */
     public function write($data, $length = null) {
         if($this->mode == 'r') {
             throw new \Exception('Invalid filemode.', 500, null);
@@ -37,6 +56,13 @@ class File {
         }
     }
 
+    /**
+     * Reads file content
+     * 
+     * @param int $length
+     * @return mixed
+     * @throws \Exception
+     */
     public function read($length = 1024) {
         if(strstr($this->mode, 'r') && $this->opened()) {
             return fread($this->fp, $length);
@@ -44,6 +70,11 @@ class File {
         throw new \Exception('Invalid operation.', 500, null);
     }
 
+    /**
+     * Check if file is already opened
+     * 
+     * @return boolean
+     */
     public function opened() {
         if($this->fp) {
             return true;
@@ -51,14 +82,27 @@ class File {
         return false;
     }
 
+    /**
+     * Returns file size
+     * 
+     * @return int
+     */
     public function getSize() {
         return filesize($this->location);
     }
 
+    /**
+     * Return file location
+     * 
+     * @return string
+     */
     public function getLocation() {
         return $this->location;
     }
 
+    /**
+     * Closes file handler
+    */
     public function __destruct() {
         fclose($this->fp);
         $this->fp = null;

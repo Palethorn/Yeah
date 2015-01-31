@@ -17,6 +17,11 @@ class DatabaseSessionHandler extends SessionHandlerAbstract {
     private $last_access = null;
     private $db = null;
 
+    /**
+     * Create new instance
+     * 
+     * @param array $options
+     */
     public function __construct($options) {
         if($options['static_url'] == 'http://' . $_SERVER['HTTP_HOST']) {
             return;

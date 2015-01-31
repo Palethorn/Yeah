@@ -39,34 +39,6 @@ class Controller {
     }
 
     /**
-     * Sets controller view
-     * 
-     * @param string $view
-     * @return View
-     */
-    public function setView($view) {
-        $this->view = new View($this->options['view']);
-        $flash = $this->session->getSessionParam('flash');
-        if($flash) {
-            $this->session->removeSessionParam('flash');
-            $this->view->setMessage($flash['text'], $flash['type']);
-        }
-        return $this->view;
-    }
-
-    /**
-     * Fetches current view
-     * 
-     * @return View
-     */
-    public function getView() {
-        if(!$this->view) {
-            $this->view = new \Yeah\Fw\Mvc\View($this->options['view']);
-        }
-        return $this->view;
-    }
-
-    /**
      * Fetches controller response data
      * 
      * @return string
@@ -130,6 +102,42 @@ class Controller {
      */
     public function setRequest(\Yeah\Fw\Http\Request $request) {
         $this->request = $request;
+    }
+
+    /**
+     * Return session handler instance
+     * 
+     * @return \SessionHandlerInterface
+     */
+    public function getSessionHandler() {
+        return $this->session;
+    }
+
+    /**
+     * Set session handler instance
+     * 
+     * @param \SessionHandlerInterface $session
+     */
+    public function setSessionHandler(\SessionHandlerInterface $session) {
+        $this->session = $session;
+    }
+
+    /**
+     * Return authentication handler
+     * 
+     * @return \Yeah\Fw\Auth\AuthInterface
+     */
+    public function getAuth() {
+        return $this->auth;
+    }
+
+    /**
+     * Set authentication handler
+     * 
+     * @param \Yeah\Fw\Auth\AuthInterface $auth
+     */
+    public function setAuth(\Yeah\Fw\Auth\AuthInterface $auth) {
+        $this->auth = $auth;
     }
 
     /**

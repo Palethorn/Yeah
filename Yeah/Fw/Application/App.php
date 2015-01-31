@@ -5,6 +5,12 @@ namespace Yeah\Fw\Application;
 /**
  * Implements singleton pattern. Used for application request entry point
  * 
+ * @property \Yeah\Fw\Error\ErrorHandler $error_handler
+ * @property \Yeah\Fw\Logger\LoggerInterface $logger
+ * @property \SessionHandlerInterface $session
+ * @property \Yeah\Fw\Auth\AuthInterface $auth
+ * @property \Yeah\Fw\Mvc\View\ViewInterface $view
+ * @property \Yeah\Fw\Application\DependencyContainer $dc
  * @property Router $router
  * @property Request $request
  * @property Response $response
@@ -23,21 +29,26 @@ class App {
     protected $session = null;
     protected $auth = null;
     protected $view = null;
+    protected $dc = null;
 
     /**
      * Class constructor.
      * @param mixed $options Configuration options
      * 
      */
-    protected function __construct() {
+    public function __construct() {
         $this->registerAutoloaders();
         $this->router = new \Yeah\Fw\Routing\Router();
         $this->request = new \Yeah\Fw\Http\Request();
         $this->response = new \Yeah\Fw\Http\Response();
         $this->error_handler = new \Yeah\Fw\Error\ErrorHandler();
         $this->loadRoutes();
+        $this->dc = new DependencyContainer();
     }
 
+    /**
+     * Register autoloader paths for probing
+     */
     protected function registerAutoloaders() {
         require_once $this->getLibDir() . DS . 'Yeah' . DS . 'Fw' . DS . 'Application' . DS . 'Autoloader.php';
         $this->autoloader = new Autoloader();
@@ -47,13 +58,16 @@ class App {
         $this->autoloader->register();
     }
 
+    /**
+     * Load additional routes
+     */
     public function loadRoutes() {
         $routes_location = $this->getBaseDir() . DS . 'config' . DS . 'routes.php';
         if(file_exists($routes_location)) {
             require_once $routes_location;
         }
     }
-    
+
     /**
      * Begins chain execution
      */
@@ -223,42 +237,89 @@ class App {
         $this->logger = $logger;
     }
 
+    /**
+     * Set custom autoloader
+     * 
+     * @param \Yeah\Fw\Application\Autoloader $autoloader
+     */
     public function setAutoloader(Autoloader $autoloader) {
         $this->autoloader = $autoloader;
     }
 
+    /**
+     * Get application autoloader
+     * @param \Yeah\Fw\Application\Autoloader $autoloader
+     */
     public function getAutoloader(Autoloader $autoloader) {
         $this->autoloader = $autoloader;
     }
 
+    /**
+     * Returns path for application root dir
+     * @return string
+     */
     public function getBaseDir() {
-        return dirname(__FILE__) . DS . '..' . '..' . '..';
+        return dirname(__FILE__) . DS . '..' . DS . '..' . DS . '..' . DS . '..';
     }
 
+    /**
+     * Returns path for library directory
+     * @return string
+     */
     public function getLibDir() {
         return $this->getBaseDir() . DS . 'lib';
     }
 
+    /**
+     * Returns path for public directory
+     * 
+     * @return string
+     */
     public function getWebDir() {
         return $this->getBaseDir() . DS . 'web';
     }
 
+    /**
+     * Return path for cache directory
+     * 
+     * @return string
+     */
     public function getCacheDir() {
         return $this->getBaseDir() . DS . 'cache';
     }
 
+    /**
+     * Returns path for logs directory
+     * 
+     * @return string
+     */
     public function getLogDir() {
         return $this->getBaseDir() . DS . 'log';
     }
 
+    /**
+     * Returns path for controllers directory
+     * 
+     * @return string
+     */
     public function getControllersDir() {
         return $this->getBaseDir() . DS . 'controllers';
     }
 
+    /**
+     * Returns path for models directory
+     * 
+     * @return string
+     */
     public function getModelsDir() {
         return $this->getBaseDir() . DS . 'models';
     }
 
+    /**
+     * Returns path for views directors
+     * 
+     * @return string
+     */
     public function getViewsDir() {
         return $this->getBaseDir() . DS . 'views';
     }
@@ -267,6 +328,13 @@ class App {
         
     }
 
+    /**
+     * Adds new simple route for GET HTTP method
+     * 
+     * @param string $url
+     * @param string $method
+     * @param bool $secure
+     */
     public function routeGet($url, $method, $secure = false) {
         \Yeah\Fw\Routing\Router::add($url, array(
             'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
@@ -276,6 +344,13 @@ class App {
         ));
     }
 
+    /**
+     * Adds new simple route for POST HTTP method
+     * 
+     * @param string $url
+     * @param string $method
+     * @param bool $secure
+     */
     public function routePost($url, $method, $secure = false) {
         \Yeah\Fw\Routing\Router::add($url, array(
             'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
@@ -285,6 +360,13 @@ class App {
         ));
     }
 
+    /**
+     * Adds new simple route for PUT HTTP method
+     * 
+     * @param string $url
+     * @param string $method
+     * @param bool $secure
+     */
     public function routePut($url, $method, $secure = false) {
         \Yeah\Fw\Routing\Router::add($url, array(
             'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
@@ -294,6 +376,13 @@ class App {
         ));
     }
 
+    /**
+     * Adds new simple route for DELETE HTTP method
+     * 
+     * @param string $url
+     * @param string $method
+     * @param bool $secure
+     */
     public function routeDelete($url, $method, $secure = false) {
         \Yeah\Fw\Routing\Router::add($url, array(
             'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
@@ -301,6 +390,15 @@ class App {
             'method' => $method,
             'http_method' => 'DELETE'
         ));
+    }
+
+    /**
+     * Returns dependency container object
+     * 
+     * @return DependencyContainer
+     */
+    public function getDependencyContainer() {
+        return $this->dc;
     }
 
     /**

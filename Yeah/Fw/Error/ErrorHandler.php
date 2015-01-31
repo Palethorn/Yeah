@@ -40,7 +40,7 @@ class ErrorHandler {
         $this->handled = true;
         if($errno & error_reporting()) {
             http_response_code(500);
-            $app = \Yeah\Fw\Application\App::getInstance();
+            //$app = \Yeah\Fw\Application\App::getInstance();
             //$options = $app->getOptions();
             //$view = $options['app']['paths']['views'] . DIRECTORY_SEPARATOR . 'error' . DIRECTORY_SEPARATOR . $options['app']['app_name'] . DIRECTORY_SEPARATOR . 'fatal_error.php';
             $this->render(array(
@@ -67,7 +67,7 @@ class ErrorHandler {
             die();
         }
         http_response_code(500);
-        $app = \Yeah\Fw\Application\App::getInstance();
+        //$app = \Yeah\Fw\Application\App::getInstance();
         //$options = $app->getOptions();
 
         //$view = $options['app']['paths']['views'] . DIRECTORY_SEPARATOR . 'error' . DIRECTORY_SEPARATOR . $options['app']['app_name'] . DIRECTORY_SEPARATOR . 'fatal_error.php';
@@ -109,7 +109,7 @@ class ErrorHandler {
     }
 
     /**
-     * Last resort error checking. Used for E_ERROR E_CORE error types which are
+     * Last resort error checking. Used for E_ERROR and E_CORE error types which are
      * not cought by error handler
      */
     public function shutdownHandler() {
@@ -182,6 +182,12 @@ class ErrorHandler {
         <?php
     }
 
+    /**
+     * Prints formatted array
+     * 
+     * @param array $array
+     * @return string
+     */
     public function print_r2($array) {
         return '<pre>' . print_r($array, true) . '</pre>';
     }

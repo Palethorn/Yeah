@@ -24,23 +24,6 @@ class Router {
     }
 
     /**
-     * Retrieves route options
-     * 
-     * @param string $route
-     * @return mixed
-     */
-    public static function match($route) {
-
-        foreach(self::$routes as $pattern => $options) {
-            $pattern = '#' . $pattern . '#';
-            if(preg_match($pattern, $route)) {
-                return $options;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Removes route under specified URI key
      * 
      * @param string $route URI key
@@ -69,7 +52,7 @@ class Router {
             throw new \Yeah\Fw\Http\Exception\NotFoundHttpException();
         }
         $route = new \Yeah\Fw\Routing\Route\Route();
-        $route->setAction($request->getParameter('action') . '_action');
+        $route->setAction($request->getParameter('action'));
         $controller = new $class();
         $route->setController($controller);
         $route->setSecure(false);

@@ -93,7 +93,7 @@ class Response {
      */
     public function redirect($uri) {
         $this->header('Location', $uri);
-        throw new \Exception('Redirecting', 302, null);
+        throw new Exception\FoundHttpException();
     }
 
     /**
@@ -102,12 +102,17 @@ class Response {
      * @param string $text
      * @param string $type
      * @return \Yeah\Fw\Http\Response
+     * 
+     * TODO: Remove this function and its references
      */
     public function setFlash($text, $type = 'info') {
         \Yeah\Fw\Application\App::getInstance()->getSessionHandler()->setSessionParam('flash', array('text' => $text, 'type' => $type));
         return $this;
     }
 
+    /**
+     * Closes the output handler
+     */
     public function __destruct() {
         fclose($this->output);
     }

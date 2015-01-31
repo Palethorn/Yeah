@@ -21,6 +21,12 @@ class ImagickAdapter extends \Imagick {
     public $mime_type;
     public $aspect_ratio;
 
+    /**
+     * Creates new instance
+     * 
+     * @param string $path
+     * @throws \Exception
+     */
     public function __construct($path) {
         if(!file_exists($path)) {
             throw new \Exception('Image not found!', 404, null);

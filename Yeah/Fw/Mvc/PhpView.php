@@ -9,10 +9,21 @@ class PhpView implements ViewInterface {
     private $layout = false;
     private $content = '';
 
+    /**
+     * Create new view instance
+     * 
+     * @param string $views_dir
+     */
     public function __construct($views_dir) {
         $this->views_dir = $views_dir;
     }
 
+    /**
+     * Magic method for accessing anonymous object properties
+     * 
+     * @param string $name
+     * @param array $arguments
+     */
     public function __call($name, $arguments) {
         if(strpos($name, 'setMeta') === 0) {
             $key = str_replace('setMeta', '', $name);
@@ -20,24 +31,32 @@ class PhpView implements ViewInterface {
         }
     }
 
-    /*
-     * @return View
+    /**
+     * {@inheritdoc}
      */
-
     public function setTemplate($template = false) {
         $this->template = $template;
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setContent($content) {
         $this->content = $content;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function withLayout($layout) {
         $this->layout = $layout;
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function withParams($params) {
         foreach($params as $key => $val) {
             $this->$key = $val;
@@ -45,6 +64,9 @@ class PhpView implements ViewInterface {
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function with($key, $value) {
         $this->$key = $value;
         return $this;
@@ -72,6 +94,10 @@ class PhpView implements ViewInterface {
         return $this;
     }
 
+    /**
+     * 
+     * @return page title
+     */
     public function getTitle() {
         if(isset($this->title)) {
             return $this->title;
@@ -79,12 +105,21 @@ class PhpView implements ViewInterface {
         return '';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function render() {
         $this->renderView();
         $this->renderLayout();
         return $this->content;
     }
 
+    /**
+     * Render layout
+     * 
+     * @return string
+     * @throws \Exception
+     */
     public function renderLayout() {
         if(!$this->layout) {
             return;
@@ -98,6 +133,12 @@ class PhpView implements ViewInterface {
         ob_end_clean();
     }
 
+    /**
+     * Render view
+     * 
+     * @return string
+     * @throws \Exception
+     */
     public function renderView() {
         if(!$this->template) {
             return;
