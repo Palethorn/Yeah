@@ -5,16 +5,16 @@ namespace Yeah\Fw\Application;
 /**
  * Implements singleton pattern. Used for application request entry point
  * 
- * @property \Yeah\Fw\Error\ErrorHandler $error_handler
- * @property \Yeah\Fw\Logger\LoggerInterface $logger
- * @property \SessionHandlerInterface $session
- * @property \Yeah\Fw\Auth\AuthInterface $auth
- * @property \Yeah\Fw\Mvc\View\ViewInterface $view
- * @property \Yeah\Fw\Application\DependencyContainer $dc
+ * @property \\Yeah\\Fw\\Error\\ErrorHandler $error_handler
+ * @property \\Yeah\\Fw\\Logger\\LoggerInterface $logger
+ * @property \\SessionHandlerInterface $session
+ * @property \\Yeah\\Fw\\Auth\\AuthInterface $auth
+ * @property \\Yeah\\Fw\\Mvc\\View\\ViewInterface $view
+ * @property \\Yeah\\Fw\\Application\\DependencyContainer $dc
  * @property Router $router
  * @property Request $request
  * @property Response $response
- * @property \Yeah\Fw\Application\Autoloader $autoloader
+ * @property \\Yeah\\Fw\\Application\\Autoloader $autoloader
  * @author David Cavar
  */
 class App {
@@ -105,7 +105,7 @@ class App {
      * Don't invoke unless you know what you're doing.
      * 
      * @param mixed $route Route options
-     * @return \Yeah\Fw\Mvc\View Controller view object
+     * @return \\Yeah\\Fw\\Mvc\\View Controller view object
      */
     private function executeAction(\Yeah\Fw\Routing\Route\RouteInterface $route) {
         return $route->execute(
@@ -117,7 +117,7 @@ class App {
      * Executes view rendering inside chain execution.
      * Don't invoke unless you know what you're doing.
      * 
-     * @param \Yeah\Fw\Mvc\View $view Controller view object
+     * @param \\Yeah\\Fw\\Mvc\\View $view Controller view object
      */
     private function executeRender($response) {
         if($response instanceof \Yeah\Fw\Mvc\ViewInterface) {
@@ -140,7 +140,7 @@ class App {
     /**
      * getter for HTTP request object
      * 
-     * @return \Yeah\Fw\Http\Request
+     * @return \\Yeah\\Fw\\Http\\Request
      */
     public function getRequest() {
         return $this->request;
@@ -149,7 +149,7 @@ class App {
     /**
      * Getter for HTTP response object
      * 
-     * @return \Yeah\Fw\Http\Response
+     * @return \\Yeah\\Fw\\Http\\Response
      */
     public function getResponse() {
         return $this->response;
@@ -158,7 +158,7 @@ class App {
     /**
      * Getter for router object
      * 
-     * @return \Yeah\Fw\Routing\Router
+     * @return \\Yeah\\Fw\\Routing\\Router
      */
     public function getRouter() {
         return $this->router;
@@ -179,7 +179,7 @@ class App {
     /**
      * Setter for session handler object
      * 
-     * @params \SessionHandlerInterface $session
+     * @params \\SessionHandlerInterface $session
      */
     public function setSession(\SessionHandlerInterface $session) {
         $this->session = $session;
@@ -188,7 +188,7 @@ class App {
     /**
      * Getter for authentication object
      * 
-     * @return \Yeah\Fw\Auth\AuthInterface
+     * @return \\Yeah\\Fw\\Auth\\AuthInterface
      */
     public function getAuth() {
         if($this->auth == null) {
@@ -200,7 +200,7 @@ class App {
     /**
      * Setter for authentication object
      * 
-     * @param \Yeah\Fw\Auth\AuthInterface $auth
+     * @param \\Yeah\\Fw\\Auth\\AuthInterface $auth
      */
     public function setAuth(\Yeah\Fw\Auth\AuthInterface $auth) {
         $this->auth = $auth;
@@ -209,7 +209,7 @@ class App {
     /**
      * Getter for logger object
      * 
-     * @return \Yeah\Fw\Logger\LoggerInterface
+     * @return \\Yeah\\Fw\\Logger\\LoggerInterface
      */
     public function getLogger() {
         if($this->logger == null) {
@@ -220,7 +220,7 @@ class App {
 
     /**
      * 
-     * @return \Yeah\Fw\Mvc\ViewInterface
+     * @return \\Yeah\\Fw\\Mvc\\ViewInterface
      */
     public function getView() {
         if(!$this->view) {
@@ -231,7 +231,7 @@ class App {
 
     /**
      * Setter for logger object
-     * @param \Yeah\Fw\Logger\LoggerInterface $logger
+     * @param \\Yeah\\Fw\\Logger\\LoggerInterface $logger
      */
     public function setLogger(\Yeah\Fw\Logger\LoggerInterface $logger) {
         $this->logger = $logger;
@@ -240,7 +240,7 @@ class App {
     /**
      * Set custom autoloader
      * 
-     * @param \Yeah\Fw\Application\Autoloader $autoloader
+     * @param \\Yeah\\Fw\\Application\\Autoloader $autoloader
      */
     public function setAutoloader(Autoloader $autoloader) {
         $this->autoloader = $autoloader;
@@ -248,7 +248,7 @@ class App {
 
     /**
      * Get application autoloader
-     * @param \Yeah\Fw\Application\Autoloader $autoloader
+     * @param \\Yeah\\Fw\\Application\\Autoloader $autoloader
      */
     public function getAutoloader(Autoloader $autoloader) {
         $this->autoloader = $autoloader;
@@ -405,7 +405,7 @@ class App {
      * Returns current application instance
      * 
      * @param mixed $options Application options
-     * @return \Yeah\Fw\Application\App
+     * @return \\Yeah\\Fw\\Application\\App
      */
     public static function getInstance() {
         if(!isset(static::$instance)) {

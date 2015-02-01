@@ -540,7 +540,7 @@ table.memberdecls {
         color: white;
         font-weight: bold;
         /*text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);*/
-        background-color: #da5c00;
+        background-color: #272822;
         /* opera specific markup */
         box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
         border-top-right-radius: 4px;

@@ -3,7 +3,7 @@
 namespace Yeah\Fw\Auth;
 
 /**
- * Doesn't provide \Yeah\Fw\Auth\AuthInterface implementation.
+ * Doesn't provide Yeah\\Fw\\Auth\\AuthInterface implementation.
  * Used for applications without authentication support.
  * 
  * @author David Cavar
