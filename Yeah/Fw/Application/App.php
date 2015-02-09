@@ -210,8 +210,8 @@ class App {
      * Get application autoloader
      * @param \\Yeah\\Fw\\Application\\Autoloader $autoloader
      */
-    public function getAutoloader(Autoloader $autoloader) {
-        $this->autoloader = $autoloader;
+    public function getAutoloader() {
+        return $this->autoloader;
     }
 
     /**
