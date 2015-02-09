@@ -16,17 +16,14 @@ class DatabaseSessionHandler extends SessionHandlerAbstract {
     private $name = 'SpoilersSession';
     private $last_access = null;
     private $db = null;
+    private $dbConfig = false;
 
     /**
      * Create new instance
      * 
      * @param array $options
      */
-    public function __construct($options) {
-        if($options['static_url'] == 'http://' . $_SERVER['HTTP_HOST']) {
-            return;
-        }
-        $db_conf = $options['database'];
+    public function __construct($config) {
         register_shutdown_function('session_write_close');
         ini_set("session.gc_probability", 100);
         ini_set("session.gc_divisor", 1);
@@ -39,7 +36,7 @@ class DatabaseSessionHandler extends SessionHandlerAbstract {
                 array($this, 'open'), array($this, 'close'), array($this, 'read'), array($this, 'write'), array($this, 'destroy'), array($this, 'gc')
         );
         
-        $this->db = new \PDO($db_conf['dsn'], $db_conf['db_user'], $db_conf['db_password']);
+        $this->db = new \PDO($config['dsn'], $config['db_user'], $config['db_password']);
         session_start();
     }
 

@@ -30,22 +30,30 @@ class App {
     protected $auth = null;
     protected $view = null;
     protected $dc = null;
+    protected $app_name = '';
 
     /**
      * Class constructor.
      * @param mixed $options Configuration options
      * 
      */
-    public function __construct() {
+    public function __construct($app_name, $env = 'prod') {
+        $this->app_name = $app_name;
         $this->registerAutoloaders();
+        $this->error_handler = new \Yeah\Fw\Error\ErrorHandler();
         $this->router = new \Yeah\Fw\Routing\Router();
         $this->request = new \Yeah\Fw\Http\Request();
         $this->response = new \Yeah\Fw\Http\Response();
-        $this->error_handler = new \Yeah\Fw\Error\ErrorHandler();
-        $this->loadRoutes();
         $this->dc = new DependencyContainer();
+        $this->configureServices();
+        $this->loadRoutes();
+        self::$instance = $this;
     }
 
+    public function getAppName() {
+        return $this->app_name;
+    }
+    
     /**
      * Register autoloader paths for probing
      */
@@ -164,46 +172,21 @@ class App {
         return $this->router;
     }
 
+    public function getDatabaseConfig() {
+        return $this->getDependencyContainer()->get('db_config');
+    }
+    
     /**
      * Getter for session handler object
      * 
      * @return SessionHandlerInterface
      */
     public function getSession() {
-        if($this->session == null) {
-            $this->session = new \Yeah\Fw\Session\NullSessionHandler();
-        }
-        return $this->session;
+        return $this->getDependencyContainer()->get('session');
     }
 
-    /**
-     * Setter for session handler object
-     * 
-     * @params \\SessionHandlerInterface $session
-     */
-    public function setSession(\SessionHandlerInterface $session) {
-        $this->session = $session;
-    }
-
-    /**
-     * Getter for authentication object
-     * 
-     * @return \\Yeah\\Fw\\Auth\\AuthInterface
-     */
     public function getAuth() {
-        if($this->auth == null) {
-            $this->auth = new \Yeah\Fw\Auth\NullAuth();
-        }
-        return $this->auth;
-    }
-
-    /**
-     * Setter for authentication object
-     * 
-     * @param \\Yeah\\Fw\\Auth\\AuthInterface $auth
-     */
-    public function setAuth(\Yeah\Fw\Auth\AuthInterface $auth) {
-        $this->auth = $auth;
+        return $this->getDependencyContainer()->get('auth');
     }
 
     /**
@@ -212,10 +195,7 @@ class App {
      * @return \\Yeah\\Fw\\Logger\\LoggerInterface
      */
     public function getLogger() {
-        if($this->logger == null) {
-            $this->logger = new \Yeah\Fw\Logger\NullLogger();
-        }
-        return $this->logger;
+        return $this->getDependencyContainer()->get('logger');
     }
 
     /**
@@ -223,27 +203,7 @@ class App {
      * @return \\Yeah\\Fw\\Mvc\\ViewInterface
      */
     public function getView() {
-        if(!$this->view) {
-            $this->view = new \Yeah\Fw\Mvc\PhpView($this->getViewsDir());
-        }
-        return $this->view;
-    }
-
-    /**
-     * Setter for logger object
-     * @param \\Yeah\\Fw\\Logger\\LoggerInterface $logger
-     */
-    public function setLogger(\Yeah\Fw\Logger\LoggerInterface $logger) {
-        $this->logger = $logger;
-    }
-
-    /**
-     * Set custom autoloader
-     * 
-     * @param \\Yeah\\Fw\\Application\\Autoloader $autoloader
-     */
-    public function setAutoloader(Autoloader $autoloader) {
-        $this->autoloader = $autoloader;
+        return $this->getDependencyContainer()->get('view');
     }
 
     /**
@@ -303,7 +263,7 @@ class App {
      * @return string
      */
     public function getControllersDir() {
-        return $this->getBaseDir() . DS . 'controllers';
+        return $this->getBaseDir() . DS . $this->getAppName() . DS . 'controllers';
     }
 
     /**
@@ -312,7 +272,7 @@ class App {
      * @return string
      */
     public function getModelsDir() {
-        return $this->getBaseDir() . DS . 'models';
+        return $this->getBaseDir() . DS . $this->getAppName() . DS . 'models';
     }
 
     /**
@@ -321,7 +281,7 @@ class App {
      * @return string
      */
     public function getViewsDir() {
-        return $this->getBaseDir() . DS . 'views';
+        return $this->getBaseDir() . DS . $this->getAppName() . DS . 'views';
     }
 
     private function __clone() {
@@ -402,15 +362,47 @@ class App {
     }
 
     /**
+     * 
+     * Configure service factories
+     * 
+     */
+    public function configureServices() {
+        $dc = $this->getDependencyContainer();
+
+        $dc->set('logger', function() {
+            return new \Yeah\Fw\Logger\NullLogger();
+        });
+
+        $dc->set('db_config', function() {
+            return null;
+        });
+
+        $dc->set('session', function() {
+            return new \Yeah\Fw\Session\NullSessionHandler();
+        });
+
+        $dc->set('auth', function() {
+            return new \Yeah\Fw\Auth\NullAuth();
+        });
+
+        $dc->set('entity_manager', function() {
+            return null;
+        });
+
+        $dc->set('view', function() {
+            return new \Yeah\Fw\Mvc\PhpView(App::getInstance()->getViewsDir(), array(
+                'cache' => $this->getCacheDir()
+            ));
+        });
+    }
+
+    /**
      * Returns current application instance
      * 
      * @param mixed $options Application options
      * @return \\Yeah\\Fw\\Application\\App
      */
     public static function getInstance() {
-        if(!isset(static::$instance)) {
-            static::$instance = new App();
-        }
         return static::$instance;
     }
 

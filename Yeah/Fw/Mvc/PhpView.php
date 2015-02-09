@@ -14,7 +14,7 @@ class PhpView implements ViewInterface {
      * 
      * @param string $views_dir
      */
-    public function __construct($views_dir) {
+    public function __construct($views_dir, $options = array()) {
         $this->views_dir = $views_dir;
     }
 

@@ -11,7 +11,7 @@ class DependencyContainer {
 
     private $factories = array();
     private $services = array();
-    
+
     /**
      * Sets factory method for service
      * 
@@ -20,8 +20,11 @@ class DependencyContainer {
      */
     public function set($key, $factory) {
         $this->factories[$key] = $factory;
+        if(isset($this->services[$key])) {
+            unset($this->services[$key]);
+        }
     }
-    
+
     /**
      * Retrieves instantiated service
      * 
@@ -34,4 +37,5 @@ class DependencyContainer {
         }
         return $this->services[$key];
     }
+
 }
