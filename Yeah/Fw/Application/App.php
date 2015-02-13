@@ -70,7 +70,7 @@ class App {
      * Load additional routes
      */
     public function loadRoutes() {
-        $routes_location = $this->getBaseDir() . DS . 'config' . DS . 'routes.php';
+        $routes_location = $this->getBaseDir() . DS . $this->getAppName() . DS . 'config' . DS . 'routes.php';
         if(file_exists($routes_location)) {
             require_once $routes_location;
         }
