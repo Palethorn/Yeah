@@ -15,6 +15,7 @@ namespace Yeah\Fw\Application;
  * @property Request $request
  * @property Response $response
  * @property \\Yeah\\Fw\\Application\\Autoloader $autoloader
+ * @property \\Yeah\\Fw\\Application\\Config $config
  * @author David Cavar
  */
 class App {
@@ -31,15 +32,19 @@ class App {
     protected $view = null;
     protected $dc = null;
     protected $app_name = '';
+    protected $config = null;
 
     /**
      * Class constructor.
      * @param mixed $options Configuration options
      * 
      */
-    public function __construct($app_name, $env = 'prod') {
+    public function __construct($app_name, $env = 'prod', $config = array()) {
         $this->app_name = $app_name;
+        require_once 'Config.php';
+        $this->config = new Config($config[$env]);
         $this->registerAutoloaders();
+        $this->configureAutoloadCache();
         $this->error_handler = new \Yeah\Fw\Error\ErrorHandler();
         $this->router = new \Yeah\Fw\Routing\Router();
         $this->request = new \Yeah\Fw\Http\Request();
@@ -47,13 +52,12 @@ class App {
         $this->dc = new DependencyContainer();
         $this->configureServices();
         $this->loadRoutes();
-        self::$instance = $this;
-    }
+        self::$instance = $this;}
 
     public function getAppName() {
         return $this->app_name;
     }
-    
+
     /**
      * Register autoloader paths for probing
      */
@@ -64,6 +68,10 @@ class App {
         $this->autoloader->addIncludePath($this->getModelsDir());
         $this->autoloader->addIncludePath($this->getControllersDir());
         $this->autoloader->register();
+    }
+    
+    public function configureAutoloadCache() {
+        $this->autoloader->setCache(new \Yeah\Fw\Cache\NullCache());
     }
 
     /**
@@ -175,7 +183,7 @@ class App {
     public function getDatabaseConfig() {
         return $this->getDependencyContainer()->get('db_config');
     }
-    
+
     /**
      * Getter for session handler object
      * 
@@ -219,6 +227,9 @@ class App {
      * @return string
      */
     public function getBaseDir() {
+        if($this->config->base_dir) {
+            return $this->config->base_dir;
+        }
         return dirname(__FILE__) . DS . '..' . DS . '..' . DS . '..' . DS . '..';
     }
 
@@ -227,6 +238,9 @@ class App {
      * @return string
      */
     public function getLibDir() {
+        if($this->config->lib_dir) {
+            return $this->config->lib_dir;
+        }
         return $this->getBaseDir() . DS . 'lib';
     }
 
@@ -236,6 +250,9 @@ class App {
      * @return string
      */
     public function getWebDir() {
+        if($this->config->web_dir) {
+            return $this->config->web_dir;
+        }
         return $this->getBaseDir() . DS . 'web';
     }
 
@@ -245,6 +262,9 @@ class App {
      * @return string
      */
     public function getCacheDir() {
+        if($this->config->cache_dir) {
+            return $this->config->cache_dir;
+        }
         return $this->getBaseDir() . DS . 'cache';
     }
 
@@ -254,6 +274,9 @@ class App {
      * @return string
      */
     public function getLogDir() {
+        if($this->config->log_dir) {
+            return $this->config->log_dir;
+        }
         return $this->getBaseDir() . DS . 'log';
     }
 
@@ -263,6 +286,9 @@ class App {
      * @return string
      */
     public function getControllersDir() {
+        if($this->config->controllers_dir) {
+            return $this->config->controllers_dir;
+        }
         return $this->getBaseDir() . DS . $this->getAppName() . DS . 'controllers';
     }
 
@@ -272,6 +298,9 @@ class App {
      * @return string
      */
     public function getModelsDir() {
+        if($this->config->models_dir) {
+            return $this->config->models_dir;
+        }
         return $this->getBaseDir() . DS . $this->getAppName() . DS . 'models';
     }
 
@@ -281,6 +310,9 @@ class App {
      * @return string
      */
     public function getViewsDir() {
+        if($this->config->views_dir) {
+            return $this->config->views_dir;
+        }
         return $this->getBaseDir() . DS . $this->getAppName() . DS . 'views';
     }
 

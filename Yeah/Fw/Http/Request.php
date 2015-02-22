@@ -42,7 +42,7 @@ class Request {
      */
     public function retrieveRequestHeaders() {
         foreach($_SERVER as $key => $value) {
-            $value = filter_input(INPUT_SERVER, $key);
+            $value = filter_var($_SERVER[$key]);
             $key = strtolower(str_replace(array('-', '_', 'HTTP'), '', $key));
             $this->headers[$key] = $value;
         }
@@ -114,7 +114,7 @@ class Request {
      */
     public function parsePostParameters() {
         foreach($_POST as $key => $value) {
-            $value = filter_input(INPUT_POST, $key);
+            $value = filter_var($_POST[$key]);
             $this->parameters[$key] = $value;
         }
     }
@@ -165,7 +165,7 @@ class Request {
      * @return string
      */
     public function getRequestMethod() {
-        return filter_input(INPUT_SERVER, 'REQUEST_METHOD', FILTER_SANITIZE_STRING);
+        return filter_var($_SERVER['REQUEST_METHOD'], FILTER_SANITIZE_STRING);
     }
 
     /**
@@ -174,7 +174,7 @@ class Request {
      * @return string
      */
     private function _getRequestUri() {
-        return filter_input(INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_STRING);
+        return filter_var($_SERVER['REQUEST_URI'], FILTER_SANITIZE_STRING);
     }
     
     /**

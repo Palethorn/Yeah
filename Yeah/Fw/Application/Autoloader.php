@@ -12,6 +12,9 @@ namespace Yeah\Fw\Application;
 class Autoloader {
 
     private $include_paths = array();
+    private $cache = false;
+    private $autoload = array();
+    private $autoload_modified = false;
 
     /*
      * Sets the path where the autoloader should look for required files
@@ -19,6 +22,7 @@ class Autoloader {
      * @param string $inc_path Include path parameter
      * @return \Yeah\Fw\Application\Autoloader
      */
+
     public function addIncludePath($inc_path) {
         $this->include_paths[] = $inc_path;
         return $this;
@@ -40,8 +44,11 @@ class Autoloader {
      * 
      * @param string $class_name Class name with its appropriate namespace
      */
-    function autoload($class_name) {
-        $class_name = ltrim($class_name, '\\');
+    function autoload($class) {
+        if($this->autoloadFromCache($class)) {
+            return;
+        }
+        $class_name = ltrim($class, '\\');
         $relative_path = '';
         $namespace = '';
         if($last_ns_pos = strrpos($class_name, '\\')) {
@@ -52,10 +59,20 @@ class Autoloader {
         foreach($this->include_paths as $include_path) {
             $file_path = $include_path . DS . $relative_path . DS . str_replace('_', DS, $class_name) . '.php';
             if(file_exists($file_path)) {
+                $this->autoload[$class] = $file_path;
                 require $file_path;
+                $this->autoload_modified = true;
                 return;
             }
         }
+    }
+
+    public function autoloadFromCache($class) {
+        if(isset($this->autoload[$class])) {
+            require_once $this->autoload[$class];
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -68,6 +85,14 @@ class Autoloader {
         return $this;
     }
 
+    public function setCache(\Yeah\Fw\Cache\CacheInterface $cache) {
+        $this->cache = $cache;
+        if($this->cache->has('autoload.php')) {
+            $this->autoload = $this->cache->get('autoload.php');
+        }
+        $this->autoload_modified = false;
+    }
+
     /**
      * 
      * Stops autoloader for further listening
@@ -77,6 +102,13 @@ class Autoloader {
     public function unregister() {
         spl_autoload_unregister(array($this, 'autoload'));
         return $this;
+    }
+
+    public function __destruct() {
+        if($this->autoload_modified) {
+
+            $this->cache->set('autoload.php', $this->autoload);
+        }
     }
 
 }

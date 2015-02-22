@@ -99,13 +99,22 @@ class File {
     public function getLocation() {
         return $this->location;
     }
-
+    
     /**
      * Closes file handler
-    */
-    public function __destruct() {
-        fclose($this->fp);
+     */
+    public function close() {
+        if($this->fp) {
+            fclose($this->fp);
+        }
         $this->fp = null;
+    }
+
+    /**
+     * Closes file handler on exit
+     */
+    public function __destruct() {
+        $this->close();
     }
 
 }

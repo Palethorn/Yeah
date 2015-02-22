@@ -1,4 +1,5 @@
 <?php
+
 namespace Yeah\Fw\Application;
 
 /**
@@ -7,30 +8,37 @@ namespace Yeah\Fw\Application;
  * @author David Cavar
  */
 class Config {
-    private static $config = array();
-    
-    /**
-     * 
-     * Fetches the value under stored key
-     * 
-     * @param string $key Hash map key
-     * @return mixed
-     */
-    public static function get($key) {
-        if(isset(self::$config[$key])) {
-            return self::$config[$key];
+
+    private $config = array();
+
+    public function __construct($array = array()) {
+        $this->importArray($array);
+    }
+
+    public function __get($name) {
+        if(!isset($this->config[$name])) {
+            return false;
         }
-        return false;
+        return $this->config[$name];
+    }
+
+    public function __set($name, $value) {
+        if(is_array($value)) {
+            $config = new Config($value);
+            $this->config[$name] = $config;
+            return;
+        }
+        $this->config[$name] = $value;
+    }
+
+    public function importArray($array) {
+        foreach($array as $key => $value) {
+            $this->$key = $value;
+        }
+    }
+
+    public function toArray() {
+        return $this->config;
     }
     
-    /**
-     * Stores specified value under specified key
-     * 
-     * @param string $key Key to store value under it
-     * @param mixed $value Value to store under certain key
-     */
-    public static function set($key, $value)
-    {
-        self::$config[$key] = $value;
-    }
 }
