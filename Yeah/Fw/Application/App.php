@@ -39,7 +39,7 @@ class App {
      * @param mixed $options Configuration options
      * 
      */
-    public function __construct($app_name, $env = 'prod', $config = array()) {
+    public function __construct($app_name, $env = 'prod', $config = array('prod' => array())) {
         $this->app_name = $app_name;
         require_once 'Config.php';
         $this->config = new Config($config[$env]);
