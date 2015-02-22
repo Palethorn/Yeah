@@ -1,0 +1,3 @@
+#!/bin/bash
+
+phpunit --bootstrap bootstrap.php $1

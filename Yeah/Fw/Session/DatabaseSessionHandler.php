@@ -1,4 +1,5 @@
 <?php
+
 namespace Yeah\Fw\Session;
 
 /**
@@ -27,17 +28,22 @@ class DatabaseSessionHandler extends SessionHandlerAbstract {
         register_shutdown_function('session_write_close');
         ini_set("session.gc_probability", 100);
         ini_set("session.gc_divisor", 1);
-        $id = isset($_COOKIE['SpoilersSession']) ? $_COOKIE['SpoilersSession'] : (isset($_GET['client_id']) ? $_GET['client_id'] : \Yeah\Fw\Toolbox\Various::generateRandomString(32));
-        $this->id = $id;
+        $this->id = isset($config['id']) ? $config['id'] : (
+                isset($_COOKIE['SpoilersSession']) ? $_COOKIE['SpoilersSession'] : (
+                        isset($_GET['client_id']) ? $_GET['client_id'] : \Yeah\Fw\Toolbox\Various::generateRandomString(32)
+                        )
+                );
         session_name($this->name);
         session_id($this->id);
 
         session_set_save_handler(
                 array($this, 'open'), array($this, 'close'), array($this, 'read'), array($this, 'write'), array($this, 'destroy'), array($this, 'gc')
         );
-        
+
         $this->db = new \PDO($config['dsn'], $config['db_user'], $config['db_password']);
-        session_start();
+        if(isset($config['env']) && $config['env'] != 'test') {
+            session_start();
+        }
     }
 
     /**
@@ -47,7 +53,7 @@ class DatabaseSessionHandler extends SessionHandlerAbstract {
      * @param string $name Session name
      */
     public function open($path, $name) {
-        
+        return true;
     }
 
     /**
@@ -58,15 +64,16 @@ class DatabaseSessionHandler extends SessionHandlerAbstract {
      */
     public function read($id) {
         $session = $this->get_session_from_db();
-        if (!$session) {
+        if(!$session) {
             $session = $this->create_new_session();
-            if (!$session) {
+            if(!$session) {
                 throw new \Exception('Could not create session.', 500, null);
             }
         } else {
             $this->params = unserialize($session['data']);
             $this->last_access = $session['last_access'];
         }
+        return true;
     }
 
     /**
@@ -100,9 +107,10 @@ class DatabaseSessionHandler extends SessionHandlerAbstract {
      * @throws \Exception
      */
     public function write($id, $value) {
-        if (!$this->update_session()) {
+        if(!$this->update_session()) {
             throw new \Exception('Session does not exist!', 500, null);
         }
+        return true;
     }
 
     /**
@@ -120,7 +128,7 @@ class DatabaseSessionHandler extends SessionHandlerAbstract {
      * Handles session close
      */
     public function close() {
-        
+        return true;
     }
 
     /**
@@ -156,6 +164,7 @@ class DatabaseSessionHandler extends SessionHandlerAbstract {
      */
     public function setSessionParam($key, $value) {
         $this->params[$key] = $value;
+        return $this;
     }
 
     /**
@@ -165,7 +174,7 @@ class DatabaseSessionHandler extends SessionHandlerAbstract {
      * @return boolean|mixed
      */
     public function getSessionParam($key) {
-        if (isset($this->params[$key])) {
+        if(isset($this->params[$key])) {
             return $this->params[$key];
         } else {
             return false;
@@ -179,6 +188,7 @@ class DatabaseSessionHandler extends SessionHandlerAbstract {
      */
     public function removeSessionParam($key) {
         unset($this->params[$key]);
+        return $this;
     }
 
 }

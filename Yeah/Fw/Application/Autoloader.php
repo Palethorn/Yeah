@@ -106,7 +106,6 @@ class Autoloader {
 
     public function __destruct() {
         if($this->autoload_modified) {
-
             $this->cache->set('autoload.php', $this->autoload);
         }
     }
