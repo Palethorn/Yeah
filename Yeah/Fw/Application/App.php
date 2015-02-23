@@ -4,7 +4,7 @@ namespace Yeah\Fw\Application;
 
 /**
  * Implements singleton pattern. Used for application request entry point
- * 
+ *
  * @property \\Yeah\\Fw\\Error\\ErrorHandler $error_handler
  * @property \\Yeah\\Fw\\Logger\\LoggerInterface $logger
  * @property \\SessionHandlerInterface $session
@@ -37,7 +37,7 @@ class App {
     /**
      * Class constructor.
      * @param mixed $options Configuration options
-     * 
+     *
      */
     public function __construct($app_name, $env = 'prod', $config = array('prod' => array())) {
         $this->app_name = $app_name;
@@ -106,7 +106,7 @@ class App {
     /**
      * Executes access checkup inside chain execution.
      * Don't invoke unless you know what you're doing.
-     * 
+     *
      * @param mixed $route Route options
      * @return mixed Route options
      */
@@ -120,7 +120,7 @@ class App {
     /**
      * Executes action inside chain execution.
      * Don't invoke unless you know what you're doing.
-     * 
+     *
      * @param mixed $route Route options
      * @return \\Yeah\\Fw\\Mvc\\View Controller view object
      */
@@ -133,7 +133,7 @@ class App {
     /**
      * Executes view rendering inside chain execution.
      * Don't invoke unless you know what you're doing.
-     * 
+     *
      * @param \\Yeah\\Fw\\Mvc\\View $view Controller view object
      */
     private function executeRender($response) {
@@ -156,7 +156,7 @@ class App {
 
     /**
      * getter for HTTP request object
-     * 
+     *
      * @return \\Yeah\\Fw\\Http\\Request
      */
     public function getRequest() {
@@ -165,7 +165,7 @@ class App {
 
     /**
      * Getter for HTTP response object
-     * 
+     *
      * @return \\Yeah\\Fw\\Http\\Response
      */
     public function getResponse() {
@@ -174,7 +174,7 @@ class App {
 
     /**
      * Getter for router object
-     * 
+     *
      * @return \\Yeah\\Fw\\Routing\\Router
      */
     public function getRouter() {
@@ -187,7 +187,7 @@ class App {
 
     /**
      * Getter for session handler object
-     * 
+     *
      * @return SessionHandlerInterface
      */
     public function getSession() {
@@ -200,7 +200,7 @@ class App {
 
     /**
      * Getter for logger object
-     * 
+     *
      * @return \\Yeah\\Fw\\Logger\\LoggerInterface
      */
     public function getLogger() {
@@ -208,7 +208,7 @@ class App {
     }
 
     /**
-     * 
+     *
      * @return \\Yeah\\Fw\\Mvc\\ViewInterface
      */
     public function getView() {
@@ -247,7 +247,7 @@ class App {
 
     /**
      * Returns path for public directory
-     * 
+     *
      * @return string
      */
     public function getWebDir() {
@@ -259,7 +259,7 @@ class App {
 
     /**
      * Return path for cache directory
-     * 
+     *
      * @return string
      */
     public function getCacheDir() {
@@ -271,7 +271,7 @@ class App {
 
     /**
      * Returns path for logs directory
-     * 
+     *
      * @return string
      */
     public function getLogDir() {
@@ -283,7 +283,7 @@ class App {
 
     /**
      * Returns path for controllers directory
-     * 
+     *
      * @return string
      */
     public function getControllersDir() {
@@ -295,7 +295,7 @@ class App {
 
     /**
      * Returns path for models directory
-     * 
+     *
      * @return string
      */
     public function getModelsDir() {
@@ -307,7 +307,7 @@ class App {
 
     /**
      * Returns path for views directors
-     * 
+     *
      * @return string
      */
     public function getViewsDir() {
@@ -318,13 +318,14 @@ class App {
     }
 
     private function __clone() {
-        
+
     }
 
     public function route($url, $method, $http_method = 'GET', $secure = false) {
         $route = \Yeah\Fw\Routing\Router::get($url);
         if($route) {
             $route['method'][$http_method] = $method;
+            \Yeah\Fw\Routing\Router::add($url, $route);
             return;
         }
         \Yeah\Fw\Routing\Router::add($url, array(
@@ -336,7 +337,7 @@ class App {
 
     /**
      * Adds new simple route for GET HTTP method
-     * 
+     *
      * @param string $url
      * @param string $method
      * @param bool $secure
@@ -347,7 +348,7 @@ class App {
 
     /**
      * Adds new simple route for POST HTTP method
-     * 
+     *
      * @param string $url
      * @param string $method
      * @param bool $secure
@@ -358,7 +359,7 @@ class App {
 
     /**
      * Adds new simple route for PUT HTTP method
-     * 
+     *
      * @param string $url
      * @param string $method
      * @param bool $secure
@@ -369,7 +370,7 @@ class App {
 
     /**
      * Adds new simple route for DELETE HTTP method
-     * 
+     *
      * @param string $url
      * @param string $method
      * @param bool $secure
@@ -380,7 +381,7 @@ class App {
 
     /**
      * Returns dependency container object
-     * 
+     *
      * @return DependencyContainer
      */
     public function getDependencyContainer() {
@@ -388,9 +389,9 @@ class App {
     }
 
     /**
-     * 
+     *
      * Configure service factories
-     * 
+     *
      */
     public function configureServices() {
         $dc = $this->getDependencyContainer();
@@ -424,7 +425,7 @@ class App {
 
     /**
      * Returns current application instance
-     * 
+     *
      * @param mixed $options Application options
      * @return \\Yeah\\Fw\\Application\\App
      */
