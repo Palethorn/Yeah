@@ -18,9 +18,19 @@ class Router {
      * @param type $params
      */
     public static function add($route, $params = array()) {
+        self::$routes[$route] = $params;
+    }
+
+    /**
+     * Retrieves route config
+     * 
+     * @param string $route URI key under which to map specified route
+     */
+    public static function get($route) {
         if(!isset(self::$routes[$route])) {
-            self::$routes[$route] = $params;
+            return false;
         }
+        return self::$routes[$route];
     }
 
     /**

@@ -11,11 +11,12 @@ class SimpleRouteRequestHandler implements RouteRequestHandlerInterface {
      * {@inheritdoc}
      */
     public function handle($options, \Yeah\Fw\Http\Request $request) {
-        if(!$this->match($request->getRequestUri(), $options['pattern']) || $options['http_method'] != $request->getRequestMethod()) {
+        $req_method = $request->getRequestMethod();
+        if(!$this->match($request->getRequestUri(), $options['pattern']) || !isset($options['method'][$req_method])) {
             return false;
         }
         $route = new \Yeah\Fw\Routing\Route\SimpleRoute();
-        $route->setAction($options['method']);
+        $route->setAction($options['method'][$req_method]);
         $controller = new \Yeah\Fw\Mvc\Controller();
         $route->setController($controller);
         $route->setSecure($options['secure']);

@@ -31,9 +31,13 @@ class Request {
      * @return mixed
      */
     public function __call($method, $args) {
-        if(strpos($method, 'get') == 0) {
+        if(strpos($method, 'get') === 0) {
             $key = strtolower(str_replace('get', '', $method));
             return $this->get($key);
+        }
+        if(strpos($method, 'set') === 0) {
+            $key = strtolower(str_replace('set', '', $method));
+            return $this->set($key, $args[0]);
         }
     }
 
@@ -93,12 +97,12 @@ class Request {
      * Parses GET parameters
      */
     public function parseGetParameters() {
-        $params = str_replace('?', '/', $this->_getRequestUri());
+        $params = str_replace('?', '/', isset($_SERVER['REQUEST_URI']) ? filter_var($_SERVER['REQUEST_URI']) : '');
         $params = str_replace('=', '/', $params);
         $params = str_replace('&', '/', $params);
         $params = explode('/', $params);
         array_shift($params);
-        if(strpos($params[0], '.php') != FALSE) {
+        if(isset($params[0]) && strpos($params[0], '.php') != FALSE) {
             array_shift($params);
         }
         $this->parameters['controller'] = isset($params[0]) ? $params[0] : '';
@@ -165,7 +169,7 @@ class Request {
      * @return string
      */
     public function getRequestMethod() {
-        return filter_var($_SERVER['REQUEST_METHOD'], FILTER_SANITIZE_STRING);
+        return $this->headers['requestmethod'];
     }
 
     /**
@@ -174,16 +178,17 @@ class Request {
      * @return string
      */
     private function _getRequestUri() {
-        return filter_var($_SERVER['REQUEST_URI'], FILTER_SANITIZE_STRING);
+        return $this->headers['requesturi'];
     }
-    
+
     /**
      * Return request uri without query string
      * 
      * @return string
      */
     public function getRequestUri() {
-        return explode('?', $this->_getRequestUri())[0];
+        $parts = explode('?', $this->_getRequestUri());
+        return $parts[0];
     }
-    
+
 }

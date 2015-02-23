@@ -52,7 +52,8 @@ class App {
         $this->dc = new DependencyContainer();
         $this->configureServices();
         $this->loadRoutes();
-        self::$instance = $this;}
+        self::$instance = $this;
+    }
 
     public function getAppName() {
         return $this->app_name;
@@ -69,7 +70,7 @@ class App {
         $this->autoloader->addIncludePath($this->getControllersDir());
         $this->autoloader->register();
     }
-    
+
     public function configureAutoloadCache() {
         $this->autoloader->setCache(new \Yeah\Fw\Cache\NullCache());
     }
@@ -320,6 +321,19 @@ class App {
         
     }
 
+    public function route($url, $method, $http_method = 'GET', $secure = false) {
+        $route = \Yeah\Fw\Routing\Router::get($url);
+        if($route) {
+            $route['method'][$http_method] = $method;
+            return;
+        }
+        \Yeah\Fw\Routing\Router::add($url, array(
+            'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
+            'secure' => $secure,
+            'method' => array($http_method => $method),
+        ));
+    }
+
     /**
      * Adds new simple route for GET HTTP method
      * 
@@ -328,12 +342,7 @@ class App {
      * @param bool $secure
      */
     public function routeGet($url, $method, $secure = false) {
-        \Yeah\Fw\Routing\Router::add($url, array(
-            'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
-            'secure' => $secure,
-            'method' => $method,
-            'http_method' => 'GET'
-        ));
+        $this->route($url, $method, 'GET', $secure);
     }
 
     /**
@@ -344,12 +353,7 @@ class App {
      * @param bool $secure
      */
     public function routePost($url, $method, $secure = false) {
-        \Yeah\Fw\Routing\Router::add($url, array(
-            'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
-            'secure' => $secure,
-            'method' => $method,
-            'http_method' => 'POST'
-        ));
+        $this->route($url, $method, 'POST', $secure);
     }
 
     /**
@@ -360,12 +364,7 @@ class App {
      * @param bool $secure
      */
     public function routePut($url, $method, $secure = false) {
-        \Yeah\Fw\Routing\Router::add($url, array(
-            'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
-            'secure' => $secure,
-            'method' => $method,
-            'http_method' => 'PUT'
-        ));
+        $this->route($url, $method, 'PUT', $secure);
     }
 
     /**
@@ -376,12 +375,7 @@ class App {
      * @param bool $secure
      */
     public function routeDelete($url, $method, $secure = false) {
-        \Yeah\Fw\Routing\Router::add($url, array(
-            'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
-            'secure' => $secure,
-            'method' => $method,
-            'http_method' => 'DELETE'
-        ));
+        $this->route($url, $method, 'DELETE', $secure);
     }
 
     /**
