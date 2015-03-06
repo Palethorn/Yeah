@@ -8,14 +8,18 @@ class RestRouteRequestHandler implements RouteRequestHandlerInterface {
      * {@inheritdoc}
      */
     public function handle($options, \Yeah\Fw\Http\Request $request) {
-        if(!$this->match($request->getRequestUri(), $options['pattern']) || !$this->checkMethod($options, $request->getRequestMethod())) {
+        $req_method = $request->getRequestMethod();
+        if(!$this->match($request->getRequestUri(), $options['pattern']) || !$this->checkMethod($options, $req_method)) {
             return false;
         }
         $route = new \Yeah\Fw\Routing\Route\Route();
-        $route->setAction($options['restful'][$request->getRequestMethod()]['action']);
+        $route->setAction($options['restful'][$req_method]['action']);
         $route->setController(new $options['controller']());
-        $secure = $options['secure'] || $options['restful'][$request->getRequestMethod()]['secure'];
+        $secure = $options['secure'] || $options['restful'][$req_method]['secure'];
         $route->setSecure($secure);
+        if(isset($options['restful'][$req_method]['cache'])) {
+            $this->configureCache($route, $options['restful'][$req_method]['cache']);
+        }
         return $route;
     }
 
@@ -41,6 +45,15 @@ class RestRouteRequestHandler implements RouteRequestHandlerInterface {
             return true;
         }
         return false;
+    }
+
+    public function configureCache(\Yeah\Fw\Routing\Route\RouteInterface $route, $options) {
+        if(isset($options['is_cacheable']) && $options['is_cacheable']) {
+            $route->setIsCacheable(true);
+            if(isset($options['cache_duration'])) {
+                $route->setCacheDuration($options['cache_duration']);
+            }
+        }
     }
 
 }

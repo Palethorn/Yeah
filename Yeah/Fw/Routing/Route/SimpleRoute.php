@@ -3,7 +3,7 @@
 namespace Yeah\Fw\Routing\Route;
 
 class SimpleRoute extends Route {
-    
+
     /**
      * Executes anonymous lambda function related to requested route
      * SimpleRoute is used for mapping URIs to closures

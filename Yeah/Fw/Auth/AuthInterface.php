@@ -34,4 +34,11 @@ interface AuthInterface {
      * @param bool $value Param indicating if the user is authenticated
      */
     function setAuthenticated($value);
+    
+    /**
+     * Checks if user is authorized
+     * 
+     * @return bool Checks if the user has permissions to access resource
+     */
+    function isAuthorized(\Yeah\Fw\Routing\Route\RouteInterface $route);
 }

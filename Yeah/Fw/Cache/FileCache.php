@@ -34,7 +34,7 @@ class FileCache implements CacheInterface {
             return true;
         }
 
-        $file = $this->load($this->cache_dir . DS . $key);
+        $file = $this->load($this->getFilename($key));
         if($file && $this->valid($file)) {
             $this->loaded[$key] = $file;
             return true;
@@ -48,7 +48,7 @@ class FileCache implements CacheInterface {
     }
 
     public function remove($key) {
-        $filename = $this->cache_dir . DS . $key;
+        $filename = $this->getFilename($key);
         if(file_exists($filename)) {
             unlink($filename);
         }
@@ -79,7 +79,7 @@ class FileCache implements CacheInterface {
         }
 
         $this->loaded[$key] = $slot;
-        $file = new \Yeah\Fw\Filesystem\File($this->cache_dir . DS . $key, 'w');
+        $file = new \Yeah\Fw\Filesystem\File($this->getFilename($key), 'w');
         $data = '<?php ' . PHP_EOL . PHP_EOL . 'return ' . var_export($slot, true) . ';';
         $file->write($data);
         $file->close();
@@ -93,4 +93,8 @@ class FileCache implements CacheInterface {
         return false;
     }
 
+    public function getFilename($key) {
+        return $this->cache_dir . DS . $key . '.cache';
+    }
+    
 }

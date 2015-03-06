@@ -40,15 +40,11 @@ class ErrorHandler {
         $this->handled = true;
         if($errno & error_reporting()) {
             http_response_code(500);
-            //$app = \Yeah\Fw\Application\App::getInstance();
-            //$options = $app->getOptions();
-            //$view = $options['app']['paths']['views'] . DIRECTORY_SEPARATOR . 'error' . DIRECTORY_SEPARATOR . $options['app']['app_name'] . DIRECTORY_SEPARATOR . 'fatal_error.php';
             $this->render(array(
                 'title' => 'Yeah! FW Error Handler',
                 'message' => $errstr,
                 'file' => $errfile,
                 'line' => $errline,
-                //'trace' => $errcontext,
                 'type' => ErrorHandler::TYPE_ERROR
             ));
             die();
@@ -67,10 +63,6 @@ class ErrorHandler {
             die();
         }
         http_response_code(500);
-        //$app = \Yeah\Fw\Application\App::getInstance();
-        //$options = $app->getOptions();
-
-        //$view = $options['app']['paths']['views'] . DIRECTORY_SEPARATOR . 'error' . DIRECTORY_SEPARATOR . $options['app']['app_name'] . DIRECTORY_SEPARATOR . 'fatal_error.php';
         $this->render(array(
         'title' => 'Yeah! FW Exception Handler',
         'message' => $e->getMessage(),
@@ -94,15 +86,11 @@ class ErrorHandler {
             return;
         }
         $app = \Yeah\Fw\Application\App::getInstance();
-        //$options = $app->getOptions();
-
-        //$view = $options['app']['paths']['views'] . DIRECTORY_SEPARATOR . 'error' . DIRECTORY_SEPARATOR . $options['app']['app_name'] . DIRECTORY_SEPARATOR . $status_code . '.php';
         $options = array(
             'title' => 'Http Exception',
             'status_code' => $e->getStatusCode(),
             'message' => $e->getMessage(),
             'type' => ErrorHandler::TYPE_HTTP_EXCEPTION,
-            //'view' => $view
         );
 
         $this->render($options);

@@ -51,6 +51,30 @@ interface RouteInterface {
     function setSecure($secure);
 
     /**
+     * Return true if route supports caching, othervise false
+     * 
+     * @return bool
+     */
+    function getIsCacheable();
+
+    /**
+     * Set to true if route supports caching, othervise false
+     */
+    function setIsCacheable($is_cacheable);
+
+    /**
+     * Get cache duration in seconds
+     * 
+     * @return int
+     */
+    function getCacheDuration();
+
+    /**
+     * Sets cache duration in seconds
+     */
+    function setCacheDuration($duration);
+
+    /**
      * Executes route action
      */
     function execute(\Yeah\Fw\Http\Request $request, \Yeah\Fw\Http\Response $response, \SessionHandlerInterface $session, \Yeah\Fw\Auth\AuthInterface $auth);

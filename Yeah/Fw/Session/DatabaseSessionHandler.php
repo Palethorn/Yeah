@@ -14,7 +14,7 @@ class DatabaseSessionHandler extends SessionHandlerAbstract {
 
     private $params = array();
     private $id = '';
-    private $name = 'SpoilersSession';
+    private $name = 'SESSION';
     private $last_access = null;
     private $db = null;
     private $dbConfig = false;
@@ -29,8 +29,8 @@ class DatabaseSessionHandler extends SessionHandlerAbstract {
         ini_set("session.gc_probability", 100);
         ini_set("session.gc_divisor", 1);
         $this->id = isset($config['id']) ? $config['id'] : (
-                isset($_COOKIE['SpoilersSession']) ? $_COOKIE['SpoilersSession'] : (
-                        isset($_GET['client_id']) ? $_GET['client_id'] : \Yeah\Fw\Toolbox\Various::generateRandomString(32)
+                isset($_COOKIE['SESSION']) ? $_COOKIE['SESSION'] : (
+                        isset($_GET['SESSION']) ? $_GET['SESSION'] : \Yeah\Fw\Toolbox\Various::generateRandomString(32)
                         )
                 );
         session_name($this->name);
@@ -39,11 +39,17 @@ class DatabaseSessionHandler extends SessionHandlerAbstract {
         session_set_save_handler(
                 array($this, 'open'), array($this, 'close'), array($this, 'read'), array($this, 'write'), array($this, 'destroy'), array($this, 'gc')
         );
+        $this->db = new \PDO($config['dsn'], $config['db_user'], $config['db_password'], array(
+            \PDO::ATTR_PERSISTENT => true,
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_EMULATE_PREPARES => true,
+            \PDO::ATTR_STRINGIFY_FETCHES => false)
+        );
 
-        $this->db = new \PDO($config['dsn'], $config['db_user'], $config['db_password']);
-        if(isset($config['env']) && $config['env'] != 'test') {
-            session_start();
+        if(isset($config['env']) && $config['env'] == 'test') {
+            return;
         }
+        session_start();
     }
 
     /**

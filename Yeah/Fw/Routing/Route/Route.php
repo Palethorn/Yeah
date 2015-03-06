@@ -4,6 +4,9 @@ namespace Yeah\Fw\Routing\Route;
 
 class Route implements RouteInterface {
 
+    private $is_cacheable = false;
+    private $cache_duration = 1440;
+
     public function getAction() {
         return $this->action;
     }
@@ -53,6 +56,34 @@ class Route implements RouteInterface {
         $this->getController()->setAuth($auth);
         $this->getController()->setSessionHandler($session);
         return $this->getController()->execute($method);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCacheDuration() {
+        return $this->cache_duration;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIsCacheable() {
+        return $this->is_cacheable;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCacheDuration($duration) {
+        $this->cache_duration = $duration;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setIsCacheable($is_cacheable) {
+        $this->is_cacheable = $is_cacheable;
     }
 
 }

@@ -13,6 +13,7 @@ class Request {
     private $parameters = array();
     private $method = null;
     private $requestBody = null;
+    private $cache_key = '';
 
     /**
      * 
@@ -100,6 +101,8 @@ class Request {
         $params = $this->getRequestUri() . '/' . $this->getQueryString();
         $params = str_replace('=', '/', $params);
         $params = str_replace('&', '/', $params);
+        $params = trim($params, '/');
+        $this->cache_key = str_replace('/', '_', $params);
         $params = explode('/', $params);
         $this->parameters['controller'] = isset($params[0]) ? $params[0] : '';
         $this->parameters['action'] = isset($params[1]) ? $params[1] : NULL;
@@ -181,6 +184,10 @@ class Request {
 
     public function getQueryString() {
         return $this->headers['querystring'];
+    }
+    
+    public function getCacheKey() {
+        return $this->cache_key;
     }
 
 }

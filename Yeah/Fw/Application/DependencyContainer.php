@@ -32,6 +32,9 @@ class DependencyContainer {
      * @return mixed
      */
     public function get($key) {
+        if(!isset($this->factories[$key])) {
+            return null;
+        }
         if(!isset($this->services[$key])) {
             $this->services[$key] = $this->factories[$key]();
         }

@@ -10,6 +10,7 @@ namespace Yeah\Fw\Http;
 class Response {
 
     private $output = null;
+    private $format = false;
 
     public function __construct($options = array()) {
         $this->output = fopen('php://output', 'w');
@@ -40,7 +41,7 @@ class Response {
      */
     public function writeJson($output) {
         $this->header('Content-Type', 'application/json');
-        fwrite($this->output, $output);
+        return fwrite($this->output, $output);
     }
 
     /**
@@ -50,7 +51,7 @@ class Response {
      */
     public function writeXml($output) {
         $this->header('Content-Type', 'application/xml');
-        fwrite($this->output, $output);
+        return fwrite($this->output, $output);
     }
 
     /**
@@ -59,7 +60,7 @@ class Response {
      * @param mixed $output
      */
     public function writePlain($output) {
-        fwrite($this->output, $output);
+        return fwrite($this->output, $output);
     }
 
     /**
@@ -69,10 +70,11 @@ class Response {
      */
     public function write($output) {
         if($this->format === 'json') {
-            $this->writeJson($output);
-        } else {
-            $this->writePlain($output);
+            return $this->writeJson($output);
+        } else if($this->format === 'xml') {
+            return $this->writeXml($output);
         }
+        return $this->writePlain($output);
     }
 
     /**

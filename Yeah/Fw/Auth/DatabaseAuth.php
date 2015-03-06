@@ -57,6 +57,13 @@ class DatabaseAuth implements AuthInterface {
     public function setAuthenticated($value) {
         $this->session_handler->setSessionParam('is_authenticated', $value);
     }
+    
+    /**
+     * {@inheritdoc }
+     */
+    public function isAuthorized(\Yeah\Fw\Routing\Route\RouteInterface $route) {
+        return true;
+    }
 
     /**
      * Destroys current session

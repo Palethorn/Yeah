@@ -20,6 +20,9 @@ class RouteRequestHandler implements RouteRequestHandlerInterface {
         $controller = new $class();
         $route->setController($controller);
         $route->setSecure($options['secure']);
+        if(isset($options['cache'])) {
+            $this->configureCache($route, $options['cache']);
+        }
         return $route;
     }
 
@@ -32,6 +35,15 @@ class RouteRequestHandler implements RouteRequestHandlerInterface {
             return true;
         }
         return false;
+    }
+
+    public function configureCache(\Yeah\Fw\Routing\Route\RouteInterface $route, $options) {
+        if(isset($options['is_cacheable']) && $options['is_cacheable']) {
+            $route->setIsCacheable(true);
+            if(isset($options['cache_duration'])) {
+                $route->setCacheDuration($options['cache_duration']);
+            }
+        }
     }
 
 }

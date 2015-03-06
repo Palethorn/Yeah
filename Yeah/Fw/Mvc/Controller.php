@@ -149,4 +149,7 @@ class Controller {
         $this->response->redirect($uri);
     }
 
+    public function __toString() {
+        return get_class($this);
+    }
 }
