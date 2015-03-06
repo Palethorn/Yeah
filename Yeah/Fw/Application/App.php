@@ -48,7 +48,11 @@ class App {
         $this->app_name = $app_name;
         $this->env = $env;
         require_once 'Config.php';
-        $this->config = new Config($config[$env]);
+        $conf = array();
+        if(isset($config[$env])) {
+            $conf = $config[$env];
+        }
+        $this->config = new Config($conf);
         $this->registerAutoloaders();
         $this->configureAutoloadCache();
         $this->error_handler = new \Yeah\Fw\Error\ErrorHandler(error_reporting());
