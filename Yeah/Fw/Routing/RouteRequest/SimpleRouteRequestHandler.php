@@ -12,7 +12,7 @@ class SimpleRouteRequestHandler implements RouteRequestHandlerInterface {
      */
     public function handle($options, \Yeah\Fw\Http\Request $request) {
         $req_method = $request->getRequestMethod();
-        if(!$this->match($request->getRequestUri(), $options['pattern']) || !isset($options['method'][$req_method])) {
+        if(!$this->match($request->getRequestUri(), $options['pattern']) || !isset($options['restful'][$req_method])) {
             return false;
         }
         $route = new \Yeah\Fw\Routing\Route\SimpleRoute();

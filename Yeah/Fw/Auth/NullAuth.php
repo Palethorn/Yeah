@@ -26,4 +26,8 @@ class NullAuth implements AuthInterface {
         
     }
 
+    public function isAuthorized(\Yeah\Fw\Routing\Route\RouteInterface $route) {
+        return true;
+    }
+
 }
