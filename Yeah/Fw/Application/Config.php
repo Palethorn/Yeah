@@ -32,6 +32,9 @@ class Config {
     }
 
     public function importArray($array) {
+        if($array == null) {
+            return;
+        }
         foreach($array as $key => $value) {
             $this->$key = $value;
         }
