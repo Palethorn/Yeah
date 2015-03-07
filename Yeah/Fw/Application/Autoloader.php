@@ -54,10 +54,10 @@ class Autoloader {
         if($last_ns_pos = strrpos($class_name, '\\')) {
             $namespace = substr($class_name, 0, $last_ns_pos);
             $class_name = substr($class_name, $last_ns_pos + 1);
-            $relative_path = str_replace('\\', DS, $namespace);
+            $relative_path = str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
         }
         foreach($this->include_paths as $include_path) {
-            $file_path = $include_path . DS . $relative_path . DS . str_replace('_', DS, $class_name) . '.php';
+            $file_path = $include_path . DIRECTORY_SEPARATOR . $relative_path . DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $class_name) . '.php';
             if(file_exists($file_path)) {
                 $this->autoload[$class] = $file_path;
                 require $file_path;

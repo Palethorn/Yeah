@@ -1,10 +1,8 @@
 <?php
 
-define('DS', DIRECTORY_SEPARATOR);
-
-require_once '..' . DS . '..' . DS . 'Yeah' . DS . 'Fw' . DS . 'Application' . DS . 'Autoloader.php';
+require_once '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Yeah' . DIRECTORY_SEPARATOR . 'Fw' . DIRECTORY_SEPARATOR . 'Application' . DIRECTORY_SEPARATOR . 'Autoloader.php';
 
 $autoloader = new Yeah\Fw\Application\Autoloader();
-$autoloader->addIncludePath('..' . DS . '..');
+$autoloader->addIncludePath('..' . DIRECTORY_SEPARATOR . '..');
 $autoloader->register();
 $autoloader->setCache(new \Yeah\Fw\Cache\NullCache());

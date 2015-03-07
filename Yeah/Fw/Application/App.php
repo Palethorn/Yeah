@@ -77,7 +77,7 @@ class App {
      * Register autoloader paths for probing
      */
     protected function registerAutoloaders() {
-        require_once $this->getLibDir() . DS . 'Yeah' . DS . 'Fw' . DS . 'Application' . DS . 'Autoloader.php';
+        require_once $this->getLibDir() . DIRECTORY_SEPARATOR . 'Yeah' . DIRECTORY_SEPARATOR . 'Fw' . DIRECTORY_SEPARATOR . 'Application' . DIRECTORY_SEPARATOR . 'Autoloader.php';
         $this->autoloader = new Autoloader();
         $this->autoloader->addIncludePath($this->getLibDir());
         $this->autoloader->addIncludePath($this->getModelsDir());
@@ -93,7 +93,7 @@ class App {
      * Load additional routes
      */
     public function loadRoutes() {
-        $routes_location = $this->getBaseDir() . DS . $this->getAppName() . DS . 'config' . DS . 'routes.php';
+        $routes_location = $this->getBaseDir() . DIRECTORY_SEPARATOR . $this->getAppName() . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'routes.php';
         if(file_exists($routes_location)) {
             require_once $routes_location;
         }
@@ -281,7 +281,7 @@ class App {
         if($this->config->base_dir) {
             return $this->config->base_dir;
         }
-        return dirname(__FILE__) . DS . '..' . DS . '..' . DS . '..' . DS . '..';
+        return dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..';
     }
 
     /**
@@ -293,7 +293,7 @@ class App {
             return $this->config->lib_dir;
         }
 
-        return $this->getBaseDir() . DS . 'lib';
+        return $this->getBaseDir() . DIRECTORY_SEPARATOR . 'lib';
     }
 
     /**
@@ -305,7 +305,7 @@ class App {
         if($this->config->web_dir) {
             return $this->config->web_dir;
         }
-        return $this->getBaseDir() . DS . 'web';
+        return $this->getBaseDir() . DIRECTORY_SEPARATOR . 'web';
     }
 
     /**
@@ -317,7 +317,7 @@ class App {
         if($this->config->cache_dir) {
             return $this->config->cache_dir;
         }
-        return $this->getBaseDir() . DS . 'cache';
+        return $this->getBaseDir() . DIRECTORY_SEPARATOR . 'cache';
     }
 
     /**
@@ -329,7 +329,7 @@ class App {
         if($this->config->log_dir) {
             return $this->config->log_dir;
         }
-        return $this->getBaseDir() . DS . 'log';
+        return $this->getBaseDir() . DIRECTORY_SEPARATOR . 'log';
     }
 
     /**
@@ -341,7 +341,7 @@ class App {
         if($this->config->controllers_dir) {
             return $this->config->controllers_dir;
         }
-        return $this->getBaseDir() . DS . $this->getAppName() . DS . 'controllers';
+        return $this->getBaseDir() . DIRECTORY_SEPARATOR . $this->getAppName() . DIRECTORY_SEPARATOR . 'controllers';
     }
 
     /**
@@ -353,7 +353,7 @@ class App {
         if($this->config->models_dir) {
             return $this->config->models_dir;
         }
-        return $this->getBaseDir() . DS . $this->getAppName() . DS . 'models';
+        return $this->getBaseDir() . DIRECTORY_SEPARATOR . $this->getAppName() . DIRECTORY_SEPARATOR . 'models';
     }
 
     /**
@@ -365,7 +365,7 @@ class App {
         if($this->config->views_dir) {
             return $this->config->views_dir;
         }
-        return $this->getBaseDir() . DS . $this->getAppName() . DS . 'views';
+        return $this->getBaseDir() . DIRECTORY_SEPARATOR . $this->getAppName() . DIRECTORY_SEPARATOR . 'views';
     }
 
     private function __clone() {

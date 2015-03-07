@@ -17,7 +17,7 @@ class FileLogger implements \Yeah\Fw\Logger\LoggerInterface {
      * {@inheritdoc}
      */
     public function __construct($path, $log_level) {
-        $path = str_replace(array('/', '\\'), DS,$path);
+        $path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR,$path);
         $this->log = new \Yeah\Fw\Filesystem\File($path, 'a');
         $this->level = $log_level;
     }

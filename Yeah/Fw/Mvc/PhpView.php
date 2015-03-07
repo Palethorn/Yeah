@@ -124,11 +124,11 @@ class PhpView implements ViewInterface {
         if(!$this->layout) {
             return;
         }
-        if(!file_exists($this->views_dir . DS . 'layouts' . DS . $this->layout . '.php')) {
+        if(!file_exists($this->views_dir . DIRECTORY_SEPARATOR . 'layouts' . DIRECTORY_SEPARATOR . $this->layout . '.php')) {
             throw new \Exception('Layout not found.', 500, null);
         }
         ob_start();
-        require_once $this->views_dir . DS . 'layouts' . DS . $this->layout . '.php';
+        require_once $this->views_dir . DIRECTORY_SEPARATOR . 'layouts' . DIRECTORY_SEPARATOR . $this->layout . '.php';
         $this->content = ob_get_contents();
         ob_end_clean();
     }
@@ -143,13 +143,13 @@ class PhpView implements ViewInterface {
         if(!$this->template) {
             return;
         }
-        $this->template = str_replace('/', DS, $this->template);
+        $this->template = str_replace('/', DIRECTORY_SEPARATOR, $this->template);
         $view = $this->template . '.php';
-        if(!file_exists($this->views_dir . DS . $view)) {
+        if(!file_exists($this->views_dir . DIRECTORY_SEPARATOR . $view)) {
             throw new \Exception('View not found.', 500, null);
         }
         ob_start();
-        require_once $this->views_dir . DS . $view;
+        require_once $this->views_dir . DIRECTORY_SEPARATOR . $view;
         $this->content = ob_get_contents();
         ob_end_clean();
     }

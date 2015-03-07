@@ -94,7 +94,7 @@ class FileCache implements CacheInterface {
     }
 
     public function getFilename($key) {
-        return $this->cache_dir . DS . $key . '.cache';
+        return $this->cache_dir . DIRECTORY_SEPARATOR . $key . '.cache';
     }
     
 }
