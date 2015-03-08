@@ -33,7 +33,7 @@ class TwigView implements ViewInterface {
      * {@inheritdoc}
      */
     public function setTemplate($template = false) {
-        $this->template = $template . '.php.twig';
+        $this->template = $template . '.twig';
         return $this;
     }
 
