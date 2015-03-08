@@ -1,6 +1,23 @@
 # GENERAL INFO #
 
-Setting up this framework requires that you download and set up Yeah! DevTools. Download from https://bitbucket.org/palethorn/yeah-devtools/src
+Easiest way to install is to use composer. Add composer.json into your project root:
+```
+#!json
+
+{
+    "require": {
+        "yeah/yeah": "dev-master"
+    }
+}
+```
+Then:
+```
+#!bash
+
+composer update
+```
+
+You can also set up Yeah! DevTools and use it. Download from https://bitbucket.org/palethorn/yeah-devtools/src
 
 After setting up your alias:
 
