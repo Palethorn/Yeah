@@ -6,15 +6,16 @@ namespace Yeah\Fw\Routing\RouteRequest;
  * Implements RouteRequestInterface handler
  */
 class RouteRequestHandler implements RouteRequestHandlerInterface {
-
     /**
      * {@inheritdoc}
      */
     public function handle($options, \Yeah\Fw\Http\Request $request) {
-        if(!$this->match($request->getRequestUri(), $options['pattern'])) {
+
+        if(($params = $this->match($options, $request)) === false) {
             return false;
         }
         $route = new \Yeah\Fw\Routing\Route\Route();
+        $route->setRouteParams($params);
         $route->setAction($options['action']);
         $class = '\\' . ucfirst($options['controller']) . 'Controller';
         $controller = new $class();
@@ -29,12 +30,9 @@ class RouteRequestHandler implements RouteRequestHandlerInterface {
     /**
      * {@inheritdoc}
      */
-    public function match($uri, $pattern) {
-        $pattern = '#^' . $pattern . '$#';
-        if(preg_match($pattern, $uri)) {
-            return true;
-        }
-        return false;
+    public function match($options, \Yeah\Fw\Http\Request $request) {
+        $matcher = new \Yeah\Fw\Routing\RouteMatching\UriMatcher();
+        return $matcher->match($options, $request);
     }
 
     public function configureCache(\Yeah\Fw\Routing\Route\RouteInterface $route, $options) {

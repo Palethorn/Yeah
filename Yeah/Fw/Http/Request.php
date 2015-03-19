@@ -8,21 +8,10 @@ namespace Yeah\Fw\Http;
  * @author David Cavar
  */
 class Request {
-
-    private $headers = array();
+    
     private $parameters = array();
-    private $method = null;
     private $requestBody = null;
-    private $cache_key = '';
-
-    /**
-     * 
-     * @param array $options
-     */
-    public function __construct() {
-        $this->retrieveRequestHeaders();
-        $this->parseParameters();
-    }
+    private $envronment_parameters = array();
 
     /**
      * Magic method for accessing parameters by using get* pattern
@@ -33,24 +22,32 @@ class Request {
      */
     public function __call($method, $args) {
         if(strpos($method, 'get') === 0) {
-            $key = strtolower(str_replace('get', '', $method));
-            return $this->get($key);
+            $key = lcfirst(str_replace('get', '', $method));
+            return $this->getEnvironmentParameter($key);
         }
         if(strpos($method, 'set') === 0) {
-            $key = strtolower(str_replace('set', '', $method));
+            $key = lcfirst(str_replace('set', '', $method));
             return $this->set($key, $args[0]);
         }
     }
 
-    /**
-     * Parses request headers
-     */
-    public function retrieveRequestHeaders() {
-        foreach($_SERVER as $key => $value) {
-            $value = filter_var($_SERVER[$key]);
-            $key = strtolower(str_replace(array('-', '_', 'HTTP'), '', $key));
-            $this->headers[$key] = $value;
+    public function getEnvironmentParameter($key) {
+        if(isset($this->envronment_parameters[$key])) {
+            return $this->envronment_parameters[$key];
         }
+
+        if(isset($_SERVER[$key])) {
+            return $this->envronment_parameters[$key] = $_SERVER[$key];
+        }
+        $key1 = preg_replace_callback('/([a-z])([A-Z])/', function($matches) {
+            return $matches[1] . '_' . $matches[2];
+        }, $key);
+        $key1 = strtoupper($key1);
+
+        if(isset($_SERVER[$key1])) {
+            return $this->envronment_parameters[$key] = $_SERVER[$key1];
+        }
+        return false;
     }
 
     /**
@@ -60,11 +57,13 @@ class Request {
      * @return string|boolean
      */
     public function getParameter($key) {
-        if(isset($this->parameters[$key])) {
+        if($this->parameters[$key] = $this->getUrlParameter($key)) {
             return $this->parameters[$key];
-        } else {
-            return false;
         }
+        if($this->parameters[$key] = $this->getPostParameter($key)) {
+            return $this->parameters[$key];
+        }
+        return false;
     }
 
     /**
@@ -83,43 +82,25 @@ class Request {
      * @return array
      */
     public function getAllParameters() {
-        return $this->parameters;
+        return array_merge($_GET, $_POST);
     }
 
-    /**
-     * Parses request parameters
-     */
-    public function parseParameters() {
-        $this->parseGetParameters();
-        $this->parsePostParameters();
-    }
-
-    /**
-     * Parses GET parameters
-     */
-    public function parseGetParameters() {
-        $params = $this->getRequestUri() . '/' . $this->getQueryString();
-        $params = str_replace('=', '/', $params);
-        $params = str_replace('&', '/', $params);
-        $params = trim($params, '/');
-        $this->cache_key = str_replace('/', '_', $params);
-        $params = explode('/', $params);
-        $this->parameters['controller'] = isset($params[0]) ? $params[0] : '';
-        $this->parameters['action'] = isset($params[1]) ? $params[1] : NULL;
-        for($i = 0; $i < (count($params)); $i++) {
-            $next = $i + 1;
-            $this->parameters[$params[$i]] = isset($params[$next]) ? $params[$next] : NULL;
+    public function getUrlParameter($key) {
+        if(isset($_GET[$key])) {
+            return $_GET['key'];
         }
+        $matches = array();
+        if(preg_match('/(' . $key . ')\/(.+)(\/|$)/', $this->getRequestUri(), $matches)) {
+            return $matches[2];
+        }
+        return false;
     }
 
-    /**
-     * Parses POST parameters
-     */
-    public function parsePostParameters() {
-        foreach($_POST as $key => $value) {
-            $value = filter_var($_POST[$key]);
-            $this->parameters[$key] = $value;
+    public function getPostParameter($key) {
+        if(isset($_POST[$key])) {
+            return $_POST[$key];
         }
+        return false;
     }
 
     /**
@@ -145,11 +126,7 @@ class Request {
      * @return string|boolean
      */
     public function get($key) {
-        if(isset($this->headers[$key])) {
-            return $this->headers[$key];
-        } else {
-            return false;
-        }
+        return $this->getEnvironmentParameter($key);
     }
 
     /**
@@ -159,7 +136,7 @@ class Request {
      * @param mixed $value
      */
     public function set($key, $value) {
-        $this->headers[$key] = $value;
+        $this->envronment_parameters[$key] = $value;
     }
 
     /**
@@ -168,7 +145,7 @@ class Request {
      * @return string
      */
     public function getRequestMethod() {
-        return $this->headers['requestmethod'];
+        return $this->getEnvironmentParameter('REQUEST_METHOD');
     }
 
     /**
@@ -177,17 +154,13 @@ class Request {
      * @return string
      */
     public function getRequestUri() {
-        $this->headers['requesturi'] = preg_replace("/(.*).php\/?/", '/', $this->headers['requesturi']);
-        $this->headers['requesturi'] = preg_replace('#\?' . $this->getQueryString() . '$#' , '', $this->headers['requesturi']);
-        return $this->headers['requesturi'];
+        $request_uri = preg_replace("/(.*).php\/?/", '/', $this->getEnvironmentParameter('REQUEST_URI'));
+        $request_uri = preg_replace('#\?' . $this->getQueryString() . '$#', '', $request_uri);
+        return $request_uri;
     }
 
     public function getQueryString() {
-        return $this->headers['querystring'];
-    }
-    
-    public function getCacheKey() {
-        return $this->cache_key;
+        return $this->getEnvironmentParameter('QUERY_STRING');
     }
 
 }

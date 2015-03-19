@@ -24,7 +24,7 @@ interface RouteRequestHandlerInterface {
      * @param string $uri
      * @param string $pattern
      */
-    function match($uri, $pattern);
+    function match($options, \Yeah\Fw\Http\Request $request);
     
     function configureCache(\Yeah\Fw\Routing\Route\RouteInterface $route, $options);
 }

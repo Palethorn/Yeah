@@ -511,7 +511,7 @@ class App {
         if($this->response_cache_key) {
             return $this->response_cache_key;
         }
-        return $this->response_cache_key = $this->route->getController() . '_' . $this->route->getAction() . '_' . $this->request->getCacheKey();
+        return $this->response_cache_key = str_replace(array('/', '?', '&'), array('_', '_', '_'), $this->getRequest()->getHttpHost() . $this->getRequest()->getEnvironmentParameter('REQUEST_URI') . $this->getRequest()->getQueryString());
     }
 
 }

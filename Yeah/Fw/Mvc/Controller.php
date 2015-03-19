@@ -16,17 +16,16 @@ class Controller {
     protected $response = null;
     private $options = null;
 
-    public function __construct() {
-        
-    }
-
     /**
      * Executes controller action if implemented
      * 
      * @param string $action
      */
-    public function execute($action) {
-        return $this->$action();
+    public function execute($action, $params) {
+        if($action instanceof \Closure) {
+            return call_user_func_array($action, $params);
+        }
+        return call_user_func_array(array($this, $action), $params);
     }
 
     /**
@@ -152,4 +151,5 @@ class Controller {
     public function __toString() {
         return get_class($this);
     }
+
 }

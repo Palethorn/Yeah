@@ -6,6 +6,7 @@ class Route implements RouteInterface {
 
     private $is_cacheable = false;
     private $cache_duration = 1440;
+    private $params = array();
 
     public function getAction() {
         return $this->action;
@@ -55,7 +56,7 @@ class Route implements RouteInterface {
         $this->getController()->setResponse($response);
         $this->getController()->setAuth($auth);
         $this->getController()->setSessionHandler($session);
-        return $this->getController()->execute($method);
+        return $this->getController()->execute($method, $this->params);
     }
 
     /**
@@ -84,6 +85,13 @@ class Route implements RouteInterface {
      */
     public function setIsCacheable($is_cacheable) {
         $this->is_cacheable = $is_cacheable;
+    }
+    
+    /**
+     * {inheritdoc}
+     */
+    public function setRouteParams($params) {
+        $this->params = $params;
     }
 
 }
