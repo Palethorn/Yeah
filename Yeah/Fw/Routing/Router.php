@@ -48,7 +48,7 @@ class Router {
      * @param \Yeah\Fw\Http\Request $request HTTP request object
      * @return RouteInterface
      */
-    public function handle($request) {
+    public function handle(\Yeah\Fw\Http\Request $request) {
         foreach(self::$routes as $pattern => $options) {
             $routeRequest = new $options['route_request_handler']();
             $options['pattern'] = $pattern;
@@ -57,16 +57,28 @@ class Router {
                 return $route;
             }
         }
-        $class = '\\' . ucfirst($request->getParameter('controller')) . 'Controller';
+        if(!$this->matchDynamic($request)) {
+            throw new \Yeah\Fw\Http\Exception\NotFoundHttpException();
+        }
+        $class = '\\' . ucfirst($request->get('controller')) . 'Controller';
         if(!class_exists($class)) {
             throw new \Yeah\Fw\Http\Exception\NotFoundHttpException();
         }
         $route = new \Yeah\Fw\Routing\Route\Route();
-        $route->setAction($request->getParameter('action'));
+        $route->setAction($request->get('action'));
         $controller = new $class();
         $route->setController($controller);
         $route->setSecure(false);
         return $route;
     }
 
+    function matchDynamic(\Yeah\Fw\Http\Request $request) {
+        $matches = array();
+        if(preg_match('/\/(.*)\/(.*)/', $request->getRequestUri(), $matches)) {
+            $request->set('controller', $matches[1]);
+            $request->set('action', $matches[2]);
+            return true;
+        }
+        return false;
+    }
 }
