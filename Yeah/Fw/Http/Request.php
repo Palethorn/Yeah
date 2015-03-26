@@ -57,10 +57,10 @@ class Request {
      * @return string|boolean
      */
     public function getParameter($key) {
-        if($this->parameters[$key] = $this->getUrlParameter($key)) {
+        if(($this->parameters[$key] = $this->getUrlParameter($key)) !== false) {
             return $this->parameters[$key];
         }
-        if($this->parameters[$key] = $this->getPostParameter($key)) {
+        if(($this->parameters[$key] = $this->getPostParameter($key)) !== false) {
             return $this->parameters[$key];
         }
         return false;
@@ -87,7 +87,7 @@ class Request {
 
     public function getUrlParameter($key) {
         if(isset($_GET[$key])) {
-            return $_GET['key'];
+            return $_GET[$key];
         }
         $matches = array();
         if(preg_match('/(' . $key . ')\/(.+)(\/|$)/', $this->getRequestUri(), $matches)) {
