@@ -142,6 +142,12 @@ class ErrorHandler {
                         padding-left: 10px;
                         color: white;
                     }
+                    #trace_line {
+                        background: white;
+                        color: black;
+                        margin-bottom: 10px;
+                        padding: 5px;
+                    }
                 </style>
             </head>
             <body>
@@ -160,7 +166,7 @@ class ErrorHandler {
 
                             <h2>Trace:</h2>
                             <?php
-                            echo $this->print_r2($options['trace']);
+                            echo $this->printTrace($options['trace']);
                             ?>
                         </div>
                     <?php } ?>
@@ -176,8 +182,15 @@ class ErrorHandler {
      * @param array $array
      * @return string
      */
-    public function print_r2($array) {
-        return '<pre>' . print_r($array, true) . '</pre>';
+    public function printTrace($trace) {
+        $string = '';
+        foreach($trace as $line) {
+            $string .= '<div id="trace_line">';
+            $string .= '<div>File: ' . (isset($line['file']) ? $line['file'] : '') . '</div><div>Line: ' . (isset($line['line']) ? $line['line'] : '') . '</div>';
+            $string .= '<div>Class: ' . (isset($line['class']) ? $line['class'] : '') . '<div></div>Function: ' . (isset($line['function']) ? $line['function'] : '') . '</div>';
+            $string .= '</div>';
+        }
+        return $string;
     }
 
 }
