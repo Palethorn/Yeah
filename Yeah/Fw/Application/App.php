@@ -514,4 +514,8 @@ class App {
         return $this->response_cache_key = str_replace(array('/', '?', '&'), array('_', '_', '_'), $this->getRequest()->getHttpHost() . $this->getRequest()->getEnvironmentParameter('REQUEST_URI') . $this->getRequest()->getQueryString());
     }
 
+    public function getConfig() {
+        return $this->config;
+    }
+    
 }
