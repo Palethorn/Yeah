@@ -32,7 +32,7 @@ class Response {
      * @param string $content_type
      */
     public function setContentType($content_type) {
-        $this->header("Content-Type", $content_type);
+        $this->setHeader("Content-Type", $content_type);
     }
 
     /**
