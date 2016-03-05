@@ -3,9 +3,9 @@
 namespace Yeah\Fw\Mvc;
 
 /**
- * @property Response $response
- * @property Request $request
- * @property SessionHandler $session 
+ * @property \Yeah\Fw\Http\Response $response
+ * @property \Yeah\Fw\Http\Request $request
+ * @property \SessionHandler $session 
  */
 class Controller {
 
