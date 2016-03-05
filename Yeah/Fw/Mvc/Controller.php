@@ -88,16 +88,15 @@ class Controller {
     /**
      * Fetches HTTP request object
      * 
-     * @return Request
+     * @return \Yeah\Fw\Http\Request
      */
     public function getRequest() {
         return $this->request;
     }
 
     /**
-     * Fetches HTTP request object
-     * 
-     * @return Request
+     * Sets HTTP request object
+     * @param \Yeah\Fw\Http\Request $request
      */
     public function setRequest(\Yeah\Fw\Http\Request $request) {
         $this->request = $request;
