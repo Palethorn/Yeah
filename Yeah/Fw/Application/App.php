@@ -45,6 +45,7 @@ class App {
      *
      */
     public function __construct($app_name, $env = 'prod', $config = array('prod' => array())) {
+        header('Created-Using: Yeah Web Framework');
         $this->app_name = $app_name;
         $this->env = $env;
         require_once 'Config.php';
