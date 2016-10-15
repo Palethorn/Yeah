@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/Palethorn/Yeah.svg?branch=master)](https://travis-ci.org/Palethorn/Yeah)
 # GENERAL INFO #
 
 Easiest way to install is to use composer. Add composer.json into your project root:
