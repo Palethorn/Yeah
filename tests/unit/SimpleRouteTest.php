@@ -1,33 +1,32 @@
 <?php
 
 class SimpleRouteTest extends PHPUnit_Framework_TestCase {
-
     public function __construct() {
         $this->route = array(
             'pattern' => '/',
             'secure' => false,
-            'method' => array(
-                'GET' => (function() {
-            return 'GET';
-        }),
-                'POST' => (function() {
-            return 'POST';
-        }),
-                'PUT' => (function() {
-            return 'PUT';
-        }),
-                'DELETE' => (function() {
-            return 'DELETE';
-        })
-            )
+            'restful' => array(
+                'GET' => array(
+                  'method' => (function () {
+                      return 'GET';
+                  }), ),
+                'POST' => array('method' => (function () {
+                    return 'POST';
+                })),
+                'PUT' => array('method' => (function () {
+                    return 'PUT';
+                })),
+                'DELETE' => array('method' => (function () {
+                    return 'DELETE';
+                })),
+            ),
         );
         $this->request = $this->getMockBuilder('\Yeah\Fw\Http\Request')->getMock();
         $this->request->method('getRequestUri')->willReturn('/');
-        
+
         $this->response = $this->getMockBuilder('\Yeah\Fw\Http\Response')->getMock();
         $this->session = $this->getMockBuilder('\Yeah\Fw\Session\NullSessionHandler')->getMock();
         $this->auth = $this->getMockBuilder('\Yeah\Fw\Auth\NullAuth')->getMock();
-        
     }
 
     public function testGet() {
@@ -61,5 +60,4 @@ class SimpleRouteTest extends PHPUnit_Framework_TestCase {
         $this->assertNotFalse($route);
         $this->assertEquals('DELETE', $route->execute($this->request, $this->response, $this->session, $this->auth));
     }
-
 }
