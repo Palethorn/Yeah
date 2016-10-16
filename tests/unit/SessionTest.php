@@ -4,9 +4,9 @@ class DatabaseSessionHandlerTest extends PHPUnit_Framework_TestCase {
 
     public function testSetWrite() {
         $session = new \Yeah\Fw\Session\DatabaseSessionHandler(array(
-            'dsn' => 'mysql:host=localhost;dbname=yeahblog;charset=utf8',
+            'dsn' => 'mysql:host=localhost;dbname=test;charset=utf8',
             'db_user' => 'root',
-            'db_password' => 'test',
+            'db_password' => '',
             'id' => 'test'
                 )
         );
@@ -18,9 +18,9 @@ class DatabaseSessionHandlerTest extends PHPUnit_Framework_TestCase {
 
     public function testGetExisting() {
         $session = new \Yeah\Fw\Session\DatabaseSessionHandler(array(
-            'dsn' => 'mysql:host=localhost;dbname=yeahblog;charset=utf8',
+            'dsn' => 'mysql:host=localhost;dbname=test;charset=utf8',
             'db_user' => 'root',
-            'db_password' => 'test',
+            'db_password' => '',
             'id' => 'test'
                 )
         );
@@ -30,9 +30,9 @@ class DatabaseSessionHandlerTest extends PHPUnit_Framework_TestCase {
 
     public function testRemoveWrite() {
         $session = new \Yeah\Fw\Session\DatabaseSessionHandler(array(
-            'dsn' => 'mysql:host=localhost;dbname=yeahblog;charset=utf8',
+            'dsn' => 'mysql:host=localhost;dbname=test;charset=utf8',
             'db_user' => 'root',
-            'db_password' => 'test',
+            'db_password' => '',
             'id' => 'test'
                 )
         );
@@ -44,9 +44,9 @@ class DatabaseSessionHandlerTest extends PHPUnit_Framework_TestCase {
 
     public function testDestroy() {
         $session = new \Yeah\Fw\Session\DatabaseSessionHandler(array(
-            'dsn' => 'mysql:host=localhost;dbname=yeahblog;charset=utf8',
+            'dsn' => 'mysql:host=localhost;dbname=test;charset=utf8',
             'db_user' => 'root',
-            'db_password' => 'test',
+            'db_password' => '',
             'id' => 'test'
                 )
         );
