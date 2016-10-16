@@ -9,4 +9,4 @@ script: phpunit --bootstrap tests/unit/bootstrap.php tests/unit/
 services:
   - mysql
 before_script:
-  - mysql -e 'create database test charset utf8 collate utf8_general_ci; create table sessions(id int(11) NOT NULL auto_increment, session_id varchar(255), data text, last_access int(11));'
+  - mysql -e 'create database test charset utf8 collate utf8_general_ci; use test; create table sessions(id int(11) NOT NULL auto_increment, session_id varchar(255), data text, last_access int(11));'
