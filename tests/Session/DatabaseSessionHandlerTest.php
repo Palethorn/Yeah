@@ -24,6 +24,7 @@ class DatabaseSessionHandlerTest extends PHPUnit_Framework_TestCase {
             'id' => 'test'
                 )
         );
+        $session->setSessionParam('test', 'val');
         $this->assertTrue($session->read('test'));
         $this->assertEquals('val', $session->getSessionParam('test'));
     }
