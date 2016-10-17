@@ -95,7 +95,6 @@ class RequestTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testGetParameter() {
-        echo PHP_EOL;
         $_SERVER = array(
             'REQUEST_METHOD' => 'GET',
             'HTTP_HOST' => 'testing.yeah',
@@ -103,10 +102,10 @@ class RequestTest extends PHPUnit_Framework_TestCase {
             'REQUEST_URI' => 'test.com/loli/20',
         );
         $request = new \Yeah\Fw\Http\Request();
-        echo $request->getParameter('loli') . PHP_EOL;
-        echo $request->getParameter('lol') . PHP_EOL;
-        echo $request->getUrlParameter('lol') . PHP_EOL;
-        echo $request->getUrlParameter('loli') . PHP_EOL;
+        $request->getParameter('loli') . PHP_EOL;
+        $request->getParameter('lol') . PHP_EOL;
+        $request->getUrlParameter('lol') . PHP_EOL;
+        $request->getUrlParameter('loli') . PHP_EOL;
     }
 
 }

@@ -24,5 +24,4 @@ class ConfigTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($config->int, 3);
         $this->assertArrayHasKey('key', $config->array->toArray());
     }
-
 }
