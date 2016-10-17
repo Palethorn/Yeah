@@ -24,13 +24,13 @@ class FileCache implements CacheInterface {
 
     public function get($key) {
         if(!$this->has($key)) {
-            return false;
+            return null;
         }
         return $this->loaded[$key]['data'];
     }
 
     public function has($key) {
-        if(isset($this->loaded[$key])) {
+        if(isset($this->loaded[$key]) && $this->valid($this->loaded[$key])) {
             return true;
         }
 
@@ -52,6 +52,7 @@ class FileCache implements CacheInterface {
         if(file_exists($filename)) {
             unlink($filename);
         }
+        unset($this->loaded[$key]);
     }
 
     public function valid($file) {
@@ -61,7 +62,7 @@ class FileCache implements CacheInterface {
         if($file['ctime'] + $file['duration'] > strtotime('now')) {
             return true;
         }
-        
+
         return false;
     }
 
@@ -96,5 +97,5 @@ class FileCache implements CacheInterface {
     public function getFilename($key) {
         return $this->cache_dir . DIRECTORY_SEPARATOR . $key . '.cache';
     }
-    
+
 }
