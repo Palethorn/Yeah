@@ -4,18 +4,18 @@ namespace Yeah\Fw\Http;
 
 /**
  * HTTP request implementation
- * 
+ *
  * @author David Cavar
  */
 class Request {
-    
+
     private $parameters = array();
     private $requestBody = null;
     private $envronment_parameters = array();
 
     /**
      * Magic method for accessing parameters by using get* pattern
-     * 
+     *
      * @param string $method
      * @param array $args
      * @return mixed
@@ -52,7 +52,7 @@ class Request {
 
     /**
      * Retrieves request parameter
-     * 
+     *
      * @param string $key
      * @return string|boolean
      */
@@ -63,12 +63,12 @@ class Request {
         if(($this->parameters[$key] = $this->getPostParameter($key)) !== false) {
             return $this->parameters[$key];
         }
-        return false;
+        return null;
     }
 
     /**
      * Overwrites default request parameter
-     * 
+     *
      * @param string $key
      * @param mixed $value
      */
@@ -78,7 +78,7 @@ class Request {
 
     /**
      * Retrieves all request parameters
-     * 
+     *
      * @return array
      */
     public function getAllParameters() {
@@ -93,19 +93,19 @@ class Request {
         if(preg_match('/(' . $key . ')\/(.+)(\/|$)/', $this->getRequestUri(), $matches)) {
             return $matches[2];
         }
-        return false;
+        return null;
     }
 
     public function getPostParameter($key) {
         if(isset($_POST[$key])) {
             return $_POST[$key];
         }
-        return false;
+        return null;
     }
 
     /**
      * Gets request POST content
-     * 
+     *
      * @return string
      */
     public function getRequestBody() {
@@ -121,7 +121,7 @@ class Request {
 
     /**
      * Retrieves header value
-     * 
+     *
      * @param string $key
      * @return string|boolean
      */
@@ -131,7 +131,7 @@ class Request {
 
     /**
      * Sets header value
-     * 
+     *
      * @param set $key
      * @param mixed $value
      */
@@ -141,7 +141,7 @@ class Request {
 
     /**
      * Identifies HTTP request method (GET, POST, PUT, DELETE)
-     * 
+     *
      * @return string
      */
     public function getRequestMethod() {
@@ -150,7 +150,7 @@ class Request {
 
     /**
      * Return request uri without query string
-     * 
+     *
      * @return string
      */
     public function getRequestUri() {
