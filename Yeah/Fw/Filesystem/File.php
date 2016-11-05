@@ -17,7 +17,7 @@ class File {
      * Create new instance
      * 
      * @param string $location
-     * @param char $mode
+     * @param string $mode
      */
     public function __construct($location, $mode = 'r') {
         $this->open($location, $mode);
@@ -31,7 +31,7 @@ class File {
      * Opens file handler
      * 
      * @param string $location
-     * @param char $mode
+     * @param string $mode
      */
     public function open($location, $mode) {
         $this->fp = fopen($location, $mode);
@@ -42,18 +42,25 @@ class File {
      * 
      * @param mixed $data
      * @param int $length
+     * @return int
      * @throws \Exception
      */
     public function write($data, $length = null) {
         if($this->mode == 'r') {
             throw new \Exception('Invalid filemode.', 500, null);
         }
+
         if($this->opened()) {
+
             if($length == null) {
                 $length = strlen($data);
             }
-            fwrite($this->fp, $data, $length);
+
+            $nob = fwrite($this->fp, $data, $length);
+            fflush($this->fp);
+            return $nob;
         }
+        return 0;
     }
 
     /**
@@ -64,7 +71,7 @@ class File {
      * @throws \Exception
      */
     public function read($length = 1024) {
-        if(strstr($this->mode, 'r') && $this->opened()) {
+        if(\Yeah\Fw\Toolbox\PhpApi::strpos($this->mode, array('r', 'w+', 'x+', 'a+', 'c+')) !== false && $this->opened()) {
             return fread($this->fp, $length);
         }
         throw new \Exception('Invalid operation.', 500, null);
