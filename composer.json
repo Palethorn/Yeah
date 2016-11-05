@@ -9,6 +9,6 @@
         "yeah/yeah-devtools": "1.0.0"
     },
     "autoload": {
-        "psr-0": { "Yeah\\Fw\\": "" }
+        "psr-0": { "Yeah\\Fw\\": "src" }
     }
 }
