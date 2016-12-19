@@ -7,5 +7,6 @@ php:
   - nightly
 services:
   - mysql
+  - redis-server
 before_script:
   - mysql -e 'create database test charset utf8 collate utf8_general_ci; use test; create table sessions(id int(11) NOT NULL auto_increment, session_id varchar(255), data text, last_access int(11), PRIMARY KEY(id));'
