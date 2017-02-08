@@ -17,7 +17,7 @@ class RouteRequestHandler implements RouteRequestHandlerInterface {
         $route = new \Yeah\Fw\Routing\Route\Route();
         $route->setRouteParams($params);
         $route->setAction($options['action']);
-        $class = '\\' . ucfirst($options['controller']) . 'Controller';
+        $class = $options['controller'];
         $controller = new $class();
         $route->setController($controller);
         $route->setSecure($options['secure']);
