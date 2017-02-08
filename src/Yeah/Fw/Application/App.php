@@ -54,8 +54,8 @@ class App {
             $conf = $config[$env];
         }
         $this->config = new Config($conf);
-        $this->registerAutoloaders();
-        $this->configureAutoloadCache();
+        // $this->registerAutoloaders();
+        // $this->configureAutoloadCache();
         $this->error_handler = new \Yeah\Fw\Error\ErrorHandler(error_reporting());
         $this->router = new \Yeah\Fw\Routing\Router();
         $this->request = new \Yeah\Fw\Http\Request();
@@ -116,7 +116,7 @@ class App {
     /**
      * Fetches the route inside of a chain execution.
      * Don't invoke unless you know what you're doing.
-     * 
+     *
      * @return RouteInterface
      */
     private function executeRouter() {
@@ -151,7 +151,7 @@ class App {
 
     /**
      * Write cached output to response if route is cacheable and cache exists
-     * 
+     *
      * @param \Yeah\Fw\Routing\Route\RouteInterface $route
      * @return boolean
      */
@@ -234,7 +234,7 @@ class App {
     }
 
     /**
-     * 
+     *
      * @return Yeah\Fw\Auth\AuthInterface
      */
     public function getAuth() {
@@ -251,7 +251,7 @@ class App {
     }
 
     /**
-     * 
+     *
      * @return Yeah\Fw\Cache\CacheInterface
      */
     public function getResponseCache() {
@@ -370,11 +370,11 @@ class App {
     }
 
     private function __clone() {
-        
+
     }
 
     /**
-     * 
+     *
      * @param string $url
      * @param Closure $method
      * @param string $http_method
@@ -518,5 +518,5 @@ class App {
     public function getConfig() {
         return $this->config;
     }
-    
+
 }
