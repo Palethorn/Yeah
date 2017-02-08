@@ -39,6 +39,9 @@ class App {
     protected $route = false;
     protected $response_cache_key = false;
 
+    protected $beforeMiddleware = array();
+    protected $afterMiddleware = array();
+
     /**
      * Class constructor.
      * @param mixed $options Configuration options
@@ -61,6 +64,7 @@ class App {
         $this->request = new \Yeah\Fw\Http\Request();
         $this->response = new \Yeah\Fw\Http\Response();
         $this->dc = new DependencyContainer();
+        $this->configureMiddleware();
         $this->configureServices();
         $this->loadRoutes();
         self::$instance = $this;
@@ -105,12 +109,30 @@ class App {
      */
     public function execute() {
         $this->executeRouter();
+        $this->beforeMiddleware();
         $this->executeSecurity();
         if($this->route->getIsCacheable() && $this->executeCache($this->route)) {
             return;
         }
         $action_result = $this->executeAction($this->route);
+        $this->afterMiddleware();
         $this->executeRender($action_result);
+    }
+
+    /**
+     * Executes middleware before application request handling
+     * Don't invoke unless you know what you're doing.
+     *
+     */
+    public function beforeMiddleware() {
+    }
+
+    /**
+     * Executes middleware after application request handling
+     * Don't invoke unless you know what you're doing.
+     *
+     */
+    public function afterMiddleware() {
     }
 
     /**
