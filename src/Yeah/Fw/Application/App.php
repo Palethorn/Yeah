@@ -59,7 +59,13 @@ class App {
         $this->config = new Config($conf);
         // $this->registerAutoloaders();
         // $this->configureAutoloadCache();
-        $this->error_handler = new \Yeah\Fw\Error\ErrorHandler(error_reporting());
+
+        if(PHP_MAJOR_VERSION) {
+            $this->error_handler = new \Yeah\Fw\Error\ErrorHandler_php7(error_reporting());
+        } else {
+            $this->error_handler = new \Yeah\Fw\Error\ErrorHandler(error_reporting());
+        }
+
         $this->router = new \Yeah\Fw\Routing\Router();
         $this->request = new \Yeah\Fw\Http\Request();
         $this->response = new \Yeah\Fw\Http\Response();
@@ -479,6 +485,14 @@ class App {
      */
     public function getDependencyContainer() {
         return $this->dc;
+    }
+
+    /**
+     * This method is designed to be specifically overriden
+     * Adds simple interface for injecting middleware into preexecution and postexecution
+     */
+    public function configureMiddleware() {
+
     }
 
     /**
