@@ -1,4 +1,5 @@
 <?php
+
 error_reporting(E_ERROR | E_PARSE);
 $_SERVER = array(
     'PHP_SELF' => '1',

@@ -1,6 +1,12 @@
 <?php
 
-class ConfigTest extends PHPUnit_Framework_TestCase {
+if(PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION >= 2) {
+    use PHPUnit\Framework\TestCase as TestCase;
+} else {
+    use PHPUnit_Framework_TestCase as TestCase;
+}
+
+class ConfigTest extends TestCase {
 
     private $config = false;
 

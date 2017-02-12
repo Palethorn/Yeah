@@ -1,6 +1,12 @@
 <?php
 
-class FileCacheTest extends PHPUnit_Framework_TestCase {
+if(PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION >= 2) {
+    use PHPUnit\Framework\TestCase as TestCase;
+} else {
+    use PHPUnit_Framework_TestCase as TestCase;
+}
+
+class FileCacheTest extends TestCase {
 
     public function __construct() {
         $this->file_cache = new \Yeah\Fw\Cache\FileCache('/tmp/test');

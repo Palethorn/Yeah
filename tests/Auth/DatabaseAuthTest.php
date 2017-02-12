@@ -1,6 +1,12 @@
 <?php
 
-class DatabaseAuthTest extends PHPUnit_Framework_TestCase {
+if(PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION >= 2) {
+    use PHPUnit\Framework\TestCase as TestCase;
+} else {
+    use PHPUnit_Framework_TestCase as TestCase;
+}
+
+class DatabaseAuthTest extends TestCase {
     public function __construct() {
         $this->session_handler = $this->getMockBuilder('\Yeah\Fw\Session\NullSessionHandler')->getMock();
         $this->database_auth = new Yeah\Fw\Auth\DatabaseAuth($this->session_handler);

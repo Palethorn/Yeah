@@ -1,5 +1,11 @@
 <?php
 
+if(PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION >= 2) {
+    use PHPUnit\Framework\TestCase as TestCase;
+} else {
+    use PHPUnit_Framework_TestCase as TestCase;
+}
+
 $_SERVER = array(
     'PHP_SELF' => '1',
     'GATEWAY_INTERFACE' => '2',
@@ -43,7 +49,7 @@ $_SERVER = array(
 
 $_GET['lol'] = 10;
 
-class RequestTest extends PHPUnit_Framework_TestCase {
+class RequestTest extends TestCase {
 
     public function testGetEnvironmentParameter() {
         $keys = array(

@@ -1,6 +1,12 @@
 <?php
 
-class ResponseTest extends PHPUnit_Framework_TestCase {
+if(PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION >= 2) {
+    use PHPUnit\Framework\TestCase as TestCase;
+} else {
+    use PHPUnit_Framework_TestCase as TestCase;
+}
+
+class ResponseTest extends TestCase {
     public function testResponseHeadering() {
         $response = new \Yeah\Fw\Http\Response();
         $response->setHeader('Test-Header', 'test');
@@ -8,7 +14,7 @@ class ResponseTest extends PHPUnit_Framework_TestCase {
             'H1' => '1',
             'H2' => '2'
         ));
-        
+
         $this->assertEquals($response->getHeader('Test-Header'), 'test');
         $this->assertEquals($response->getHeader('H1'), '1');
         $this->assertEquals($response->getHeader('H2'), '2');
