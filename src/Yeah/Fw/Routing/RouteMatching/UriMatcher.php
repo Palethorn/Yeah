@@ -15,6 +15,11 @@ class UriMatcher implements MatcherInterface {
             }
             return '([a-zA-Z0-9_]+)?';
         }, $pattern);
+
+        if(isset($options['prefix'])) {
+            $pattern = $options['prefix'] . $pattern;
+        }
+
         $pattern = '#^' . $pattern . '$#';
         $matches = array();
         if(preg_match($pattern, $request_uri, $matches)) {
