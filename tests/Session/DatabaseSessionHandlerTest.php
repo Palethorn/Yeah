@@ -1,6 +1,6 @@
 <?php
 
-class DatabaseSessionHandlerTest extends PHPUnit_Framework_TestCase {
+class DatabaseSessionHandlerTest extends TestCase {
 
     public function testSetWrite() {
         $session = new \Yeah\Fw\Session\DatabaseSessionHandler(array(

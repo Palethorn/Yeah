@@ -1,6 +1,6 @@
 <?php
 
-class DatabaseAuthTest extends PHPUnit_Framework_TestCase {
+class DatabaseAuthTest extends TestCase {
     public function __construct() {
         $this->session_handler = $this->getMockBuilder('\Yeah\Fw\Session\NullSessionHandler')->getMock();
         $this->database_auth = new Yeah\Fw\Auth\DatabaseAuth($this->session_handler);

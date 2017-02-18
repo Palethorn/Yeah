@@ -1,6 +1,6 @@
 <?php
 
-class SimpleRouteTest extends PHPUnit_Framework_TestCase {
+class SimpleRouteTest extends TestCase {
     public function __construct() {
         $this->route = array(
             'pattern' => '/',

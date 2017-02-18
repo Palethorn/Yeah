@@ -1,6 +1,6 @@
 <?php
 
-class FileCacheTest extends PHPUnit_Framework_TestCase {
+class FileCacheTest extends TestCase {
 
     public function __construct() {
         $this->file_cache = new \Yeah\Fw\Cache\FileCache('/tmp/test');

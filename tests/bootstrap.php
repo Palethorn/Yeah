@@ -1,4 +1,10 @@
 <?php
+
+if(PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION >= 2) {
+    class TestCase extends PHPUnit\Framework\TestCase {}
+} else {
+    class TestCase extends PHPUnit_Framework_TestCase {}
+}
 error_reporting(E_ERROR | E_PARSE);
 $_SERVER = array(
     'PHP_SELF' => '1',

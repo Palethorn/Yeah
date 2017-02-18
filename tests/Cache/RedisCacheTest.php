@@ -1,6 +1,6 @@
 <?php
 
-class RedisCacheTest extends PHPUnit_Framework_TestCase {
+class RedisCacheTest extends TestCase {
 
     public function __construct() {
         $this->cache = new \Yeah\Fw\Cache\RedisCache();

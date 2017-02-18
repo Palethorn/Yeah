@@ -43,7 +43,7 @@ $_SERVER = array(
 
 $_GET['lol'] = 10;
 
-class RequestTest extends PHPUnit_Framework_TestCase {
+class RequestTest extends TestCase {
 
     public function testGetEnvironmentParameter() {
         $keys = array(
