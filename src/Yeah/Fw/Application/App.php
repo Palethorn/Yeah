@@ -39,8 +39,20 @@ class App {
     protected $route = false;
     protected $response_cache_key = false;
 
-    protected $beforeMiddleware = array();
-    protected $afterMiddleware = array();
+    private $middleware = array(
+        0 => array(),
+        1 => array(),
+        2 => array(),
+        3 => array(),
+        4 => array(),
+        5 => array(),
+        6 => array(),
+        7 => array(),
+        8 => array(),
+        9 => array(),
+        10 => array(),
+        11 => array()
+    );
 
     /**
      * Class constructor.
@@ -114,37 +126,48 @@ class App {
      * Begins chain execution
      */
     public function execute() {
+        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::PRE_ROUTING);
         $this->executeRouter();
-        $this->beforeMiddleware();
+        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::POST_ROUTING);
+        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::PRE_SECURITY);
         $this->executeSecurity();
+        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::POST_SECURITY);
+        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::PRE_CACHE);
         if($this->route->getIsCacheable() && $this->executeCache($this->route)) {
             return;
         }
+        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::POST_CACHE);
+        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::PRE_ACTION);
         $action_result = $this->executeAction($this->route);
-        $this->afterMiddleware();
+        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::POST_ACTION);
+        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::PRE_RENDER);
         $this->executeRender($action_result);
+        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::POST_RENDER);
     }
 
     /**
-     * Executes middleware before application request handling
-     * Don't invoke unless you know what you're doing.
+     * Executes middleware from designated slot
      *
+     *@param $slot Execute middleware collection from designated slot
      */
-    public function beforeMiddleware() {
-    }
-
-    /**
-     * Executes middleware after application request handling
-     * Don't invoke unless you know what you're doing.
-     *
-     */
-    public function afterMiddleware() {
+    public function executeMiddleware($slot) {
+        $collection = $this->middleware[$slot];
+        foreach ($collection as $middleware) {
+            if($middleware instanceof \Closure) {
+                call_user_func_array($middleware);
+            } else if(in_array('Yeah\Fw\Middleware\MiddlewareInterface', class_implements($middleware))) {
+                $middleware_object = new $middleware();
+                $middleware_object->execute();
+            } else {
+                throw new \Exception('Middleware class '
+                . $middleware
+                . ' must implement Yeah\Fw\Middleware\MiddlewareInterface');
+            }
+        }
     }
 
     /**
      * Fetches the route inside of a chain execution.
-     * Don't invoke unless you know what you're doing.
-     *
      * @return RouteInterface
      */
     private function executeRouter() {
@@ -216,9 +239,11 @@ class App {
                     ->render();
             $this->response->write($output);
         }
+        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::PRE_REPONSE_CACHE);
         if($this->route->getIsCacheable()) {
             $this->getResponseCache()->set($this->getUrlCacheKey(), $output, $this->route->getCacheDuration());
         }
+        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::POST_REPONSE_CACHE);
     }
 
     /**
@@ -493,6 +518,14 @@ class App {
      */
     public function configureMiddleware() {
 
+    }
+
+    /**
+     * This method is designed to be specifically overriden
+     * Adds simple interface for injecting middleware into preexecution and postexecution
+     */
+    public function addMiddleware($slot, $middleware) {
+        $this->middleware[$slot][] = $middleware;
     }
 
     /**
