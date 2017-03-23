@@ -5,7 +5,9 @@ if(PHP_MAJOR_VERSION == 7) {
 } else {
     class TestCase extends PHPUnit_Framework_TestCase {}
 }
+
 error_reporting(E_ERROR | E_PARSE);
+
 $_SERVER = array(
     'PHP_SELF' => '1',
     'GATEWAY_INTERFACE' => '2',

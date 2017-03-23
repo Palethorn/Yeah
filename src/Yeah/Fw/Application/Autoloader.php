@@ -5,10 +5,9 @@ namespace Yeah\Fw\Application;
 /*
  * Used for for automatic loading of required files.
  * Designed for low performance hit and low resource consuption.
- * 
  * @author David Cavar
+ * @deprecated Autoloading is passed to composer autoload functionality.
  */
-
 class Autoloader {
 
     private $include_paths = array();
@@ -18,7 +17,7 @@ class Autoloader {
 
     /*
      * Sets the path where the autoloader should look for required files
-     * 
+     *
      * @param string $inc_path Include path parameter
      * @return \Yeah\Fw\Application\Autoloader
      */
@@ -29,8 +28,8 @@ class Autoloader {
     }
 
     /**
-     * Getter for include path
-     * 
+     * Getter for include paths
+     *
      * @return string
      */
     public function getIncludePaths() {
@@ -41,7 +40,7 @@ class Autoloader {
      * Automatically loads required file based on it's namespace
      * Uses any registered directory path as library root then resolves
      * relative path based on namespace
-     * 
+     *
      * @param string $class_name Class name with its appropriate namespace
      */
     function autoload($class) {
@@ -67,6 +66,9 @@ class Autoloader {
         }
     }
 
+    /**
+     * If a fingerprint is present inside of a cache use the cached class
+     */
     public function autoloadFromCache($class) {
         if(isset($this->autoload[$class])) {
             require_once $this->autoload[$class];
@@ -77,7 +79,7 @@ class Autoloader {
 
     /**
      * Instructs autoloader to begin listening for class requirements
-     * 
+     *
      * @return \Yeah\Fw\Application\Autoloader
      */
     public function register() {
@@ -94,9 +96,9 @@ class Autoloader {
     }
 
     /**
-     * 
+     *
      * Stops autoloader for further listening
-     * 
+     *
      * @return \Yeah\Fw\Application\Autoloader
      */
     public function unregister() {

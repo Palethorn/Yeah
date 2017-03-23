@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['else',['else',['../bootstrap_8php.html#a71be838e3bbf5cd4d93241df04085323',1,'bootstrap.php']]],
+  ['else',['else',['../bootstrap_8php.html#a8728fb0ec0dbc53d19a59d40c908a392',1,'bootstrap.php']]],
   ['emergency',['emergency',['../class_yeah_1_1_fw_1_1_logger_1_1_file_logger.html#a8445d95f798b7d2eadd4dba21b6dfaec',1,'Yeah\Fw\Logger\FileLogger\emergency()'],['../interface_yeah_1_1_fw_1_1_logger_1_1_logger_interface.html#a2281bb95b792651cb931586f56d68eb3',1,'Yeah\Fw\Logger\LoggerInterface\emergency()'],['../class_yeah_1_1_fw_1_1_logger_1_1_null_logger.html#ace1692820bd5ae59e4520746f3fb4efb',1,'Yeah\Fw\Logger\NullLogger\emergency()'],['../class_yeah_1_1_fw_1_1_logger_1_1_log_level.html#a6e5c486123d71123cc87f7bfa61d70e2',1,'Yeah\Fw\Logger\LogLevel\EMERGENCY()']]],
   ['error',['error',['../class_yeah_1_1_fw_1_1_logger_1_1_file_logger.html#a8c16e1363f39d85a1657083938aae06a',1,'Yeah\Fw\Logger\FileLogger\error()'],['../interface_yeah_1_1_fw_1_1_logger_1_1_logger_interface.html#a01b3820b0ecf73acc67f815ed7753abc',1,'Yeah\Fw\Logger\LoggerInterface\error()'],['../class_yeah_1_1_fw_1_1_logger_1_1_null_logger.html#a241810d2d3c04c4d2b9c81cacd68a543',1,'Yeah\Fw\Logger\NullLogger\error()'],['../class_yeah_1_1_fw_1_1_logger_1_1_log_level.html#a7a70908fad50dbab0d14526c3edd60ac',1,'Yeah\Fw\Logger\LogLevel\ERROR()']]],
   ['errorhandler',['ErrorHandler',['../class_yeah_1_1_fw_1_1_error_1_1_error_handler.html',1,'Yeah::Fw::Error']]],

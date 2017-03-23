@@ -133,7 +133,17 @@ Private Attributes</h2></td></tr>
 <tr class="separator:a02f7ea3b0d77c68b43f254d3cd085bfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Use for storing runtime configuration</p>
+<div class="textblock"><p>Use for storing runtime configuration. Pretty cool class.</p>
+<p>Strict options:</p><ul>
+<li>controllers_dir</li>
+<li>views_dir</li>
+<li>lib_dir</li>
+<li>base_dir</li>
+<li>web_dir</li>
+<li>cache_dir</li>
+<li>log_dir</li>
+<li>models_dir</li>
+</ul>
 <dl class="section author"><dt>Author</dt><dd>David Cavar </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ade1abcceaf804f4bbb0256d8fd0557b5"></a>
@@ -149,6 +159,12 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Default constructor. Imports and maps the array to appropriate properties. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">mixed</td><td class="paramname">$array</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -166,6 +182,12 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Magic method for getting property value, which is not declared as class property, based on array key. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">string</td><td class="paramname">$name</td><td>Represents class magic property </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -192,6 +214,13 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Magic method for setting property value, which is not declared as class property, based on array key. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">string</td><td class="paramname">$name</td><td>Represents class magic property </td></tr>
+    <tr><td class="paramtype">string</td><td class="paramname">$value</td><td>This value is assigned to specified property </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -208,6 +237,12 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Performs mapping of multiple properties based on array format. Invoked from constructor </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">mixed</td><td class="paramname">$array</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -223,6 +258,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Retrieves array from this level </p>
 
 </div>
 </div>
