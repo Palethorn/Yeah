@@ -294,9 +294,11 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Class constructor. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Class default constructor </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramtype">mixed</td><td class="paramname">$options</td><td>Configuration options </td></tr>
+    <tr><td class="paramtype">string</td><td class="paramname">$app_name</td><td>Besides used in some friendly messages and decoration, it is also used for deducing default paths </td></tr>
+    <tr><td class="paramtype">string</td><td class="paramname">$env</td><td>Represents a section of your config which identifies development, testing, local, production or whatever other you choose to load. See palethorn.github.io/yeah/tutorial#environments </td></tr>
+    <tr><td class="paramtype">mixed</td><td class="paramname">$config</td><td>Array of different config sections which are also arrays representing various configuration options. See See palethorn.github.io/yeah/tutorial#config </td></tr>
   </table>
   </dd>
 </dl>
@@ -350,7 +352,27 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>This method is designed to be specifically overriden Adds simple interface for injecting middleware into preexecution and postexecution </p>
+<p>Adds simple interface for injecting middleware into preexecution and postexecution </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">integer</td><td class="paramname">$slot</td><td>Designated slot for listeners. Available slots:<ul>
+<li>PRE_ROUTING</li>
+<li>POST_ROUTING</li>
+<li>PRE_SECURITY</li>
+<li>POST_SECURITY</li>
+<li>PRE_CACHE</li>
+<li>POST_CACHE</li>
+<li>PRE_ACTION</li>
+<li>POST_ACTION</li>
+<li>PRE_RENDER</li>
+<li>POST_RENDER</li>
+<li>PRE_REPONSE_CACHE</li>
+<li>POST_REPONSE_CACHE </li>
+</ul>
+</td></tr>
+    <tr><td class="paramtype">\\Closure&#160;|&#160;\\Yeah\\Fw\\Middleware\\MiddlewareInterface</td><td class="paramname">$middleware,.</td><td><a class="el" href="namespace_yeah_1_1_fw_1_1_middleware.html">Middleware</a> to be executed for a designated slot </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -366,6 +388,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Method used for configuring autoload cache strategy. Method is marked for override </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>All autoloading is handled by composer autoload functionality </dd></dl>
 
 </div>
 </div>
@@ -381,7 +404,21 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>This method is designed to be specifically overriden Adds simple interface for injecting middleware into preexecution and postexecution </p>
+<p>This method is marked for override. Adds simple interface for injecting middleware into preexecution and postexecution. Method is invoked during application initialization and lets a developer to assign various middleware event listeners using ::addMiddleware method.</p>
+<p>Available slots:</p><ul>
+<li>PRE_ROUTING</li>
+<li>POST_ROUTING</li>
+<li>PRE_SECURITY</li>
+<li>POST_SECURITY</li>
+<li>PRE_CACHE</li>
+<li>POST_CACHE</li>
+<li>PRE_ACTION</li>
+<li>POST_ACTION</li>
+<li>PRE_RENDER</li>
+<li>POST_RENDER</li>
+<li>PRE_REPONSE_CACHE</li>
+<li>POST_REPONSE_CACHE </li>
+</ul>
 
 </div>
 </div>
@@ -397,7 +434,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Configure service factories </p>
+<p>Configure service factories. Method marked for override. You can populate service container here. </p>
 
 </div>
 </div>
@@ -413,7 +450,15 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Begins chain execution </p>
+<p>Begins chain execution. Executes each separate job for request, and their respective event handlers.</p>
+<p>Current list of jobs:</p><ul>
+<li><a class="el" href="namespace_yeah_1_1_fw_1_1_routing.html">Routing</a></li>
+<li>Security</li>
+<li>Route response cache</li>
+<li>Matching controller action execution</li>
+<li>Output rendering</li>
+</ul>
+<p>Each job has a pre and post event dispatcher </p>
 
 </div>
 </div>
@@ -438,7 +483,7 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Executes action inside chain execution. Don't invoke unless you know what you're doing.</p>
+<p>Executes action inside chain execution. Executes controller action from inside the route.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramtype">mixed</td><td class="paramname">$route</td><td>Route options </td></tr>
@@ -470,10 +515,10 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Write cached output to response if route is cacheable and cache exists</p>
+<p>Write cached output to response if route is cacheable and cache exists.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramtype">\Yeah\Fw\Routing\Route\RouteInterface</td><td class="paramname">$route</td><td></td></tr>
+    <tr><td class="paramtype">\\Yeah\\Fw\\Routing\\Route\\RouteInterface</td><td class="paramname">$route</td><td></td></tr>
   </table>
   </dd>
 </dl>
@@ -525,10 +570,10 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Executes view rendering inside chain execution. Don't invoke unless you know what you're doing.</p>
+<p>Executes view rendering inside chain execution. Supports various templating engines through adapter implementation. Twig work out of the box.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramtype">\\Yeah\\Fw\\Mvc\\View</td><td class="paramname">$view</td><td>Controller view object </td></tr>
+    <tr><td class="paramtype">mixed&#160;|&#160;\\Yeah\\Fw\\Mvc\\ViewInterface</td><td class="paramname">$view</td><td>Controller view object </td></tr>
   </table>
   </dd>
 </dl>
@@ -555,7 +600,7 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Fetches the route inside of a chain execution. </p><dl class="section return"><dt>Returns</dt><dd>RouteInterface </dd></dl>
+<p>Performs matching the URI to the the route inside of a chain execution. </p><dl class="section return"><dt>Returns</dt><dd>RouteInterface </dd></dl>
 
 </div>
 </div>
@@ -579,7 +624,7 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Executes access checkup inside chain execution. Don't invoke unless you know what you're doing.</p>
+<p>Executes access checkup inside chain execution. Can be used for authentication, authorization and generally for various access controlls. Just implement \<a class="el" href="namespace_yeah.html">Yeah</a>\<a class="el" href="namespace_yeah_1_1_fw.html">Fw</a>\<a class="el" href="namespace_yeah_1_1_fw_1_1_auth.html">Auth</a>\AuthInterface, and override \<a class="el" href="namespace_yeah.html">Yeah</a>\<a class="el" href="namespace_yeah_1_1_fw.html">Fw</a>\<a class="el" href="namespace_yeah_1_1_fw_1_1_application.html">Application</a>\<a class="el" href="class_yeah_1_1_fw_1_1_application_1_1_app.html#aecf19a40f8043fa99741864be6f94aa2">App::configureServices</a> for configuration</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramtype">RouteInterface</td><td class="paramname">$route</td><td>Route object </td></tr>
@@ -602,6 +647,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Getter for $app_name property. Returns the application name passed to the constructor on the application initialization </p><dl class="section return"><dt>Returns</dt><dd>string </dd></dl>
 
 </div>
 </div>
@@ -617,7 +663,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespace_yeah.html">Yeah</a> </dd></dl>
+<p>Retrieves authorization, and authentication object from service container. </p><dl class="section return"><dt>Returns</dt><dd>\<a class="el" href="namespace_yeah.html">Yeah</a>\<a class="el" href="namespace_yeah_1_1_fw.html">Fw</a>\<a class="el" href="namespace_yeah_1_1_fw_1_1_auth.html">Auth</a>\AuthInterface </dd></dl>
 
 </div>
 </div>
@@ -639,6 +685,7 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000004">Deprecated:</a></b></dt><dd>Autoloading is handled by composer autoload functionality </dd></dl>
 
 </div>
 </div>
@@ -654,7 +701,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns path for application root dir </p><dl class="section return"><dt>Returns</dt><dd>string </dd></dl>
+<p>Returns path for application root dir. If the base_dir is not passed through config then the method tries to guess most probable path.</p>
+<dl class="section return"><dt>Returns</dt><dd>string </dd></dl>
 
 </div>
 </div>
@@ -670,7 +718,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Return path for cache directory</p>
+<p>Return path for cache directory. If the cache_dir is not passed through config then the method tries to guess most probable path.</p>
 <dl class="section return"><dt>Returns</dt><dd>string </dd></dl>
 
 </div>
@@ -702,7 +750,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns path for controllers directory</p>
+<p>Returns path for controllers directory. If the controllers_dir is not passed through config then the method tries to guess most probable path.</p>
 <dl class="section return"><dt>Returns</dt><dd>string </dd></dl>
 
 </div>
@@ -719,6 +767,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Retrieves database config from service container. Can also be used to directly configure the neccessary ORM or DBAL </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>Database configuration doesn't requre developer overriding service configuration for this. </dd></dl>
 
 </div>
 </div>
@@ -734,7 +783,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns dependency container object</p>
+<p>Returns dependency container object.</p>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="class_yeah_1_1_fw_1_1_application_1_1_dependency_container.html">DependencyContainer</a> </dd></dl>
 
 </div>
@@ -751,6 +800,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Getter for environment property. Returns the application environment passed to the consturctor on the application initialization </p>
 
 </div>
 </div>
@@ -775,12 +825,6 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Returns current application instance</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramtype">mixed</td><td class="paramname">$options</td><td><a class="el" href="namespace_yeah_1_1_fw_1_1_application.html">Application</a> options </td></tr>
-  </table>
-  </dd>
-</dl>
 <dl class="section return"><dt>Returns</dt><dd>\<a class="el" href="namespace_yeah.html">Yeah</a>\<a class="el" href="namespace_yeah_1_1_fw.html">Fw</a>\<a class="el" href="namespace_yeah_1_1_fw_1_1_application.html">Application</a>\<a class="el" href="class_yeah_1_1_fw_1_1_application_1_1_app.html">App</a> </dd></dl>
 
 </div>
@@ -797,7 +841,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns path for library directory </p><dl class="section return"><dt>Returns</dt><dd>string </dd></dl>
+<p>Returns path for library directory. If the lib_dir is not passed through config then the method tries to guess most probable path.</p>
+<dl class="section return"><dt>Returns</dt><dd>string </dd></dl>
 
 </div>
 </div>
@@ -813,7 +858,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns path for logs directory</p>
+<p>Returns path for logs directory. If the log_dir is not passed through config then the method tries to guess most probable path.</p>
 <dl class="section return"><dt>Returns</dt><dd>string </dd></dl>
 
 </div>
@@ -830,7 +875,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Getter for logger object</p>
+<p>Retrieves logger object from service container.</p>
 <dl class="section return"><dt>Returns</dt><dd>\<a class="el" href="namespace_yeah.html">Yeah</a>\<a class="el" href="namespace_yeah_1_1_fw.html">Fw</a>\<a class="el" href="namespace_yeah_1_1_fw_1_1_logger.html">Logger</a>\LoggerInterface </dd></dl>
 
 </div>
@@ -847,7 +892,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns path for models directory</p>
+<p>Returns path for models directory. If the models_dir is not passed through config then the method tries to guess most probable path.</p>
 <dl class="section return"><dt>Returns</dt><dd>string </dd></dl>
 
 </div>
@@ -864,7 +909,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>getter for HTTP request object</p>
+<p>Getter for HTTP request object. Retrieves request object which represents abstracted version og HTTP request.</p>
 <dl class="section return"><dt>Returns</dt><dd>\<a class="el" href="namespace_yeah.html">Yeah</a>\<a class="el" href="namespace_yeah_1_1_fw.html">Fw</a>\<a class="el" href="namespace_yeah_1_1_fw_1_1_http.html">Http</a>\Request </dd></dl>
 
 </div>
@@ -881,7 +926,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Getter for HTTP response object</p>
+<p>Getter for HTTP response object.</p>
 <dl class="section return"><dt>Returns</dt><dd>\<a class="el" href="namespace_yeah.html">Yeah</a>\<a class="el" href="namespace_yeah_1_1_fw.html">Fw</a>\<a class="el" href="namespace_yeah_1_1_fw_1_1_http.html">Http</a>\Response </dd></dl>
 
 </div>
@@ -898,7 +943,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespace_yeah.html">Yeah</a> </dd></dl>
+<p>Retrieves response cache handler from service container.</p>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespace_yeah.html">Yeah</a>\<a class="el" href="namespace_yeah_1_1_fw.html">Fw</a>\<a class="el" href="namespace_yeah_1_1_fw_1_1_cache.html">Cache</a>\CacheInterface </dd></dl>
 
 </div>
 </div>
@@ -914,7 +960,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Getter for router object</p>
+<p>Getter for router object.</p>
 <dl class="section return"><dt>Returns</dt><dd>\<a class="el" href="namespace_yeah.html">Yeah</a>\<a class="el" href="namespace_yeah_1_1_fw.html">Fw</a>\<a class="el" href="namespace_yeah_1_1_fw_1_1_routing.html">Routing</a>\Router </dd></dl>
 
 </div>
@@ -931,7 +977,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Getter for session handler object</p>
+<p>Retrieves session handler object from object container.</p>
 <dl class="section return"><dt>Returns</dt><dd>SessionHandlerInterface </dd></dl>
 
 </div>
@@ -948,6 +994,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Override this method if you need some other format of response cache keys. </p>
 
 </div>
 </div>
@@ -963,6 +1010,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Retrieves view renderer from service container.</p>
 <dl class="section return"><dt>Returns</dt><dd>\<a class="el" href="namespace_yeah.html">Yeah</a>\<a class="el" href="namespace_yeah_1_1_fw.html">Fw</a>\<a class="el" href="namespace_yeah_1_1_fw_1_1_mvc.html">Mvc</a>\ViewInterface </dd></dl>
 
 </div>
@@ -979,7 +1027,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns path for views directors</p>
+<p>Returns path for views directors. If the views_dir is not passed through config then the method tries to guess most probable path.</p>
 <dl class="section return"><dt>Returns</dt><dd>string </dd></dl>
 
 </div>
@@ -996,7 +1044,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns path for public directory</p>
+<p>Returns path for public directory. If the web_dir is not passed through config then the method tries to guess most probable path.</p>
 <dl class="section return"><dt>Returns</dt><dd>string </dd></dl>
 
 </div>
@@ -1013,7 +1061,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Load additional routes </p>
+<p>Load additional routes. Method is marked for override. </p>
 
 </div>
 </div>
@@ -1037,7 +1085,7 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Register autoloader paths for probing </p>
+<p>Register autoloader paths for probing. Method is marked for override </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>All autoloading is handled by composer autoload functionality </dd></dl>
 
 </div>
 </div>
@@ -1082,6 +1130,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>General method used for appending simple routes</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramtype">string</td><td class="paramname">$url</td><td></td></tr>
@@ -1123,7 +1172,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Adds new simple route for DELETE HTTP method</p>
+<p>Adds new simple route for DELETE HTTP method.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramtype">string</td><td class="paramname">$url</td><td></td></tr>
@@ -1170,7 +1219,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Adds new simple route for GET HTTP method</p>
+<p>Adds new simple route for GET HTTP method.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramtype">string</td><td class="paramname">$url</td><td></td></tr>
@@ -1211,7 +1260,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Adds new simple route for POST HTTP method</p>
+<p>Adds new simple route for POST HTTP method.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramtype">string</td><td class="paramname">$url</td><td></td></tr>
@@ -1252,7 +1301,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Adds new simple route for PUT HTTP method</p>
+<p>Adds new simple route for PUT HTTP method.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramtype">string</td><td class="paramname">$url</td><td></td></tr>

@@ -14,5 +14,6 @@ var searchData=
   ['debug_2ephp',['Debug.php',['../_debug_8php.html',1,'']]],
   ['dependencycontainer',['DependencyContainer',['../class_yeah_1_1_fw_1_1_application_1_1_dependency_container.html',1,'Yeah::Fw::Application']]],
   ['dependencycontainer_2ephp',['DependencyContainer.php',['../_dependency_container_8php.html',1,'']]],
+  ['deprecated_20list',['Deprecated List',['../deprecated.html',1,'']]],
   ['destroy',['destroy',['../class_yeah_1_1_fw_1_1_auth_1_1_database_auth.html#af2c1d15043b3b6a55330a60319a4f60d',1,'Yeah\Fw\Auth\DatabaseAuth\destroy()'],['../class_yeah_1_1_fw_1_1_session_1_1_database_session_handler.html#a9450e1c5c86af5c58f2410785948ca23',1,'Yeah\Fw\Session\DatabaseSessionHandler\destroy()'],['../class_yeah_1_1_fw_1_1_session_1_1_null_session_handler.html#ad5e46e144b1f5b2de96c24bb77d3e0a5',1,'Yeah\Fw\Session\NullSessionHandler\destroy()'],['../class_yeah_1_1_fw_1_1_session_1_1_session_handler_abstract.html#a418f86d46f1b9a2e6081b1edcfe03321',1,'Yeah\Fw\Session\SessionHandlerAbstract\destroy()']]]
 ];

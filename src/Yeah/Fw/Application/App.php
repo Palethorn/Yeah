@@ -5,6 +5,7 @@ namespace Yeah\Fw\Application;
 /**
  * Implements singleton pattern. Used for application request entry point
  *
+ * @property \\Yeah\\Fw\\Application $instance Singleton instance of this class
  * @property Yeah\\Fw\\Error\\ErrorHandler $error_handler
  * @property Yeah\\Fw\\Logger\\LoggerInterface $logger
  * @property SessionHandlerInterface $session
@@ -55,8 +56,13 @@ class App {
     );
 
     /**
-     * Class constructor.
-     * @param mixed $options Configuration options
+     * Class default constructor
+     * @param string $app_name Besides used in some friendly messages and decoration, it is also used for deducing
+     * default paths
+     * @param string $env Represents a section of your config which identifies development, testing, local, production or
+     * whatever other you choose to load. See palethorn.github.io/yeah/tutorial#environments
+     * @param mixed $config Array of different config sections which are also arrays representing various configuration
+     * options. See See palethorn.github.io/yeah/tutorial#config
      *
      */
     public function __construct($app_name, $env = 'prod', $config = array('prod' => array())) {
@@ -69,8 +75,6 @@ class App {
             $conf = $config[$env];
         }
         $this->config = new Config($conf);
-        // $this->registerAutoloaders();
-        // $this->configureAutoloadCache();
 
         if(PHP_MAJOR_VERSION) {
             $this->error_handler = new \Yeah\Fw\Error\ErrorHandler_php7(error_reporting());
@@ -88,16 +92,26 @@ class App {
         self::$instance = $this;
     }
 
+    /**
+     * Getter for $app_name property. Returns the application name passed to the constructor
+     * on the application initialization
+     * @return string
+     */
     public function getAppName() {
         return $this->app_name;
     }
 
+    /**
+     * Getter for environment property. Returns the application environment passed to the consturctor
+     * on the application initialization
+     */
     public function getEnvironment() {
         return $this->env;
     }
 
     /**
-     * Register autoloader paths for probing
+     * Register autoloader paths for probing. Method is marked for override
+     * @deprecated All autoloading is handled by composer autoload functionality
      */
     protected function registerAutoloaders() {
         require_once $this->getLibDir() . DIRECTORY_SEPARATOR . 'Yeah' . DIRECTORY_SEPARATOR . 'Fw' . DIRECTORY_SEPARATOR . 'Application' . DIRECTORY_SEPARATOR . 'Autoloader.php';
@@ -108,22 +122,42 @@ class App {
         $this->autoloader->register();
     }
 
+    /**
+     * Method used for configuring autoload cache strategy. Method is marked for override
+     * @deprecated All autoloading is handled by composer autoload functionality
+     */
     public function configureAutoloadCache() {
         $this->autoloader->setCache(new \Yeah\Fw\Cache\NullCache());
     }
 
     /**
-     * Load additional routes
+     * Load additional routes. Method is marked for override.
      */
     public function loadRoutes() {
-        $routes_location = $this->getBaseDir() . DIRECTORY_SEPARATOR . $this->getAppName() . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'routes.php';
+        $routes_location = $this->getBaseDir() .
+        DIRECTORY_SEPARATOR .
+        $this->getAppName() .
+        DIRECTORY_SEPARATOR .
+        'config' .
+        DIRECTORY_SEPARATOR .
+        'routes.php';
+
         if(file_exists($routes_location)) {
             require_once $routes_location;
         }
     }
 
     /**
-     * Begins chain execution
+     * Begins chain execution. Executes each separate job for request, and their respective event handlers.
+     *
+     * Current list of jobs:
+     * - Routing
+     * - Security
+     * - Route response cache
+     * - Matching controller action execution
+     * - Output rendering
+     *
+     * Each job has a pre and post event dispatcher
      */
     public function execute() {
         $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::PRE_ROUTING);
@@ -167,7 +201,7 @@ class App {
     }
 
     /**
-     * Fetches the route inside of a chain execution.
+     * Performs matching the URI to the the route inside of a chain execution.
      * @return RouteInterface
      */
     private function executeRouter() {
@@ -175,8 +209,9 @@ class App {
     }
 
     /**
-     * Executes access checkup inside chain execution.
-     * Don't invoke unless you know what you're doing.
+     * Executes access checkup inside chain execution. Can be used for authentication, authorization and generally for
+     * various access controlls. Just implement \\Yeah\\Fw\\Auth\\AuthInterface,
+     * and override \\Yeah\\Fw\\Application\\App::configureServices for configuration
      *
      * @param RouteInterface $route Route object
      * @return RouteInterface
@@ -188,8 +223,7 @@ class App {
     }
 
     /**
-     * Executes action inside chain execution.
-     * Don't invoke unless you know what you're doing.
+     * Executes action inside chain execution. Executes controller action from inside the route.
      *
      * @param mixed $route Route options
      * @return \\Yeah\\Fw\\Mvc\\View Controller view object
@@ -201,9 +235,9 @@ class App {
     }
 
     /**
-     * Write cached output to response if route is cacheable and cache exists
+     * Write cached output to response if route is cacheable and cache exists.
      *
-     * @param \Yeah\Fw\Routing\Route\RouteInterface $route
+     * @param \\Yeah\\Fw\\Routing\\Route\\RouteInterface $route
      * @return boolean
      */
     private function executeCache(\Yeah\Fw\Routing\Route\RouteInterface $route) {
@@ -219,10 +253,10 @@ class App {
     }
 
     /**
-     * Executes view rendering inside chain execution.
-     * Don't invoke unless you know what you're doing.
+     * Executes view rendering inside chain execution. Supports various templating engines through adapter
+     * implementation. Twig work out of the box.
      *
-     * @param \\Yeah\\Fw\\Mvc\\View $view Controller view object
+     * @param mixed|\\Yeah\\Fw\\Mvc\\ViewInterface $view Controller view object
      */
     private function executeRender($response) {
         if($response instanceof \Yeah\Fw\Mvc\ViewInterface) {
@@ -247,7 +281,7 @@ class App {
     }
 
     /**
-     * getter for HTTP request object
+     * Getter for HTTP request object. Retrieves request object which represents abstracted version og HTTP request.
      *
      * @return \\Yeah\\Fw\\Http\\Request
      */
@@ -256,7 +290,7 @@ class App {
     }
 
     /**
-     * Getter for HTTP response object
+     * Getter for HTTP response object.
      *
      * @return \\Yeah\\Fw\\Http\\Response
      */
@@ -265,7 +299,7 @@ class App {
     }
 
     /**
-     * Getter for router object
+     * Getter for router object.
      *
      * @return \\Yeah\\Fw\\Routing\\Router
      */
@@ -273,12 +307,17 @@ class App {
         return $this->router;
     }
 
+    /**
+     * Retrieves database config from service container. Can also be used to directly configure the neccessary
+     * ORM or DBAL
+     * @deprecated Database configuration doesn't requre developer overriding service configuration for this.
+     */
     public function getDatabaseConfig() {
         return $this->getDependencyContainer()->get('db_config');
     }
 
     /**
-     * Getter for session handler object
+     * Retrieves session handler object from object container.
      *
      * @return SessionHandlerInterface
      */
@@ -287,15 +326,15 @@ class App {
     }
 
     /**
-     *
-     * @return Yeah\Fw\Auth\AuthInterface
+     * Retrieves authorization, and authentication object from service container.
+     * @return \\Yeah\\Fw\\Auth\\AuthInterface
      */
     public function getAuth() {
         return $this->getDependencyContainer()->get('auth');
     }
 
     /**
-     * Getter for logger object
+     * Retrieves logger object from service container.
      *
      * @return \\Yeah\\Fw\\Logger\\LoggerInterface
      */
@@ -304,14 +343,16 @@ class App {
     }
 
     /**
+     * Retrieves response cache handler from service container.
      *
-     * @return Yeah\Fw\Cache\CacheInterface
+     * @return Yeah\\Fw\\Cache\\CacheInterface
      */
     public function getResponseCache() {
         return $this->dc->get('response_cache');
     }
 
     /**
+     * Retrieves view renderer from service container.
      *
      * @return \\Yeah\\Fw\\Mvc\\ViewInterface
      */
@@ -322,13 +363,17 @@ class App {
     /**
      * Get application autoloader
      * @param \\Yeah\\Fw\\Application\\Autoloader $autoloader
+
+     * @deprecated Autoloading is handled by composer autoload functionality
      */
     public function getAutoloader() {
         return $this->autoloader;
     }
 
     /**
-     * Returns path for application root dir
+     * Returns path for application root dir. If the base_dir is not passed through config then the method tries
+     * to guess most probable path.
+     *
      * @return string
      */
     public function getBaseDir() {
@@ -339,7 +384,9 @@ class App {
     }
 
     /**
-     * Returns path for library directory
+     * Returns path for library directory. If the lib_dir is not passed through config then the method tries
+     * to guess most probable path.
+     *
      * @return string
      */
     public function getLibDir() {
@@ -351,7 +398,8 @@ class App {
     }
 
     /**
-     * Returns path for public directory
+     * Returns path for public directory. If the web_dir is not passed through config then the method tries
+     * to guess most probable path.
      *
      * @return string
      */
@@ -363,7 +411,8 @@ class App {
     }
 
     /**
-     * Return path for cache directory
+     * Return path for cache directory. If the cache_dir is not passed through config then the method tries
+     * to guess most probable path.
      *
      * @return string
      */
@@ -375,7 +424,8 @@ class App {
     }
 
     /**
-     * Returns path for logs directory
+     * Returns path for logs directory. If the log_dir is not passed through config then the method tries
+     * to guess most probable path.
      *
      * @return string
      */
@@ -387,7 +437,8 @@ class App {
     }
 
     /**
-     * Returns path for controllers directory
+     * Returns path for controllers directory. If the controllers_dir is not passed through config then the method tries
+     * to guess most probable path.
      *
      * @return string
      */
@@ -399,7 +450,8 @@ class App {
     }
 
     /**
-     * Returns path for models directory
+     * Returns path for models directory. If the models_dir is not passed through config then the method tries
+     * to guess most probable path.
      *
      * @return string
      */
@@ -411,7 +463,8 @@ class App {
     }
 
     /**
-     * Returns path for views directors
+     * Returns path for views directors. If the views_dir is not passed through config then the method tries
+     * to guess most probable path.
      *
      * @return string
      */
@@ -427,6 +480,7 @@ class App {
     }
 
     /**
+     * General method used for appending simple routes
      *
      * @param string $url
      * @param Closure $method
@@ -460,7 +514,7 @@ class App {
     }
 
     /**
-     * Adds new simple route for GET HTTP method
+     * Adds new simple route for GET HTTP method.
      *
      * @param string $url
      * @param string $method
@@ -471,7 +525,7 @@ class App {
     }
 
     /**
-     * Adds new simple route for POST HTTP method
+     * Adds new simple route for POST HTTP method.
      *
      * @param string $url
      * @param string $method
@@ -482,7 +536,7 @@ class App {
     }
 
     /**
-     * Adds new simple route for PUT HTTP method
+     * Adds new simple route for PUT HTTP method.
      *
      * @param string $url
      * @param string $method
@@ -493,7 +547,7 @@ class App {
     }
 
     /**
-     * Adds new simple route for DELETE HTTP method
+     * Adds new simple route for DELETE HTTP method.
      *
      * @param string $url
      * @param string $method
@@ -504,7 +558,7 @@ class App {
     }
 
     /**
-     * Returns dependency container object
+     * Returns dependency container object.
      *
      * @return DependencyContainer
      */
@@ -513,16 +567,47 @@ class App {
     }
 
     /**
-     * This method is designed to be specifically overriden
-     * Adds simple interface for injecting middleware into preexecution and postexecution
+     * This method is marked for override.
+     * Adds simple interface for injecting middleware into preexecution and postexecution. Method is invoked during
+     * application initialization and lets a developer to assign various middleware event listeners using
+     * \Yeag\Fw\Application\App::addMiddleware method.
+     *
+     * Available slots:
+     * - PRE_ROUTING
+     * - POST_ROUTING
+     * - PRE_SECURITY
+     * - POST_SECURITY
+     * - PRE_CACHE
+     * - POST_CACHE
+     * - PRE_ACTION
+     * - POST_ACTION
+     * - PRE_RENDER
+     * - POST_RENDER
+     * - PRE_REPONSE_CACHE
+     * - POST_REPONSE_CACHE
      */
     public function configureMiddleware() {
 
     }
 
     /**
-     * This method is designed to be specifically overriden
      * Adds simple interface for injecting middleware into preexecution and postexecution
+     * @param integer $slot Designated slot for listeners.
+     * Available slots:
+     * - PRE_ROUTING
+     * - POST_ROUTING
+     * - PRE_SECURITY
+     * - POST_SECURITY
+     * - PRE_CACHE
+     * - POST_CACHE
+     * - PRE_ACTION
+     * - POST_ACTION
+     * - PRE_RENDER
+     * - POST_RENDER
+     * - PRE_REPONSE_CACHE
+     * - POST_REPONSE_CACHE
+     * @param \\Closure|\\Yeah\\Fw\\Middleware\\MiddlewareInterface $middleware. Middleware to be executed for a designated
+     * slot
      */
     public function addMiddleware($slot, $middleware) {
         $this->middleware[$slot][] = $middleware;
@@ -530,7 +615,7 @@ class App {
 
     /**
      *
-     * Configure service factories
+     * Configure service factories. Method marked for override. You can populate service container here.
      *
      */
     public function configureServices() {
@@ -570,13 +655,15 @@ class App {
     /**
      * Returns current application instance
      *
-     * @param mixed $options Application options
      * @return \\Yeah\\Fw\\Application\\App
      */
     public static function getInstance() {
         return static::$instance;
     }
 
+    /**
+    * Override this method if you need some other format of response cache keys.
+    */
     public function getUrlCacheKey() {
         if($this->response_cache_key) {
             return $this->response_cache_key;

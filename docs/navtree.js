@@ -2,6 +2,7 @@ var NAVTREE =
 [
   [ "Yeah!Fw", "index.html", [
     [ "README", "md__r_e_a_d_m_e.html", null ],
+    [ "Deprecated List", "deprecated.html", null ],
     [ "Namespaces", null, [
       [ "Namespace List", "namespaces.html", "namespaces" ],
       [ "Namespace Members", "namespacemembers.html", [
@@ -33,7 +34,7 @@ var NAVTREEINDEX =
 "_app_8php.html",
 "class_yeah_1_1_fw_1_1_auth_1_1_null_auth.html#a1226b133639683159f7faa5a96e0bc20",
 "class_yeah_1_1_fw_1_1_mvc_1_1_controller.html#a2b44e667650a7eb9de3cb5aff5d50242",
-"interface_yeah_1_1_fw_1_1_form_1_1_form_interface.html#aae2a442780e492acc8281d7c25bef49c"
+"interface_yeah_1_1_fw_1_1_form_1_1_form_interface.html#a8dadf2908fbdf2aa5cbb65f4a8463be0"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
