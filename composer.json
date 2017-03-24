@@ -1,6 +1,6 @@
 {
     "name": "palethorn/yeah",
-    "license": "MIT"
+    "license": "MIT",
     "description": "Hopefully easy to use PHP framework, originally written for personal use. Then it started to grow...",
     "type": "library",
     "keywords": ["framework", "PHP", "yeah"],
