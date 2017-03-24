@@ -6,7 +6,7 @@ Easiest way to install is to use composer. Add composer.json into your project r
 
 {
     "require": {
-        "yeah/yeah": "dev-master"
+        "palethorn/yeah": "dev-master"
     }
 }
 ```
