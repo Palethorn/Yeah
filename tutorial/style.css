@@ -1,0 +1,15 @@
+h1 { margin-top: 0; }
+
+#content { float: right; width: 80%; }
+#menu { float: left; }
+#main-title{ color: #da5c00; }
+
+.menuitem-selected { border-bottom: solid 3px #da5c00; }
+.clear { clear:both }
+
+.menuitem {
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+
+.list-style-none { list-style-type: none; }

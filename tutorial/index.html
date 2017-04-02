@@ -1,0 +1,63 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="style.css"></link>
+<link rel="stylesheet" type "text/css" href="highlightjs.min.css"></link>
+<script type="text/javascript" src="highlightjs.min.js"></script>
+<link rel="stylesheet" type "text/css" href="atom-one-dark.css"></link>
+</head>
+<body>
+    <h1 id="main-title">Yeah! PHP Framework Tutorial</h1>
+    <div id="menu">
+        <ul class="list-style-none">
+            <li class="menuitem menuitem-selected" url="first_steps.html" id="menu-item-first-steps" onclick="menuitem_click(this);">First Steps</li>
+            <li class="menuitem" url="routing.html" onclick="menuitem_click(this);">Routing</li>
+        </ul>
+    </div>
+    <div id="content"></div>
+</body>
+<script>
+var selected_menu_item = null;
+function loader(url, callback) {
+    var xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = function () {
+        var DONE = 4; // readyState 4 means the request is done.
+        var OK = 200; // status 200 is a successful return.
+        if (xhr.readyState === DONE) {
+            callback(xhr.responseText, xhr.status);
+        }
+    };
+
+    xhr.open('GET', url);
+    xhr.send(null);
+}
+
+var load = function(url) {
+    loader(url, function(data, status) {
+        document.querySelector("#content").innerHTML = data;
+    });
+}
+
+var add_class = function(target, clazz) {
+    target.className += ' ' + clazz;
+}
+
+var remove_class = function(target, clazz) {
+    target.className = target.className.replace(' ' + clazz, '');
+    target.className = target.className.replace(clazz, '');
+}
+
+var menuitem_click = function(target) {
+    remove_class(selected_menu_item, 'menuitem-selected');
+    selected_menu_item = target;
+    add_class(selected_menu_item, 'menuitem-selected');
+    console.log(selected_menu_item.getAttribute('url'));
+    load(selected_menu_item.getAttribute('url'));
+}
+
+window.onload = function() {
+    selected_menu_item = document.querySelector("#menu-item-first-steps");
+    load('first_steps.html');
+};
+</script>
+</html>

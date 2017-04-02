@@ -76,7 +76,7 @@ class App {
         }
         $this->config = new Config($conf);
 
-        if(PHP_MAJOR_VERSION) {
+        if(PHP_MAJOR_VERSION == 7) {
             $this->error_handler = new \Yeah\Fw\Error\ErrorHandler_php7(error_reporting());
         } else {
             $this->error_handler = new \Yeah\Fw\Error\ErrorHandler(error_reporting());
