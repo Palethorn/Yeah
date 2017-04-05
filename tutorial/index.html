@@ -1,16 +1,16 @@
 <html>
 <head>
 <link rel="stylesheet" type="text/css" href="style.css"></link>
-<link rel="stylesheet" type "text/css" href="highlightjs.min.css"></link>
-<script type="text/javascript" src="highlightjs.min.js"></script>
-<link rel="stylesheet" type "text/css" href="atom-one-dark.css"></link>
+<script src="hljs/highlight.pack.js"></script>
+<link rel="stylesheet" type "text/css" href="hljs/styles/atom-one-dark.css"></link>
 </head>
 <body>
     <h1 id="main-title">Yeah! PHP Framework Tutorial</h1>
     <div id="menu">
         <ul class="list-style-none">
-            <li class="menuitem menuitem-selected" url="first_steps.html" id="menu-item-first-steps" onclick="menuitem_click(this);">First Steps</li>
-            <li class="menuitem" url="routing.html" onclick="menuitem_click(this);">Routing</li>
+            <li class="menuitem" url="first-steps" id="menu-item-first-steps" onclick="menuitem_click(this);">First Steps</li>
+            <li class="menuitem" url="preparing-application" id="menu-item-preparing-application" onclick="menuitem_click(this);">Preparing application</li>
+            <li class="menuitem" url="routing" id="menu-item-routing" onclick="menuitem_click(this);">Routing</li>
         </ul>
     </div>
     <div id="content"></div>
@@ -33,8 +33,15 @@ function loader(url, callback) {
 }
 
 var load = function(url) {
+    location.href = '#' + url;
+    url += '.html';
     loader(url, function(data, status) {
         document.querySelector("#content").innerHTML = data;
+        var snippets = document.querySelectorAll('code');
+        console.log(snippets);
+        for(var i = 0; i < snippets.length; i++) {
+            hljs.highlightBlock(snippets[i]);
+        }
     });
 }
 
@@ -56,8 +63,10 @@ var menuitem_click = function(target) {
 }
 
 window.onload = function() {
-    selected_menu_item = document.querySelector("#menu-item-first-steps");
-    load('first_steps.html');
+    hash = location.hash.length != 0 ? location.hash.replace('#', '') : 'first-steps';
+    selected_menu_item = document.querySelector("#menu-item-" + hash);
+    add_class(selected_menu_item, 'menuitem-selected');
+    load(hash);
 };
 </script>
 </html>

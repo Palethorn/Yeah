@@ -1,10 +1,190 @@
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+<h2>Routing</h2>
+
+<p>More often you want different actions for different urls. YeahFW supports several ways to achieve that. Routes defined
+in this tutorial look pretty simple, but in actuality they represent regex, which is then matched with HTTP
+request path. You can use string literals, but beware of the regex
+<a target="_blank" href="http://www.regular-expressions.info/characters.html">special characters</a>.
+If you want to match them, they need to be escaped with a backslash (\).</p>
+
+<h3>Simple Routes</h3>
+
+<p>Simple routes use closure to execute an action. Examples of simple routes:</p>
+
+<pre><code class="hljs php">
+    // web/index.php
+
+    // Standard init goes here...
+
+    /**
+     *  Syntax: $app->route$Method$('path', function() {
+     *     // Execute your code here ...
+     * });
+     */
+
+    $app->routeGet('/get', function() {
+       echo "GET method used";
+    });
+    $app->routePost('/post', function() {
+       echo "POST method used";
+    });
+    $app->routePut('/put', function() {
+       echo "PUT method used";
+    });
+    $app->routeDelete('/delete', function() {
+       echo "DELETE method used";
+    });
+
+    $app->execute();
+</code></pre>
+
+<p>You can attach these routes directly to an application instance. These routes match url with one of the standard HTTP
+methods. If a match is found then the corresponding closure is executed. You can consider these routes as simplified
+ REST routes, because they are. App:routeGet(), App:routePost(), App:routePut(), App:routeDelete() methods are just a
+ simplified wrapper for configuring routes as demonstrated in the following section.</p>
+
+<h2>Standard Routing</h2>
+<p>YeahFW also comes with what you can recognize as a standard routing flavour. These can get quite complex, as they
+support multitude of options. They require overriding App::loadRoutes() method. Sample of a route configuration for
+posts path</p>
+<pre>
+<code class="hljs php">
+    // blog/src/Blog.php
+    class Blog extends \Yeah\Fw\Application\App {
+        public function loadRoutes() {
+            // Standard route with Yeah\Fw\Routing\RouteRequest\RouteRequestHandler
+            \Yeah\Fw\Routing\Router::add('/posts', array(
+                'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\RouteRequestHandler',
+                'controller' => 'Controllers\PostsController',
+                'action' => 'index',
+                'secure' => false,
+                'prefix' => '/api'
+            ));
+
+            // Restful route with Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler
+            \Yeah\Fw\Routing\Router::add($url, array(
+                'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
+                'secure' => $secure,
+                'restful' => array('GET' => (
+                    array(
+                        'method' => 'get',
+                        'cache' => array('is_cacheable' => false, 'cache_duration' => 1440),
+                        'secure' => false
+                    )
+                )
+            )));
+
+            // Restful route with \Yeah\Fw\Routing\RestRouteRequestHandler
+            \Yeah\Fw\Routing\Router::add('/posts/(.*)', array(
+                'controller' => 'post',
+                'route_request_handler' => '\Yeah\Fw\Routing\RestRouteRequestHandler',
+                'secure' => false,
+                'restful' => array(
+                    'GET' => array(
+                        'secure' => false,
+                        'action' => 'get'
+                    )
+                )
+            ));
+        }
+    }
+</code>
+</pre>
+<p>
+What's up with these different route types? And what are those handlers? Well, they basically do the same stuff, it's
+just the way the action is executed that is different.</p><p> Standard route with Yeah\Fw\Routing\RouteRequest\RouteRequestHandler
+will match the path, instantiate a controller object using "controller" parameter which indicates a class, then executes
+specified method using "action" parameter. Pretty straightforward.</p>
+<p>Restful routes with Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler are actually those simple routes which are
+added behind App::route$Method$ methods. Difference with these is that they know how to handle closures as actions.</p>
+<p>Finally there are restful routes with \Yeah\Fw\Routing\RestRouteRequestHandler, and they are pure rest routes. They
+execute a class action only then when both path and method are matched. If a path is matched, for a HTTP method in
+question, configured controller method is executed.</p><p> Additional configuration parameters explanation:
+
+<ul>
+<li>secure - Indicates whether path requires authentication and authorization. If it does, application security layer is
+    executed before executing the action.</li>
+<li>
+    cache - Indicates whether to cache the action response. Accepts an array with indicates whether to activate cache, and
+    cache duration.
+</li>
+<li>
+    prefix - Great for grouping and versioning actions, for example, versioning an API as /api_v1 or /api_v2. Routes will
+    only be matched if they have that prefix. For example if a route has prefix "/api", route will match /api/posts,
+    but not /posts.
+</li>
+</ul>
+</p>
+
+<h2>Separating Routing Configuration</h2>
+<p>
+As the time passes, more and more functionality and configuration is added to your application class. To remove clutter,
+provide better mainainability, and readability, you can load routes from external file. Just move your routes to
+blog/config/routes.php
+</p>
+<pre>
+    <code class="hljs php">
+        // blog/config/routes.php
+        \Yeah\Fw\Routing\Router::add('/posts', array(
+            'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\RouteRequestHandler',
+            'controller' => 'Controllers\PostsController',
+            'action' => 'index',
+            'secure' => false,
+            'prefix' => '/api'
+        ));
+
+        \Yeah\Fw\Routing\Router::add($url, array(
+            'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
+            'secure' => $secure,
+            'restful' => array('GET' => (
+                array(
+                    'method' => 'get',
+                    'cache' => array('is_cacheable' => false, 'cache_duration' => 1440),
+                    'secure' => false
+                )
+            )
+        )));
+
+        \Yeah\Fw\Routing\Router::add('/posts/(.*)', array(
+            'controller' => 'post',
+            'route_request_handler' => '\Yeah\Fw\Routing\RestRouteRequestHandler',
+            'secure' => false,
+            'restful' => array(
+                'GET' => array(
+                    'secure' => false,
+                    'action' => 'get'
+                )
+            )
+        ));
+    </code>
+</pre>
+
+<p>Then just include the file in App::loadRoutes() method:</p>
+<pre>
+    <code class="hljs php">
+    // blog/src/Blog.php
+    class Blog extends \Yeah\Fw\Application\App {
+        public function loadRoutes() {
+            require $this->config->config_dir . '/routes.php';
+        }
+    }
+</code>
+</pre>
+<p>provided that you pass "config_dir" array parameter when initializing application:</p>
+<pre>
+<code class="hljs php">
+    // web/index.php
+
+    // Include composer autoloader
+    require_once '../vendor/autoload.php';
+
+    $config = array(
+        'dev' => array(
+            'config_dir' => dirname('__FILE__') . '/../blog/config'
+        )
+    );
+
+    $app = new Blog('blog', 'dev', $config);
+
+    $app->execute();
+</code>
+</pre>

@@ -1,0 +1,53 @@
+<h2>Preparing application</h2>
+
+<p>Project requires several required files following the project structure provided in first steps. Code samples are
+provided and explained in this section which will get our sample project easily and quickly started.</p>
+
+<p>Modify your composer.json to autoload necessary files. This will ensure that your controllers, models, repositories, and
+other various files are loaded without any special care.</p>
+
+<pre>
+<code class="hljs json">
+{
+    "require": {
+        "palethorn/yeah": "dev-master"
+    },
+    "psr-4": {
+        "Blog\\": "blog/src"
+    }
+}
+</code>
+</pre>
+
+<p>Create application class. You will want to override certaing methods down the line to configure services, load routes,
+handle extra configuration:</p>
+<pre>
+<code class="hljs php">
+    // blog/src/Blog.php
+    class Blog extends \Yeah\Fw\Application\App {
+
+    }
+</code>
+</pre>
+
+<p>Finally, create index.php. Include composer autoloader, create initial configuration and initialize your application.</p>
+
+<pre>
+<code class="hljs php">
+    // web/index.php
+
+    // Include composer autoloader
+    require_once '../vendor/autoload.php';
+
+    $config = array(
+        'dev' => array()
+    );
+
+    $app = new Blog('blog', 'dev', $config);
+
+    $app->execute();
+</code>
+</pre>
+<p>
+index.php is the application entry point. From there App::execute takes place, which handles request initialization, routing,
+parameter parsing etc.</p>

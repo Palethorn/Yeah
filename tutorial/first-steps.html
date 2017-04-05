@@ -1,6 +1,6 @@
 <h2>First Steps</h2>
 <h3>Installation</h3>
-Easiest way to install is to use composer. Create your project folder, add composer.json :
+<p>Easiest way to install is to use composer. Create your project folder, add composer.json :</p>
 <pre>
 <code class="hljs json">
 {
@@ -17,34 +17,39 @@ Then:
 composer update
 </code>
 <pre>
+<p>
 You have a single folder called vendor inside your project folder. Inside of it is everything you need to get started.
 You have installed Yeah! PHP Framework. We can refer to it as YeahFW.
-
+</p>
 <h3>Creating project structure</h3>
-We'll start building a sample application called blog. We need to create a project structure for it. YeahFW accepts
+<p>
+We'll start by building a sample application called blog. We need to create a project structure for it. YeahFW accepts
 whatever structure you impose on it, as long as it's configured correctly. Sample structure we can use for our sample
 project is this:
-
+</p>
 <pre>
-<code class="hljs">
+<code class="hljs nohighlight">
 .
 ├── blog
 │   ├── config
-│   ├── controllers
-│   │   └── HomeController.php
+|   ├── src
+│   │   │── Controllers
+|   │   │   └── HomeController.php
+|   │   │── Models
+│   │   │── Repositories
+|   |   └── Blog.php
 │   ├── data
-│   ├── models
-│   │── views
-│   │   ├── index.php
-│   │   └── layouts
-│   │       └── default.php
-│   └── Blog.php
+│   └── views
+│       ├── index.php
+│       └── layouts
+│           └── default.php
 │── vendor
 │── web
 │    └── app_name.php
 └── composer.json
 </code>
 </pre>
+<p>
 Examplanation of various files and directories:
 <ul>
     <li>blog - Holds application specific configuration, controllers, models, and views. Controllers and models
@@ -65,7 +70,10 @@ update is run.</li>
 go here.</li>
     <li>composer.json - Exposes project dependencies which are managed via composer*.</li>
 </ul>
+</p>
+<p>
 Sidenotes:
 * https://getcomposer.org/
 
 Purpose of these directories will be explained in more detail further down in the tutorial.
+</p>
