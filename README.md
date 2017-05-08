@@ -5,6 +5,7 @@ Easiest way to install is to use composer. Add composer.json into your project r
 ```
 
 {
+    "minimum-stability": "dev",
     "require": {
         "palethorn/yeah": "dev-master"
     }
@@ -42,8 +43,9 @@ Lighttpd rewrite rules:
 Apache rewrite rules are similar. htaccess file example (NOT TESTED):
 
 ```
+Options +FollowSymLinks
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^/(.*)$ project_name.php/$1 [L]
+RewriteRule ^ project_name.php [L]
 ```

@@ -1,0 +1,27 @@
+<h2>Web Server Configurations</h2>
+
+<h3>Apache</h3>
+<p>Minimal configuration for apache. This goes to web/.htaccess:
+<pre>
+<code class="hljs">
+# web/.htaccess
+Options +FollowSymLinks
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [L]
+</code>
+</pre>
+</p>
+
+<h3>Lighttpd</h3>
+<p>Rewrite rules for lighttpd.
+<pre>
+<code class="hljs">
+url.rewrite-if-not-file = (
+    "^/(.*)" => "/project_name.php/$1"
+)
+</code>
+</pre>
+</p>

@@ -1,0 +1,61 @@
+<h2>Controllers</h2>
+
+<p>
+For a larger application, you should organize your request handling inside of controllers. Project code is organized in
+much cleaner way, and provides better maintainability. Also lets you group request endpoints to the same resource. As a
+developer, you can decide where to put your controllers, but most common is project_dir/app_dir/src/Controllers
+</p>
+
+<h3>Adding First Controller</h3>
+
+<p>
+For the purposes of this tutorial we've mapped Controllers directory to blog/src/Controllers path. Controllers here have
+the namespace Blog\Controllers. Example controller:
+
+<pre>
+<code class="hljs php">
+    // blog/src/Controllers/HomeController.php
+    namespace Blog\Controllers;
+
+    class HomeController extends \Yeah\Fw\Mvc\Controller {
+        public function index() {
+            echo "home/index";
+        }
+    }
+</code>
+</pre>
+
+For now add route to web/index.php. It should look like this:
+
+<pre>
+<code class="hljs php">
+    // web/index.php
+    // Include composer autoloader
+    require_once '../vendor/autoload.php';
+
+    $config = array(
+        'dev' => array()
+    );
+
+    $app = new \Blog\Blog('blog', 'dev', $config);
+
+    $app->routeGet('/get', function() {
+       echo "GET method used";
+    });
+
+    // Add index route
+    \Yeah\Fw\Routing\Router::add('/', array(
+         'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\RouteRequestHandler',
+         'controller' => 'Blog\Controllers\HomeController',
+         'action' => 'index',
+         'secure' => false
+     ));
+
+    $app->execute();
+</code>
+</pre>
+
+Navigate to "project_url/" in your browser. It should say
+<code class="hljs">home/index</code>
+Great, we have our controller.
+</p>

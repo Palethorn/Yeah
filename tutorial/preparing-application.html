@@ -1,4 +1,4 @@
-<h2>Preparing application</h2>
+<h2>Preparing Application</h2>
 
 <p>Project requires several required files following the project structure provided in first steps. Code samples are
 provided and explained in this section which will get our sample project easily and quickly started.</p>
@@ -12,8 +12,10 @@ other various files are loaded without any special care.</p>
     "require": {
         "palethorn/yeah": "dev-master"
     },
-    "psr-4": {
-        "Blog\\": "blog/src"
+    "autoload": {
+        "psr-4": {
+            "Blog\\": "blog/src"
+        }
     }
 }
 </code>
@@ -24,6 +26,8 @@ handle extra configuration:</p>
 <pre>
 <code class="hljs php">
     // blog/src/Blog.php
+    namespace Blog;
+
     class Blog extends \Yeah\Fw\Application\App {
 
     }

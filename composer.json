@@ -10,6 +10,6 @@
         "palethorn/yeah-devtools": "dev-master"
     },
     "autoload": {
-        "psr-0": { "Yeah\\Fw\\": "src" }
+        "psr-4": { "Yeah\\Fw\\": "src/Yeah/Fw" }
     }
 }
