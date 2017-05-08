@@ -2,7 +2,8 @@
 
 class RedisCacheTest extends TestCase {
 
-    public function __construct() {
+    public function __construct($name = null, array $data = [], $dataName = '') {
+        parent::__construct($name, $data, $dataName);
         $this->cache = new \Yeah\Fw\Cache\RedisCache();
         $this->cache->set('test', 'test');
     }

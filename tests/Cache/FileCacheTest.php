@@ -2,7 +2,8 @@
 
 class FileCacheTest extends TestCase {
 
-    public function __construct() {
+    public function __construct($name = null, array $data = [], $dataName = '') {
+        parent::__construct($name, $data, $dataName);
         $this->file_cache = new \Yeah\Fw\Cache\FileCache('/tmp/test');
         $this->file_cache->set('test', 'test');
     }

@@ -1,7 +1,9 @@
 <?php
 
 class SimpleRouteTest extends TestCase {
-    public function __construct() {
+    public function __construct($name = null, array $data = [], $dataName = '') {
+        parent::__construct($name, $data, $dataName);
+
         $this->route = array(
             'pattern' => '/',
             'secure' => false,
@@ -21,6 +23,7 @@ class SimpleRouteTest extends TestCase {
                 })),
             ),
         );
+
         $this->request = $this->getMockBuilder('\Yeah\Fw\Http\Request')->getMock();
         $this->request->method('getRequestUri')->willReturn('/');
 
