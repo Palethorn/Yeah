@@ -2,22 +2,26 @@
 
 namespace Yeah\Fw\Application;
 
+use Yeah\Fw\Event\EventArgs;
+use Yeah\Fw\Event\Event;
+use Yeah\Fw\Event\EventDispatcher;
+
 /**
  * Implements singleton pattern. Used for application request entry point
  *
- * @property \\Yeah\\Fw\\Application $instance Singleton instance of this class
- * @property Yeah\\Fw\\Error\\ErrorHandler $error_handler
- * @property Yeah\\Fw\\Logger\\LoggerInterface $logger
+ * @property Yeah\Fw\Application $instance Singleton instance of this class
+ * @property Yeah\Fw\Error\ErrorHandler $error_handler
+ * @property Yeah\Fw\Logger\LoggerInterface $logger
  * @property SessionHandlerInterface $session
- * @property Yeah\\Fw\\Auth\\AuthInterface $auth
- * @property Yeah\\Fw\\Mvc\\View\\ViewInterface $view
- * @property Yeah\\Fw\\Application\\DependencyContainer $dc
- * @property Router $router
+ * @property Yeah\Fw\Auth\AuthInterface $auth
+ * @property Yeah\Fw\Mvc\View\ViewInterface $view
+ * @property Yeah\Fw\Application\DependencyContainer $dc
+ * @property Yeah\Fw\Routing\Route\Router $router
  * @property Request $request
  * @property Response $response
- * @property Yeah\\Fw\\Application\\Autoloader $autoloader
- * @property Yeah\\Fw\\Application\\Config $config
- * @property Yeah\\Fw\\Routing\\Route\\RouteInterface $route
+ * @property Yeah\Fw\Application\Autoloader $autoloader
+ * @property Yeah\Fw\Application\Config $config
+ * @property \Yeah\Fw\Routing\Route\RouteInterface $route
  * @author David Cavar
  */
 class App {
@@ -40,21 +44,6 @@ class App {
     protected $route = false;
     protected $response_cache_key = false;
 
-    private $middleware = array(
-        0 => array(),
-        1 => array(),
-        2 => array(),
-        3 => array(),
-        4 => array(),
-        5 => array(),
-        6 => array(),
-        7 => array(),
-        8 => array(),
-        9 => array(),
-        10 => array(),
-        11 => array()
-    );
-
     /**
      * Class default constructor
      * @param string $app_name Besides used in some friendly messages and decoration, it is also used for deducing
@@ -66,14 +55,16 @@ class App {
      *
      */
     public function __construct($app_name, $env = 'prod', $config = array('prod' => array())) {
-        header('Created-Using: Yeah Web Framework');
+        header('X-Powered-By: Yeah Web Framework');
         $this->app_name = $app_name;
         $this->env = $env;
         require_once 'Config.php';
         $conf = array();
+
         if(isset($config[$env])) {
             $conf = $config[$env];
         }
+
         $this->config = new Config($conf);
 
         if(PHP_MAJOR_VERSION == 7) {
@@ -86,7 +77,7 @@ class App {
         $this->request = new \Yeah\Fw\Http\Request();
         $this->response = new \Yeah\Fw\Http\Response();
         $this->dc = new DependencyContainer();
-        $this->configureMiddleware();
+        $this->event_dispatcher = new EventDispatcher();
         $this->configureServices();
         $this->loadRoutes();
         self::$instance = $this;
@@ -160,44 +151,25 @@ class App {
      * Each job has a pre and post event dispatcher
      */
     public function execute() {
-        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::PRE_ROUTING);
+        $this->event_dispatcher->dispatch(new Event(Event::PRE_ROUTING, $this, new EventArgs()));
         $this->executeRouter();
-        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::POST_ROUTING);
-        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::PRE_SECURITY);
+        $this->event_dispatcher->dispatch(new Event(Event::POST_ROUTING, $this, new EventArgs()));
+        $this->event_dispatcher->dispatch(new Event(Event::PRE_SECURITY, $this, new EventArgs()));
         $this->executeSecurity();
-        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::POST_SECURITY);
-        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::PRE_CACHE);
+        $this->event_dispatcher->dispatch(new Event(Event::POST_SECURITY, $this, new EventArgs()));
+        $this->event_dispatcher->dispatch(new Event(Event::PRE_CACHE, $this, new EventArgs()));
+
         if($this->route->getIsCacheable() && $this->executeCache($this->route)) {
             return;
         }
-        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::POST_CACHE);
-        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::PRE_ACTION);
-        $action_result = $this->executeAction($this->route);
-        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::POST_ACTION);
-        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::PRE_RENDER);
-        $this->executeRender($action_result);
-        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::POST_RENDER);
-    }
 
-    /**
-     * Executes middleware from designated slot
-     *
-     *@param $slot Execute middleware collection from designated slot
-     */
-    public function executeMiddleware($slot) {
-        $collection = $this->middleware[$slot];
-        foreach ($collection as $middleware) {
-            if($middleware instanceof \Closure) {
-                call_user_func_array($middleware);
-            } else if(in_array('Yeah\Fw\Middleware\MiddlewareInterface', class_implements($middleware))) {
-                $middleware_object = new $middleware();
-                $middleware_object->execute();
-            } else {
-                throw new \Exception('Middleware class '
-                . $middleware
-                . ' must implement Yeah\Fw\Middleware\MiddlewareInterface');
-            }
-        }
+        $this->event_dispatcher->dispatch(new Event(Event::POST_CACHE, $this, new EventArgs()));
+        $this->event_dispatcher->dispatch(new Event(Event::PRE_ACTION, $this, new EventArgs()));
+        $action_result = $this->executeAction($this->route);
+        $this->event_dispatcher->dispatch(new Event(Event::POST_ACTION, $this, new EventArgs()));
+        $this->event_dispatcher->dispatch(new Event(Event::PRE_RENDER, $this, new EventArgs()));
+        $this->executeRender($action_result);
+        $this->event_dispatcher->dispatch(new Event(Event::POST_RENDER, $this, new EventArgs()));
     }
 
     /**
@@ -217,7 +189,7 @@ class App {
      * @return RouteInterface
      */
     private function executeSecurity() {
-        if($this->route->isSecure() && (!$this->getAuth()->isAuthenticated() || !$this->getAuth()->isAuthorized())) {
+        if($this->route->isSecure() && (!$this->getAuth()->isAuthenticated() || !$this->getAuth()->isAuthorized($this->route))) {
             throw new \Yeah\Fw\Http\Exception\UnauthorizedHttpException();
         }
     }
@@ -226,7 +198,7 @@ class App {
      * Executes action inside chain execution. Executes controller action from inside the route.
      *
      * @param mixed $route Route options
-     * @return \\Yeah\\Fw\\Mvc\\View Controller view object
+     * @return Yeah\Fw\Mvc\View Controller view object
      */
     private function executeAction(\Yeah\Fw\Routing\Route\RouteInterface $route) {
         return $route->execute(
@@ -237,18 +209,21 @@ class App {
     /**
      * Write cached output to response if route is cacheable and cache exists.
      *
-     * @param \\Yeah\\Fw\\Routing\\Route\\RouteInterface $route
+     * @param Yeah\Fw\Routing\Route\RouteInterface $route
      * @return boolean
      */
     private function executeCache(\Yeah\Fw\Routing\Route\RouteInterface $route) {
         if(!$route->getIsCacheable()) {
             return false;
         }
+
         $response_cache = $this->getResponseCache();
+
         if($response_cache->has($this->getUrlCacheKey())) {
             $this->response->write($response_cache->get($this->getUrlCacheKey()));
             return true;
         }
+
         return false;
     }
 
@@ -263,6 +238,7 @@ class App {
             $output = $response->render();
             $this->response->write($output);
         }
+
         if(is_array($response)) {
             $layout = isset($response['layout']) ? $response['layout'] : 'default';
             $template = isset($response['template']) ? $response['template'] : ($this->request->getParameter('action') ? $this->request->getParameter('action') : 'index');
@@ -273,17 +249,20 @@ class App {
                     ->render();
             $this->response->write($output);
         }
+
         $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::PRE_REPONSE_CACHE);
+
         if($this->route->getIsCacheable()) {
             $this->getResponseCache()->set($this->getUrlCacheKey(), $output, $this->route->getCacheDuration());
         }
+
         $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::POST_REPONSE_CACHE);
     }
 
     /**
      * Getter for HTTP request object. Retrieves request object which represents abstracted version og HTTP request.
      *
-     * @return \\Yeah\\Fw\\Http\\Request
+     * @return \Yeah\Fw\Http\Request
      */
     public function getRequest() {
         return $this->request;
@@ -292,7 +271,7 @@ class App {
     /**
      * Getter for HTTP response object.
      *
-     * @return \\Yeah\\Fw\\Http\\Response
+     * @return \Yeah\Fw\Http\Response
      */
     public function getResponse() {
         return $this->response;
@@ -319,7 +298,7 @@ class App {
     /**
      * Retrieves session handler object from object container.
      *
-     * @return SessionHandlerInterface
+     * @return \SessionHandlerInterface
      */
     public function getSession() {
         return $this->getDependencyContainer()->get('session');
@@ -327,7 +306,7 @@ class App {
 
     /**
      * Retrieves authorization, and authentication object from service container.
-     * @return \\Yeah\\Fw\\Auth\\AuthInterface
+     * @return \Yeah\Fw\Auth\AuthInterface
      */
     public function getAuth() {
         return $this->getDependencyContainer()->get('auth');
@@ -420,6 +399,7 @@ class App {
         if($this->config->cache_dir) {
             return $this->config->cache_dir;
         }
+
         return $this->getBaseDir() . DIRECTORY_SEPARATOR . 'cache';
     }
 
@@ -433,6 +413,7 @@ class App {
         if($this->config->log_dir) {
             return $this->config->log_dir;
         }
+
         return $this->getBaseDir() . DIRECTORY_SEPARATOR . 'log';
     }
 
@@ -446,6 +427,7 @@ class App {
         if($this->config->controllers_dir) {
             return $this->config->controllers_dir;
         }
+
         return $this->getBaseDir() . DIRECTORY_SEPARATOR . $this->getAppName() . DIRECTORY_SEPARATOR . 'controllers';
     }
 
@@ -459,6 +441,7 @@ class App {
         if($this->config->models_dir) {
             return $this->config->models_dir;
         }
+
         return $this->getBaseDir() . DIRECTORY_SEPARATOR . $this->getAppName() . DIRECTORY_SEPARATOR . 'models';
     }
 
@@ -472,6 +455,7 @@ class App {
         if($this->config->views_dir) {
             return $this->config->views_dir;
         }
+
         return $this->getBaseDir() . DIRECTORY_SEPARATOR . $this->getAppName() . DIRECTORY_SEPARATOR . 'views';
     }
 
@@ -489,6 +473,7 @@ class App {
      */
     public function route($url, $method, $http_method = 'GET', $secure = false, $cache_options = array('is_cacheable' => false, 'cache_duration' => 1440)) {
         $route = \Yeah\Fw\Routing\Router::get($url);
+        
         if($route) {
             $route['restful'][$http_method] = array(
                 'method' => $method,
@@ -498,6 +483,7 @@ class App {
             \Yeah\Fw\Routing\Router::add($url, $route);
             return;
         }
+
         \Yeah\Fw\Routing\Router::add($url, array(
             'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
             'secure' => $secure,
@@ -564,53 +550,6 @@ class App {
      */
     public function getDependencyContainer() {
         return $this->dc;
-    }
-
-    /**
-     * This method is marked for override.
-     * Adds simple interface for injecting middleware into preexecution and postexecution. Method is invoked during
-     * application initialization and lets a developer to assign various middleware event listeners using
-     * \Yeag\Fw\Application\App::addMiddleware method.
-     *
-     * Available slots:
-     * - PRE_ROUTING
-     * - POST_ROUTING
-     * - PRE_SECURITY
-     * - POST_SECURITY
-     * - PRE_CACHE
-     * - POST_CACHE
-     * - PRE_ACTION
-     * - POST_ACTION
-     * - PRE_RENDER
-     * - POST_RENDER
-     * - PRE_REPONSE_CACHE
-     * - POST_REPONSE_CACHE
-     */
-    public function configureMiddleware() {
-
-    }
-
-    /**
-     * Adds simple interface for injecting middleware into preexecution and postexecution
-     * @param integer $slot Designated slot for listeners.
-     * Available slots:
-     * - PRE_ROUTING
-     * - POST_ROUTING
-     * - PRE_SECURITY
-     * - POST_SECURITY
-     * - PRE_CACHE
-     * - POST_CACHE
-     * - PRE_ACTION
-     * - POST_ACTION
-     * - PRE_RENDER
-     * - POST_RENDER
-     * - PRE_REPONSE_CACHE
-     * - POST_REPONSE_CACHE
-     * @param \\Closure|\\Yeah\\Fw\\Middleware\\MiddlewareInterface $middleware. Middleware to be executed for a designated
-     * slot
-     */
-    public function addMiddleware($slot, $middleware) {
-        $this->middleware[$slot][] = $middleware;
     }
 
     /**

@@ -13,8 +13,17 @@ namespace Yeah\Fw\Application;
  */
 class DependencyContainer {
 
-    private $factories = array();
-    private $services = array();
+    private $factory_index = array(
+        'type' => array(),
+        'tag' => array(),
+        'id' => array()
+    );
+
+    private $service_index = array(
+        'type' => array(),
+        'tag' => array(),
+        'id' => array()
+    );
 
     /**
      * Sets factory method for service
@@ -22,11 +31,13 @@ class DependencyContainer {
      * @param string $key
      * @param Closure $factory
      */
-    public function set($key, $factory) {
-        $this->factories[$key] = $factory;
-        if(isset($this->services[$key])) {
-            unset($this->services[$key]);
+    public function set($config) {
+        if(isset($config['tag'])) {
+            $this->registerTag($config['tag'], $config['id']);
         }
+
+        $this->registerType($config['class'], $config['id']);
+        $this->factory_index['id'][$config['id']] = $config;
     }
 
     /**
@@ -35,14 +46,25 @@ class DependencyContainer {
      * @param string $key
      * @return mixed
      */
-    public function get($key) {
-        if(!isset($this->factories[$key])) {
-            return null;
-        }
-        if(!isset($this->services[$key])) {
-            $this->services[$key] = $this->factories[$key]();
-        }
-        return $this->services[$key];
+    public function get($id) {
+
     }
+
+    public function registerType($type, $id) {
+        if(!isset($this->factory_index['type'][$type])) {
+            $this->factory_index['type'][$type] = array();
+        }
+
+        $this->factory_index['type'][$type][] = $id;
+    }
+
+    public function registerTag($tag, $id) {
+        if(!isset($this->factory_index['tag'][$tag])) {
+            $this->factory_index['tag'][$tag] = array();
+        }
+
+        $this->factory_index['tag'][$tag][] = $id;
+    }
+
 
 }
