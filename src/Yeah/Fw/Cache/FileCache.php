@@ -11,6 +11,7 @@ class FileCache implements CacheInterface {
     public function __construct($cache_dir, $default_duration = 1440) {
         $this->cache_dir = $cache_dir;
         $this->default_duration = $default_duration;
+
         if(!is_dir($cache_dir)) {
             mkdir($cache_dir, 0777, true);
         }
@@ -26,6 +27,7 @@ class FileCache implements CacheInterface {
         if(!$this->has($key)) {
             return null;
         }
+
         return $this->loaded[$key]['data'];
     }
 
@@ -35,10 +37,12 @@ class FileCache implements CacheInterface {
         }
 
         $file = $this->load($this->getFilename($key));
+
         if($file && $this->valid($file)) {
             $this->loaded[$key] = $file;
             return true;
         }
+
         $this->remove($key);
         return false;
     }
@@ -49,9 +53,11 @@ class FileCache implements CacheInterface {
 
     public function remove($key) {
         $filename = $this->getFilename($key);
+
         if(file_exists($filename)) {
             unlink($filename);
         }
+
         unset($this->loaded[$key]);
     }
 
@@ -59,7 +65,8 @@ class FileCache implements CacheInterface {
         if($file['duration'] == 0) {
             return true;
         }
-        if($file['ctime'] + $file['duration'] > strtotime('now')) {
+        
+        if($file['ctime'] + $file['duration'] > time()) {
             return true;
         }
 
@@ -71,7 +78,7 @@ class FileCache implements CacheInterface {
             $duration = $this->default_duration;
         }
         $slot = array();
-        $slot['ctime'] = strtotime('now');
+        $slot['ctime'] = time();
         $slot['duration'] = $duration;
         $slot['data'] = $value;
 

@@ -560,35 +560,39 @@ class App {
     public function configureServices() {
         $dc = $this->getDependencyContainer();
 
-        $dc->set('logger', function() {
-            return new \Yeah\Fw\Logger\NullLogger();
-        });
+        $dc->set(array(
+            'id' => 'logger',
+            'class' => 'Yeah\Fw\Logger\NullLogger'
+        ));
 
-        $dc->set('db_config', function() {
-            return null;
-        });
+        $dc->set(array(
+            'id' => 'session',
+            'class' => 'Yeah\Fw\Session\NullSessionHandler'
+        ));
 
-        $dc->set('session', function() {
-            return new \Yeah\Fw\Session\NullSessionHandler();
-        });
+        $dc->set(array(
+            'id' => 'auth',
+            'class' => 'Yeah\Fw\Auth\NullAuth'
+        ));
 
-        $dc->set('auth', function() {
-            return new \Yeah\Fw\Auth\NullAuth();
-        });
+        $dc->set(array(
+            'id' => 'view',
+            'class' => 'Yeah\Fw\Mvc\PhpView',
+            'params' => array(
+                $this->getViewsDir(),
+                array(
+                    'cache' => $this->getCacheDir()
+                ))
+        ));
 
-        $dc->set('entity_manager', function() {
-            return null;
-        });
-
-        $dc->set('view', function() {
-            return new \Yeah\Fw\Mvc\PhpView(App::getInstance()->getViewsDir(), array(
-                'cache' => $this->getCacheDir()
-            ));
-        });
-
-        $dc->set('response_cache', function () {
-            return \Yeah\Fw\Cache\CacheFactory::create();
-        });
+        $dc->set(array(
+            'id' => 'response_cache',
+            'class' => 'Yeah\Fw\Cache\FileCache',
+            'params' => array(
+                $this->getCacheDir(),
+                3600
+            )
+        ));
     }
 
     /**
