@@ -2,45 +2,35 @@
 
 namespace Yeah\Fw\Application;
 
+use Yeah\Fw\Error\ErrorHandler;
 use Yeah\Fw\Event\EventArgs;
 use Yeah\Fw\Event\Event;
 use Yeah\Fw\Event\EventDispatcher;
+use Yeah\Fw\Http\Request;
+use Yeah\Fw\Mvc\Closure;
+use Yeah\Fw\Mvc\ViewInterface;
+use Yeah\Fw\Routing\Route;
+use Yeah\Fw\Routing\Route\RouteInterface;
+use Yeah\Fw\Routing\Router;
 
 /**
  * Implements singleton pattern. Used for application request entry point
  *
  * @property Yeah\Fw\Application $instance Singleton instance of this class
  * @property Yeah\Fw\Error\ErrorHandler $error_handler
- * @property Yeah\Fw\Logger\LoggerInterface $logger
- * @property SessionHandlerInterface $session
- * @property Yeah\Fw\Auth\AuthInterface $auth
- * @property Yeah\Fw\Mvc\View\ViewInterface $view
  * @property Yeah\Fw\Application\DependencyContainer $dc
- * @property Yeah\Fw\Routing\Route\Router $router
- * @property Request $request
- * @property Response $response
- * @property Yeah\Fw\Application\Autoloader $autoloader
  * @property Yeah\Fw\Application\Config $config
- * @property \Yeah\Fw\Routing\Route\RouteInterface $route
+ * @property Route $route
  * @author David Cavar
  */
 class App {
 
     protected static $instance = null;
-    protected $request = null;
-    protected $response = null;
-    protected $router = null;
-    protected $autoloader = null;
     protected $error_handler = null;
-    protected $logger = null;
-    protected $session = null;
-    protected $auth = null;
-    protected $view = null;
     protected $dc = null;
     protected $app_name = '';
     protected $config = null;
-    protected $env = false;
-    protected $response_cache = false;
+    protected $env = 'prod';
     protected $route = false;
     protected $response_cache_key = false;
 
@@ -58,26 +48,21 @@ class App {
         header('X-Powered-By: Yeah Web Framework');
         $this->app_name = $app_name;
         $this->env = $env;
-        require_once 'Config.php';
+
         $conf = array();
 
         if(isset($config[$env])) {
             $conf = $config[$env];
+        } else {
+            $conf = $config;
         }
 
         $this->config = new Config($conf);
 
         if(PHP_MAJOR_VERSION == 7) {
-            $this->error_handler = new \Yeah\Fw\Error\ErrorHandler_php7(error_reporting());
-        } else {
-            $this->error_handler = new \Yeah\Fw\Error\ErrorHandler(error_reporting());
+            $this->error_handler = new ErrorHandler(error_reporting());
         }
 
-        $this->router = new \Yeah\Fw\Routing\Router();
-        $this->request = new \Yeah\Fw\Http\Request();
-        $this->response = new \Yeah\Fw\Http\Response();
-        $this->dc = new DependencyContainer();
-        $this->event_dispatcher = new EventDispatcher();
         $this->configureServices();
         $this->loadRoutes();
         self::$instance = $this;
@@ -101,37 +86,16 @@ class App {
     }
 
     /**
-     * Register autoloader paths for probing. Method is marked for override
-     * @deprecated All autoloading is handled by composer autoload functionality
-     */
-    protected function registerAutoloaders() {
-        require_once $this->getLibDir() . DIRECTORY_SEPARATOR . 'Yeah' . DIRECTORY_SEPARATOR . 'Fw' . DIRECTORY_SEPARATOR . 'Application' . DIRECTORY_SEPARATOR . 'Autoloader.php';
-        $this->autoloader = new Autoloader();
-        $this->autoloader->addIncludePath($this->getLibDir());
-        $this->autoloader->addIncludePath($this->getModelsDir());
-        $this->autoloader->addIncludePath($this->getControllersDir());
-        $this->autoloader->register();
-    }
-
-    /**
-     * Method used for configuring autoload cache strategy. Method is marked for override
-     * @deprecated All autoloading is handled by composer autoload functionality
-     */
-    public function configureAutoloadCache() {
-        $this->autoloader->setCache(new \Yeah\Fw\Cache\NullCache());
-    }
-
-    /**
      * Load additional routes. Method is marked for override.
      */
     public function loadRoutes() {
         $routes_location = $this->getBaseDir() .
-        DIRECTORY_SEPARATOR .
-        $this->getAppName() .
-        DIRECTORY_SEPARATOR .
-        'config' .
-        DIRECTORY_SEPARATOR .
-        'routes.php';
+            DIRECTORY_SEPARATOR .
+            $this->getAppName() .
+            DIRECTORY_SEPARATOR .
+            'config' .
+            DIRECTORY_SEPARATOR .
+            'routes.php';
 
         if(file_exists($routes_location)) {
             require_once $routes_location;
@@ -140,36 +104,26 @@ class App {
 
     /**
      * Begins chain execution. Executes each separate job for request, and their respective event handlers.
-     *
-     * Current list of jobs:
-     * - Routing
-     * - Security
-     * - Route response cache
-     * - Matching controller action execution
-     * - Output rendering
-     *
-     * Each job has a pre and post event dispatcher
+     * Each job has a pre and post event
      */
     public function execute() {
-        $this->event_dispatcher->dispatch(new Event(Event::PRE_ROUTING, $this, new EventArgs()));
+        $this->getEventDispatcher()->dispatch(new Event(Event::PRE_ROUTING, $this, new EventArgs()));
         $this->executeRouter();
-        $this->event_dispatcher->dispatch(new Event(Event::POST_ROUTING, $this, new EventArgs()));
-        $this->event_dispatcher->dispatch(new Event(Event::PRE_SECURITY, $this, new EventArgs()));
+        $this->getEventDispatcher()->dispatch(new Event(Event::POST_ROUTING, $this, new EventArgs()));
+        $this->getEventDispatcher()->dispatch(new Event(Event::PRE_SECURITY, $this, new EventArgs()));
         $this->executeSecurity();
-        $this->event_dispatcher->dispatch(new Event(Event::POST_SECURITY, $this, new EventArgs()));
-        $this->event_dispatcher->dispatch(new Event(Event::PRE_CACHE, $this, new EventArgs()));
+        $this->getEventDispatcher()->dispatch(new Event(Event::POST_SECURITY, $this, new EventArgs()));
+        $this->getEventDispatcher()->dispatch(new Event(Event::PRE_CACHE, $this, new EventArgs()));
 
         if($this->route->getIsCacheable() && $this->executeCache($this->route)) {
             return;
         }
 
-        $this->event_dispatcher->dispatch(new Event(Event::POST_CACHE, $this, new EventArgs()));
-        $this->event_dispatcher->dispatch(new Event(Event::PRE_ACTION, $this, new EventArgs()));
-        $action_result = $this->executeAction($this->route);
-        $this->event_dispatcher->dispatch(new Event(Event::POST_ACTION, $this, new EventArgs()));
-        $this->event_dispatcher->dispatch(new Event(Event::PRE_RENDER, $this, new EventArgs()));
-        $this->executeRender($action_result);
-        $this->event_dispatcher->dispatch(new Event(Event::POST_RENDER, $this, new EventArgs()));
+        $this->getEventDispatcher()->dispatch(new Event(Event::POST_CACHE, $this, new EventArgs()));
+        $this->getEventDispatcher()->dispatch(new Event(Event::PRE_ACTION, $this, new EventArgs()));
+        $response = $this->executeAction($this->route);
+        $this->getEventDispatcher()->dispatch(new Event(Event::POST_ACTION, $this, new EventArgs()));
+        $response->write();
     }
 
     /**
@@ -177,7 +131,7 @@ class App {
      * @return RouteInterface
      */
     private function executeRouter() {
-        return $this->route = $this->router->handle($this->request);
+        return $this->route = $this->getRouter()->handle($this->getRequest());
     }
 
     /**
@@ -197,13 +151,32 @@ class App {
     /**
      * Executes action inside chain execution. Executes controller action from inside the route.
      *
-     * @param mixed $route Route options
-     * @return Yeah\Fw\Mvc\View Controller view object
+     * @param RouteInterface $route
+     * @return View Controller view object
      */
-    private function executeAction(\Yeah\Fw\Routing\Route\RouteInterface $route) {
-        return $route->execute(
-                        $this->getRequest(), $this->getResponse(), $this->getSession(), $this->getAuth()
-        );
+    private function executeAction(Route $route) {
+        $controller_class = $route->getController();
+        $action = $route->getAction();
+        $controller = new $controller_class($action);
+
+        $reflectionClass = new \ReflectionClass($controller_class);
+        $methods = $reflectionClass->getMethods();
+        
+        foreach($methods as $method) {
+            $matches = array();
+
+            if(preg_match('/^set(.*)$/', $method->name, $matches)) {
+                $id = trim(preg_replace_callback('/[A-Z]/', function($matches) {
+                    return strtolower('_' . $matches[0]);
+                }, $matches[1]), '_');
+                
+                if($this->dc->has($id)) {
+                    $controller->{$method->name}($this->dc->get($id));
+                }
+            }
+        }
+
+        return $controller->call();
     }
 
     /**
@@ -212,7 +185,7 @@ class App {
      * @param Yeah\Fw\Routing\Route\RouteInterface $route
      * @return boolean
      */
-    private function executeCache(\Yeah\Fw\Routing\Route\RouteInterface $route) {
+    private function executeCache(Route $route) {
         if(!$route->getIsCacheable()) {
             return false;
         }
@@ -231,10 +204,10 @@ class App {
      * Executes view rendering inside chain execution. Supports various templating engines through adapter
      * implementation. Twig work out of the box.
      *
-     * @param mixed|\\Yeah\\Fw\\Mvc\\ViewInterface $view Controller view object
+     * @param $view Controller view object
      */
     private function executeRender($response) {
-        if($response instanceof \Yeah\Fw\Mvc\ViewInterface) {
+        if($response instanceof ViewInterface) {
             $output = $response->render();
             $this->response->write($output);
         }
@@ -242,21 +215,23 @@ class App {
         if(is_array($response)) {
             $layout = isset($response['layout']) ? $response['layout'] : 'default';
             $template = isset($response['template']) ? $response['template'] : ($this->request->getParameter('action') ? $this->request->getParameter('action') : 'index');
+            
             $output = $this->getView()
                     ->setTemplate($template)
                     ->withLayout($layout)
                     ->withParams($response)
                     ->render();
+
             $this->response->write($output);
         }
 
-        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::PRE_REPONSE_CACHE);
+        $this->getEventDispatcher()->dispatch(new Event(Event::PRE_REPONSE_CACHE, $this, new EventArgs()));
 
         if($this->route->getIsCacheable()) {
             $this->getResponseCache()->set($this->getUrlCacheKey(), $output, $this->route->getCacheDuration());
         }
 
-        $this->executeMiddleware(\Yeah\Fw\Middleware\Slots::POST_REPONSE_CACHE);
+        $this->getEventDispatcher()->dispatch(new Event(Event::POST_REPONSE_CACHE, $this, new EventArgs()));
     }
 
     /**
@@ -265,25 +240,25 @@ class App {
      * @return \Yeah\Fw\Http\Request
      */
     public function getRequest() {
-        return $this->request;
-    }
-
-    /**
-     * Getter for HTTP response object.
-     *
-     * @return \Yeah\Fw\Http\Response
-     */
-    public function getResponse() {
-        return $this->response;
+        return $this->dc->get('request');
     }
 
     /**
      * Getter for router object.
      *
-     * @return \\Yeah\\Fw\\Routing\\Router
+     * @return RouterInterface
      */
     public function getRouter() {
-        return $this->router;
+        return $this->dc->get('router');
+    }
+
+    /**
+     * Getter for event dispatcher object.
+     *
+     * @return EventDispatcher
+     */
+    public function getEventDispatcher() {
+        return $this->dc->get('event_dispatcher');
     }
 
     /**
@@ -324,7 +299,7 @@ class App {
     /**
      * Retrieves response cache handler from service container.
      *
-     * @return Yeah\\Fw\\Cache\\CacheInterface
+     * @return CacheInterface
      */
     public function getResponseCache() {
         return $this->dc->get('response_cache');
@@ -333,20 +308,10 @@ class App {
     /**
      * Retrieves view renderer from service container.
      *
-     * @return \\Yeah\\Fw\\Mvc\\ViewInterface
+     * @return ViewInterface
      */
     public function getView() {
         return $this->getDependencyContainer()->get('view');
-    }
-
-    /**
-     * Get application autoloader
-     * @param \\Yeah\\Fw\\Application\\Autoloader $autoloader
-
-     * @deprecated Autoloading is handled by composer autoload functionality
-     */
-    public function getAutoloader() {
-        return $this->autoloader;
     }
 
     /**
@@ -359,6 +324,7 @@ class App {
         if($this->config->base_dir) {
             return $this->config->base_dir;
         }
+
         return dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..';
     }
 
@@ -386,6 +352,7 @@ class App {
         if($this->config->web_dir) {
             return $this->config->web_dir;
         }
+
         return $this->getBaseDir() . DIRECTORY_SEPARATOR . 'web';
     }
 
@@ -471,29 +438,29 @@ class App {
      * @param string $http_method
      * @param bool $secure
      */
-    public function route($url, $method, $http_method = 'GET', $secure = false, $cache_options = array('is_cacheable' => false, 'cache_duration' => 1440)) {
-        $route = \Yeah\Fw\Routing\Router::get($url);
-        
+    public function route($url, \Closure $closure, $http_method = 'GET', $secure = false, $cache_options = array('is_cacheable' => false, 'cache_duration' => 1440)) {
+        $route = $this->getRouter()->get($url);
+
         if($route) {
             $route['restful'][$http_method] = array(
-                'method' => $method,
+                'controller' => Closure::class,
+                'action' => $closure,
                 'cache' => $cache_options,
                 'secure' => $secure
             );
-            \Yeah\Fw\Routing\Router::add($url, $route);
+
+            $this->getRouter()->add($url, $route);
             return;
         }
-
-        \Yeah\Fw\Routing\Router::add($url, array(
-            'route_request_handler' => 'Yeah\Fw\Routing\RouteRequest\SimpleRouteRequestHandler',
+        
+        $this->getRouter()->add($url, array(
             'secure' => $secure,
-            'restful' =>
-            array($http_method => (
-                array(
-                    'method' => $method,
+            'restful' => array(
+                $http_method => array(
+                    'controller' => Closure::class,
+                    'action' => $closure,
                     'cache' => $cache_options,
                     'secure' => $secure
-                )
                 )
             )
         ));
@@ -506,8 +473,8 @@ class App {
      * @param string $method
      * @param bool $secure
      */
-    public function routeGet($url, $method, $secure = false, $cache_options = array('is_cacheable' => false, 'cache_duration' => 1440)) {
-        $this->route($url, $method, 'GET', $secure, $cache_options);
+    public function routeGet($url, \Closure $closure, $secure = false, $cache_options = array('is_cacheable' => false, 'cache_duration' => 1440)) {
+        $this->route($url, $closure, 'GET', $secure, $cache_options);
     }
 
     /**
@@ -517,8 +484,8 @@ class App {
      * @param string $method
      * @param bool $secure
      */
-    public function routePost($url, $method, $secure = false) {
-        $this->route($url, $method, 'POST', $secure);
+    public function routePost($url, \Closure $closure, $secure = false) {
+        $this->route($url, $closure, 'POST', $secure);
     }
 
     /**
@@ -528,8 +495,8 @@ class App {
      * @param string $method
      * @param bool $secure
      */
-    public function routePut($url, $method, $secure = false) {
-        $this->route($url, $method, 'PUT', $secure);
+    public function routePut($url, \Closure $closure, $secure = false) {
+        $this->route($url, $closure, 'PUT', $secure);
     }
 
     /**
@@ -539,8 +506,8 @@ class App {
      * @param string $method
      * @param bool $secure
      */
-    public function routeDelete($url, $method, $secure = false) {
-        $this->route($url, $method, 'DELETE', $secure);
+    public function routeDelete($url, \Closure $closure, $secure = false) {
+        $this->route($url, $closure, 'DELETE', $secure);
     }
 
     /**
@@ -558,25 +525,33 @@ class App {
      *
      */
     public function configureServices() {
-        $dc = $this->getDependencyContainer();
+        $this->dc = new DependencyContainer();
 
-        $dc->set(array(
-            'id' => 'logger',
+        $this->dc->set('router', array(
+            'class' => Router::class
+        ));
+
+        $this->dc->set('request', array(
+            'class' => Request::class
+        ));
+
+        $this->dc->set('event_dispatcher', array(
+            'class' => EventDispatcher::class
+        ));
+
+        $this->dc->set('logger', array(
             'class' => 'Yeah\Fw\Logger\NullLogger'
         ));
 
-        $dc->set(array(
-            'id' => 'session',
+        $this->dc->set('session', array(
             'class' => 'Yeah\Fw\Session\NullSessionHandler'
         ));
 
-        $dc->set(array(
-            'id' => 'auth',
+        $this->dc->set('auth', array(
             'class' => 'Yeah\Fw\Auth\NullAuth'
         ));
 
-        $dc->set(array(
-            'id' => 'view',
+        $this->dc->set('view', array(
             'class' => 'Yeah\Fw\Mvc\PhpView',
             'params' => array(
                 $this->getViewsDir(),
@@ -585,8 +560,7 @@ class App {
                 ))
         ));
 
-        $dc->set(array(
-            'id' => 'response_cache',
+        $this->dc->set('response_cache', array(
             'class' => 'Yeah\Fw\Cache\FileCache',
             'params' => array(
                 $this->getCacheDir(),
@@ -611,6 +585,7 @@ class App {
         if($this->response_cache_key) {
             return $this->response_cache_key;
         }
+        
         return $this->response_cache_key = str_replace(array('/', '?', '&'), array('_', '_', '_'), $this->getRequest()->getHttpHost() . $this->getRequest()->getEnvironmentParameter('REQUEST_URI') . $this->getRequest()->getQueryString());
     }
 

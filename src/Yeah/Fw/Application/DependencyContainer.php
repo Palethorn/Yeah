@@ -31,13 +31,13 @@ class DependencyContainer {
      * @param string $key
      * @param Closure $factory
      */
-    public function set($config) {
+    public function set($id, $config) {
         if(isset($config['tag'])) {
-            $this->registerTag($config['tag'], $config['id']);
+            $this->registerTag($id, $config['tag']);
         }
 
-        $this->registerType($config['class'], $config['id']);
-        $this->factory_index['id'][$config['id']] = $config;
+        $this->registerType($config['class'], $id);
+        $this->factory_index['id'][$id] = $config;
     }
 
     /**
@@ -47,7 +47,22 @@ class DependencyContainer {
      * @return mixed
      */
     public function get($id) {
+        if(isset($this->service_index['id'][$id])) {
+            return $this->service_index['id'][$id];
+        }
 
+        $config = $this->factory_index['id'][$id];
+        $class = new \ReflectionClass($config['class']);
+        
+        if(isset($config['params'])) {
+            $object = $class->newInstanceArgs($config['params']);
+        } else {
+            $object = $class->newInstance();
+        }
+
+        $this->service_index['id'][$id] = $object;
+        $this->service_index['type'][$config['class']] = $object;
+        return $object;
     }
 
     public function registerType($type, $id) {
@@ -58,7 +73,7 @@ class DependencyContainer {
         $this->factory_index['type'][$type][] = $id;
     }
 
-    public function registerTag($tag, $id) {
+    public function registerTag($id, $tag) {
         if(!isset($this->factory_index['tag'][$tag])) {
             $this->factory_index['tag'][$tag] = array();
         }
@@ -66,5 +81,7 @@ class DependencyContainer {
         $this->factory_index['tag'][$tag][] = $id;
     }
 
-
+    public function has($id) {
+        return isset($this->factory_index['id'][$id]);
+    }
 }

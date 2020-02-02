@@ -56,7 +56,7 @@ class ErrorHandler {
      *
      * @param \Exception $e Caught exception
      */
-    public function exceptionHandler(\Exception $e) {
+    public function exceptionHandler(\Throwable $e) {
         $this->handled = true;
         if($e instanceof \Yeah\Fw\Http\Exception\HttpExceptionInterface) {
             $this->handleHttpException($e);

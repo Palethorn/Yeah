@@ -7,13 +7,17 @@ namespace Yeah\Fw\Http;
  * 
  * @author David Cavar
  */
-class Response {
+class Response implements ResponseInterface {
 
     private $output = null;
-    private $format = false;
     private $headers = array();
+    private $data = null;
 
-    public function __construct($options = array()) {
+    public function __construct($data, $status = 200, $headers = array()) {
+        $this->headers = array();
+        $this->data = $data;
+        $this->setResponseCode($status);
+        $this->setHeaders($headers);
         $this->output = fopen('php://output', 'w');
     }
 
@@ -36,49 +40,13 @@ class Response {
     }
 
     /**
-     * Writes JSON data to response
-     * 
-     * @param string $output
-     */
-    public function writeJson($output) {
-        header('Content-Type:' . 'application/json');
-        return fwrite($this->output, $output);
-    }
-
-    /**
-     * Writes XML data to response
-     * 
-     * @param string $output
-     */
-    public function writeXml($output) {
-        header('Content-Type:' . 'application/xml');
-        return fwrite($this->output, $output);
-    }
-
-    /**
-     * Writes raw content to response
-     * 
-     * @param mixed $output
-     */
-    public function writePlain($output) {
-        return fwrite($this->output, $output);
-    }
-
-    /**
      * Writes content based on specified response format
      * 
      * @param string $output
      */
-    public function write($output) {
-        $this->writeHeaders();
-        
-        if($this->format === 'json') {
-            return $this->writeJson($output);
-        } else if($this->format === 'xml') {
-            return $this->writeXml($output);
-        }
-        
-        return $this->writePlain($output);
+    public function write() {
+        $this->writeHeaders();        
+        return fwrite($this->output, $this->data);
     }
 
     /**
@@ -149,20 +117,6 @@ class Response {
     public function redirect($uri) {
         header('Location: ' . $uri);
         throw new Exception\FoundHttpException();
-    }
-
-    /**
-     * Sets user message to be displayed across redirects
-     * 
-     * @param string $text
-     * @param string $type
-     * @return \Yeah\Fw\Http\Response
-     * 
-     * TODO: Remove this function and its references
-     */
-    public function setFlash($text, $type = 'info') {
-        \Yeah\Fw\Application\App::getInstance()->getSessionHandler()->setSessionParam('flash', array('text' => $text, 'type' => $type));
-        return $this;
     }
 
     /**

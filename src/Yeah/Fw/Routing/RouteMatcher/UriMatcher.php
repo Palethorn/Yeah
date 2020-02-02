@@ -1,10 +1,12 @@
 <?php
 
-namespace Yeah\Fw\Routing\RouteMatching;
+namespace Yeah\Fw\Routing\RouteMatcher;
+
+use Yeah\Fw\Http\Request;
 
 class UriMatcher implements MatcherInterface {
 
-    public function match($options, \Yeah\Fw\Http\Request $request) {
+    public function match($options, Request $request) {
         $request_uri = $request->getRequestUri();
         $pattern = $options['pattern'];
         $requirements = isset($options['requirements']) ? $options['requirements'] : array();

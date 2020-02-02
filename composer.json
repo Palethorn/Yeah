@@ -1,12 +1,15 @@
 {
     "name": "palethorn/yeah",
+    "version": "3.0.0",
     "license": "MIT",
     "description": "Hopefully easy to use PHP framework, originally written for personal use. Then it started to grow...",
     "type": "library",
     "keywords": ["framework", "PHP", "yeah"],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.3.0",
+        "php": ">=7.1.0"
+    },
+    "suggest": {
         "palethorn/yeah-devtools": "dev-master"
     },
     "autoload": {

@@ -1,10 +1,8 @@
 <?php
 namespace Yeah\Fw\Toolbox;
 
-class PhpApi
-{
-    static function strpos($haystack, $needles)
-    {
+class PhpApi {
+    static function strpos($haystack, $needles) {
         if (is_array($needles)) {
             foreach ($needles as $str) {
                 if (is_array($str)) {
@@ -19,6 +17,7 @@ class PhpApi
         } else {
             return strpos($haystack, $needles);
         }
+
         return false;
     }
 
@@ -30,10 +29,12 @@ class PhpApi
         $pool = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUWXYZ';
         $pool = str_shuffle($pool);
         $str = '';
+
         for($i = 0; $i < $length; $i++) {
             $pos = rand(0, strlen($pool) - 1);
             $str .= $pool[$pos];
         }
+
         return $str;
     }
 }

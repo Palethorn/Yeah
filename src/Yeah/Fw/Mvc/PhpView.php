@@ -2,6 +2,8 @@
 
 namespace Yeah\Fw\Mvc;
 
+use Yeah\Fw\Http\Response;
+
 class PhpView implements ViewInterface {
 
     public $params = array();
@@ -111,7 +113,7 @@ class PhpView implements ViewInterface {
     public function render() {
         $this->renderView();
         $this->renderLayout();
-        return $this->content;
+        return new Response($this->content);
     }
 
     /**
@@ -143,11 +145,14 @@ class PhpView implements ViewInterface {
         if(!$this->template) {
             return;
         }
+
         $this->template = str_replace('/', DIRECTORY_SEPARATOR, $this->template);
         $view = $this->template . '.php';
+        
         if(!file_exists($this->views_dir . DIRECTORY_SEPARATOR . $view)) {
             throw new \Exception('View not found.', 500, null);
         }
+        
         ob_start();
         require_once $this->views_dir . DIRECTORY_SEPARATOR . $view;
         $this->content = ob_get_contents();
