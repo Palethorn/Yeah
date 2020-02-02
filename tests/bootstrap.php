@@ -1,6 +1,6 @@
 <?php
 
-if(PHP_MAJOR_VERSION == 7) {
+if(PHP_MAJOR_VERSION >= 7) {
     class TestCase extends PHPUnit\Framework\TestCase {}
 } else {
     class TestCase extends PHPUnit_Framework_TestCase {}
